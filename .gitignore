@@ -13,6 +13,10 @@ out/
 # vercel
 .vercel
 
+# uploaded product images (local dev only — use Vercel Blob in production)
+public/uploads/*
+!public/uploads/.gitkeep
+
 # misc
 .DS_Store
 *.pem
