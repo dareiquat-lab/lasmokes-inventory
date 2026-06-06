@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import Image from "next/image";
 import { Upload, X, Camera, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +10,42 @@ interface ImageUploadProps {
   category?: string;
 }
 
-export function ImageUpload({ currentImageUrl, onImageChange, category }: ImageUploadProps) {
+// Resize + compress to max 600px wide/tall, JPEG 82% — keeps files under ~80KB
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const MAX = 600;
+        let { width, height } = img;
+
+        if (width > MAX || height > MAX) {
+          if (width > height) {
+            height = Math.round((height * MAX) / width);
+            width = MAX;
+          } else {
+            width = Math.round((width * MAX) / height);
+            height = MAX;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+export function ImageUpload({ currentImageUrl, onImageChange }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
@@ -24,24 +58,22 @@ export function ImageUpload({ currentImageUrl, onImageChange, category }: ImageU
       setError("Only JPEG, PNG, WebP, and GIF are allowed.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError("File too large. Maximum size is 5MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File too large. Maximum size is 10MB.");
       return;
     }
 
     setError("");
     setIsUploading(true);
 
-    // Show local preview immediately
-    const localUrl = URL.createObjectURL(file);
-    setPreview(localUrl);
-
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const compressed = await compressImage(file);
+      setPreview(compressed);
+
       const res = await fetch("/api/upload", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: compressed, mimeType: "image/jpeg" }),
       });
 
       if (!res.ok) {
@@ -52,11 +84,9 @@ export function ImageUpload({ currentImageUrl, onImageChange, category }: ImageU
       const { url } = await res.json();
       setPreview(url);
       onImageChange(url);
-      URL.revokeObjectURL(localUrl);
     } catch (err) {
       setPreview(currentImageUrl || null);
       setError(err instanceof Error ? err.message : "Upload failed");
-      URL.revokeObjectURL(localUrl);
     } finally {
       setIsUploading(false);
     }
@@ -81,12 +111,8 @@ export function ImageUpload({ currentImageUrl, onImageChange, category }: ImageU
 
       {preview ? (
         <div className="relative w-full aspect-square max-w-[200px] rounded-xl overflow-hidden border border-[#2a2a2a] bg-[#1a1a1a] group">
-          <Image
-            src={preview}
-            alt="Product"
-            fill
-            className="object-cover"
-          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview} alt="Product" className="w-full h-full object-cover" />
           {isUploading && (
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
               <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -158,7 +184,7 @@ export function ImageUpload({ currentImageUrl, onImageChange, category }: ImageU
       )}
 
       <p className="text-[10px] text-gray-600">
-        JPEG, PNG, WebP, GIF · Max 5MB
+        JPEG, PNG, WebP, GIF · Auto-compressed on upload
       </p>
     </div>
   );

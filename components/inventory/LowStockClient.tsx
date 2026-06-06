@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { AlertTriangle, Edit2, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+
 import { CategoryBadge } from "@/components/ui/Badge";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { Modal } from "@/components/ui/Modal";
@@ -114,7 +114,7 @@ export function LowStockClient() {
                   <td className="table-cell">
                     {product.image_url ? (
                       <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#2a2a2a]">
-                        <Image src={product.image_url} alt={product.product_name} width={32} height={32} className="w-full h-full object-cover" />
+                        <img src={product.image_url} alt={product.product_name} className="w-full h-full object-cover" />
                       </div>
                     ) : (
                       <CategoryIcon category={product.category} size="sm" />
