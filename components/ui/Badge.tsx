@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { CATEGORY_COLORS } from "@/types";
 
 interface BadgeProps {
   children: React.ReactNode;
@@ -9,24 +8,23 @@ interface BadgeProps {
 
 export function Badge({ children, className, variant = "default" }: BadgeProps) {
   const variantClasses = {
-    default: "bg-gray-500/10 text-gray-400 border-gray-500/20",
-    success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    danger: "bg-red-500/10 text-red-400 border-red-500/20",
-    info: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    default: "bg-[#1e1e2e] text-[#4a4a6a] border-[#2e2e4a]",
+    success: "bg-[#00ff8810] text-[#00ff88] border-[#00ff8830]",
+    warning: "bg-[#ffff0010] text-[#cccc00] border-[#ffff0030]",
+    danger:  "bg-[#ff336610] text-[#ff3366] border-[#ff336630]",
+    info:    "bg-[#00d4ff10] text-[#00d4ff] border-[#00d4ff30]",
   };
 
   return (
-    <span className={cn("badge", variantClasses[variant], className)}>
+    <span className={cn("badge font-orbitron", variantClasses[variant], className)}>
       {children}
     </span>
   );
 }
 
 export function CategoryBadge({ category }: { category: string }) {
-  const colorClass = CATEGORY_COLORS[category] || "bg-gray-500/10 text-gray-400 border-gray-500/20";
   return (
-    <span className={cn("badge", colorClass)}>
+    <span className="badge font-orbitron bg-[#00d4ff08] text-[#00d4ff] border-[#00d4ff20]">
       {category}
     </span>
   );
@@ -34,10 +32,10 @@ export function CategoryBadge({ category }: { category: string }) {
 
 export function StockBadge({ quantity, threshold = 10 }: { quantity: number; threshold?: number }) {
   if (quantity === 0) {
-    return <Badge variant="danger">Out of Stock</Badge>;
+    return <Badge variant="danger">Out</Badge>;
   }
   if (quantity <= threshold) {
-    return <Badge variant="warning">Low Stock</Badge>;
+    return <Badge variant="warning">Low</Badge>;
   }
-  return <Badge variant="success">In Stock</Badge>;
+  return <Badge variant="success">OK</Badge>;
 }

@@ -15,12 +15,12 @@ import type { Product } from "@/types";
 
 const productSchema = z.object({
   product_name: z.string().min(1, "Product name is required").max(200),
-  category: z.string().min(1, "Category is required"),
-  sku: z.string().min(1, "SKU is required").max(50),
-  quantity: z.coerce.number().int().min(0, "Quantity must be 0 or more"),
-  price: z.coerce.number().min(0, "Price must be 0 or more"),
-  barcode: z.string().optional(),
-  notes: z.string().optional(),
+  category:     z.string().min(1, "Category is required"),
+  sku:          z.string().min(1, "SKU is required").max(50),
+  quantity:     z.coerce.number().int().min(0, "Quantity must be 0 or more"),
+  price:        z.coerce.number().min(0, "Price must be 0 or more"),
+  barcode:      z.string().optional(),
+  notes:        z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -44,17 +44,17 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       product_name: product?.product_name || "",
-      category: product?.category || "",
-      sku: product?.sku || "",
-      quantity: product?.quantity ?? 0,
-      price: product?.price ?? 0,
-      barcode: product?.barcode || "",
-      notes: product?.notes || "",
+      category:     product?.category || "",
+      sku:          product?.sku || "",
+      quantity:     product?.quantity ?? 0,
+      price:        product?.price ?? 0,
+      barcode:      product?.barcode || "",
+      notes:        product?.notes || "",
     },
   });
 
@@ -80,8 +80,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
         .map((s: string) => parseInt(s.split("-")[1] || "0"))
         .filter((n: number) => !isNaN(n));
       const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
-      const sku = `${prefix}-${String(next).padStart(3, "0")}`;
-      setValue("sku", sku);
+      setValue("sku", `${prefix}-${String(next).padStart(3, "0")}`);
     } catch {
       // ignore
     } finally {
@@ -92,7 +91,6 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
   const onSubmit = async (data: ProductFormData) => {
     setIsSaving(true);
     setSaveError("");
-
     try {
       const payload = { ...data, image_url: imageUrl };
       const url = isEditing ? `/api/products/${product!.id}` : "/api/products";
@@ -141,10 +139,13 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main form */}
           <div className="lg:col-span-2 space-y-5">
-            <div className="card p-5 space-y-5">
-              <h2 className="text-sm font-semibold text-white border-b border-[#1f1f1f] pb-3">
-                Product Information
-              </h2>
+            <div className="card p-5 space-y-5 border-[#00ff8818]">
+              {/* Section heading */}
+              <div className="pb-3 border-b border-[#1e1e2e]">
+                <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a]">
+                  <span className="text-[#00ff8860]">&gt;</span> Product Information
+                </h2>
+              </div>
 
               <div>
                 <label className="label">Product Name *</label>
@@ -155,7 +156,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   className="input-field"
                 />
                 {errors.product_name && (
-                  <p className="text-red-400 text-xs mt-1">{errors.product_name.message}</p>
+                  <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.product_name.message}</p>
                 )}
               </div>
 
@@ -172,23 +173,25 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                   {errors.category && (
-                    <p className="text-red-400 text-xs mt-1">{errors.category.message}</p>
+                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.category.message}</p>
                   )}
                 </div>
 
                 <div>
                   <label className="label">
                     SKU *
-                    {skuSuggesting && <span className="text-emerald-400 ml-1 text-[10px]">Auto-generating...</span>}
+                    {skuSuggesting && (
+                      <span className="text-[#00ff88] ml-2 text-[9px] animate-pulse">Auto-generating...</span>
+                    )}
                   </label>
                   <input
                     {...register("sku")}
                     type="text"
                     placeholder="e.g. CIG-044"
-                    className="input-field font-mono"
+                    className="input-field"
                   />
                   {errors.sku && (
-                    <p className="text-red-400 text-xs mt-1">{errors.sku.message}</p>
+                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.sku.message}</p>
                   )}
                 </div>
               </div>
@@ -204,14 +207,14 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     className="input-field"
                   />
                   {errors.quantity && (
-                    <p className="text-red-400 text-xs mt-1">{errors.quantity.message}</p>
+                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.quantity.message}</p>
                   )}
                 </div>
 
                 <div>
                   <label className="label">Price *</label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-[#2e2e4a] text-sm">$</span>
                     <input
                       {...register("price")}
                       type="number"
@@ -222,7 +225,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     />
                   </div>
                   {errors.price && (
-                    <p className="text-red-400 text-xs mt-1">{errors.price.message}</p>
+                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.price.message}</p>
                   )}
                 </div>
               </div>
@@ -233,9 +236,11 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   {...register("barcode")}
                   type="text"
                   placeholder="e.g. 012345678901"
-                  className="input-field font-mono"
+                  className="input-field"
                 />
-                <p className="text-[10px] text-gray-600 mt-1">For future barcode scanner support</p>
+                <p className="font-jetbrains text-[9px] text-[#1e1e2e] mt-1">
+                  For barcode scanner support
+                </p>
               </div>
 
               <div>
@@ -253,7 +258,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
           {/* Sidebar */}
           <div className="space-y-5">
             {/* Image upload */}
-            <div className="card p-5">
+            <div className="card p-5 border-[#00ff8818]">
               <ImageUpload
                 currentImageUrl={imageUrl}
                 onImageChange={setImageUrl}
@@ -262,11 +267,13 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
             </div>
 
             {/* Actions */}
-            <div className="card p-5 space-y-3">
-              <h2 className="text-sm font-semibold text-white">Actions</h2>
+            <div className="card p-5 space-y-3 border-[#00ff8818]">
+              <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a]">
+                <span className="text-[#00ff8860]">&gt;</span> Actions
+              </h2>
 
               {saveError && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-3 py-2 text-xs">
+                <div className="font-jetbrains bg-[#ff336610] border border-[#ff336630] text-[#ff3366] clip-chamfer-sm px-3 py-2 text-xs">
                   {saveError}
                 </div>
               )}
@@ -278,12 +285,12 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
               >
                 {isSaving ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" />
+                    <Save className="w-3.5 h-3.5" />
                     {isEditing ? "Save Changes" : "Add Product"}
                   </>
                 )}
@@ -293,7 +300,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                 href="/inventory"
                 className="w-full btn-secondary flex items-center justify-center gap-2"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-3.5 h-3.5" />
                 Back to Inventory
               </Link>
 
@@ -303,7 +310,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   onClick={() => setShowDeleteConfirm(true)}
                   className="w-full btn-danger flex items-center justify-center gap-2 mt-2"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                   Delete Product
                 </button>
               )}
@@ -311,20 +318,22 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
 
             {/* Product meta */}
             {isEditing && product && (
-              <div className="card p-5 space-y-2">
-                <h2 className="text-sm font-semibold text-white mb-3">Product Info</h2>
-                <div className="text-xs space-y-2">
+              <div className="card p-5 space-y-2 border-[#00d4ff18]">
+                <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a] mb-3">
+                  <span className="text-[#00d4ff60]">&gt;</span> Record Info
+                </h2>
+                <div className="font-jetbrains text-xs space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">ID</span>
-                    <span className="text-gray-300 font-mono">#{product.id}</span>
+                    <span className="text-[#2e2e4a]">ID</span>
+                    <span className="text-[#00d4ff]">#{product.id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Created</span>
-                    <span className="text-gray-300">{new Date(product.created_at).toLocaleDateString()}</span>
+                    <span className="text-[#2e2e4a]">Created</span>
+                    <span className="text-[#4a4a6a]">{new Date(product.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Updated</span>
-                    <span className="text-gray-300">{new Date(product.updated_at).toLocaleDateString()}</span>
+                    <span className="text-[#2e2e4a]">Updated</span>
+                    <span className="text-[#4a4a6a]">{new Date(product.updated_at).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -339,7 +348,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
         onConfirm={handleDelete}
         title="Delete Product"
         message={`Are you sure you want to delete "${product?.product_name}"? This action cannot be undone.`}
-        confirmLabel="Delete Product"
+        confirmLabel="Delete"
         isLoading={isDeleting}
         isDanger
       />
