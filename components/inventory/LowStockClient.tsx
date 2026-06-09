@@ -131,7 +131,7 @@ export function LowStockClient() {
                   </td>
                   <td className="table-cell">
                     <Link
-                      href={`/products/${product.id}`}
+                      href={`/admin/products/${product.id}`}
                       className="font-jetbrains text-[#c0c0d8] hover:text-[#00ff88] font-bold transition-colors text-sm"
                     >
                       {product.product_name}
@@ -170,7 +170,7 @@ export function LowStockClient() {
                         Restock
                       </button>
                       <Link
-                        href={`/products/${product.id}`}
+                        href={`/admin/products/${product.id}`}
                         className="p-1.5 text-[#2e2e4a] hover:text-[#00ff88] hover:bg-[#00ff8810] clip-chamfer-sm transition-colors"
                       >
                         <Edit2 className="w-3.5 h-3.5" />

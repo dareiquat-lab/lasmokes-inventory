@@ -38,6 +38,50 @@ export interface DashboardStats {
   categoryBreakdown: { category: string; count: number }[];
 }
 
+export type OrderStatus = "new" | "contacted" | "ready" | "completed" | "cancelled";
+
+export interface OrderItem {
+  id: number;
+  order_id: number;
+  product_id: number | null;
+  product_name: string;
+  product_sku: string | null;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  notes: string | null;
+  status: OrderStatus;
+  created_at: string;
+  updated_at: string;
+  items?: OrderItem[];
+}
+
+export interface CartItem {
+  id: number;
+  product_name: string;
+  sku: string;
+  price: number;
+  image_url: string | null;
+  category: string;
+  quantity: number;
+  stock: number;
+}
+
+export const ORDER_STATUSES: { value: OrderStatus; label: string; color: string }[] = [
+  { value: "new",       label: "New",       color: "#00d4ff" },
+  { value: "contacted", label: "Contacted", color: "#ff00ff" },
+  { value: "ready",     label: "Ready",     color: "#ffff00" },
+  { value: "completed", label: "Completed", color: "#00ff88" },
+  { value: "cancelled", label: "Cancelled", color: "#ff3366" },
+];
+
 export const CATEGORIES = [
   "Cigarettes",
   "Cigars",

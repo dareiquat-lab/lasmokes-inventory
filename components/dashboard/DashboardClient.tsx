@@ -157,7 +157,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/products/new" className="btn-primary flex items-center gap-1.5">
+          <Link href="/admin/products/new" className="btn-primary flex items-center gap-1.5">
             <PlusCircle className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Add Item</span>
           </Link>
@@ -259,7 +259,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
               (stats.recentlyUpdated ?? []).map((product) => (
                 <Link
                   key={product.id}
-                  href={`/products/${product.id}`}
+                  href={`/admin/products/${product.id}`}
                   className="flex items-start gap-3 group"
                 >
                   <CategoryIcon category={product.category} size="sm" />
@@ -277,7 +277,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
             )}
           </div>
           <Link
-            href="/inventory"
+            href="/admin/inventory"
             className="mt-4 font-orbitron text-[9px] text-[#00ff88] hover:text-[#33ffaa] flex items-center gap-1 transition-colors uppercase tracking-widest"
           >
             View all →
@@ -304,7 +304,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
             </p>
           </div>
           <Link
-            href="/low-stock"
+            href="/admin/low-stock"
             className="font-orbitron text-[9px] text-[#ff3366] font-black border border-[#ff336640] px-3 py-1.5 uppercase tracking-widest hover:bg-[#ff336615] transition-colors clip-chamfer-sm flex-shrink-0"
           >
             View →
@@ -326,7 +326,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           {(stats.categoryBreakdown ?? []).map((item) => (
             <Link
               key={item.category}
-              href={`/inventory?category=${encodeURIComponent(item.category)}`}
+              href={`/admin/inventory?category=${encodeURIComponent(item.category)}`}
               className="flex flex-col items-center gap-2 p-3 bg-[#0a0a0f] border border-[#1e1e2e] hover:border-[#00ff8840] hover:bg-[#00ff8808] transition-all group clip-chamfer-sm"
             >
               <CategoryIcon category={item.category} size="sm" />

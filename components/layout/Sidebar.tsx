@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -10,15 +10,18 @@ import {
   PlusCircle,
   Menu,
   X,
+  ShoppingCart,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { href: "/",             label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inventory",    label: "Inventory",  icon: Package         },
-  { href: "/low-stock",    label: "Low Stock",  icon: AlertTriangle   },
-  { href: "/products/new", label: "Add Item",   icon: PlusCircle      },
+  { href: "/admin",             label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/inventory",   label: "Inventory",  icon: Package         },
+  { href: "/admin/orders",      label: "Orders",     icon: ShoppingCart    },
+  { href: "/admin/low-stock",   label: "Low Stock",  icon: AlertTriangle   },
+  { href: "/admin/products/new",label: "Add Item",   icon: PlusCircle      },
 ];
 
 function NavLink({ href, label, icon: Icon, onClick }: {
@@ -98,6 +101,13 @@ export function Sidebar() {
 }
 
 function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClose?: boolean }) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    router.push("/admin/login");
+  };
+
   return (
     <>
       {/* Logo */}
@@ -112,7 +122,7 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
                 LA SMOKES
               </div>
               <div className="font-orbitron text-[8px] text-[#4a4a6a] leading-tight tracking-widest uppercase">
-                Inventory System
+                Admin Portal
               </div>
             </div>
           </div>
@@ -122,8 +132,6 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
             </button>
           )}
         </div>
-
-        {/* Decorative corner lines */}
         <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-[#00ff8840] to-transparent" />
       </div>
 
@@ -143,13 +151,33 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
         {navLinks.map((link) => (
           <NavLink key={link.href} {...link} onClick={onClose} />
         ))}
+
+        {/* Storefront link */}
+        <div className="font-orbitron text-[8px] text-[#2e2e4a] uppercase tracking-widest px-3 py-2 mt-3">
+          Storefront
+        </div>
+        <Link
+          href="/"
+          onClick={onClose}
+          className="sidebar-link sidebar-link-inactive"
+          target="_blank"
+        >
+          <Package className="w-4 h-4 flex-shrink-0" />
+          <span>View Store</span>
+        </Link>
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-[#00ff8810]">
-        <div className="font-jetbrains text-[9px] text-[#2e2e4a] leading-relaxed">
+      {/* Logout */}
+      <div className="p-3 border-t border-[#00ff8810]">
+        <button
+          onClick={handleLogout}
+          className="sidebar-link sidebar-link-inactive w-full text-left text-[#ff3366] hover:text-[#ff3366] hover:bg-[#ff336610] hover:border-l-[#ff336640]"
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          <span>Logout</span>
+        </button>
+        <div className="font-jetbrains text-[9px] text-[#2e2e4a] mt-3 leading-relaxed">
           <div className="text-[#00ff8840]">v1.0.0 // LASMOKES-INV</div>
-          <div>© 2025 Internal Use Only</div>
         </div>
       </div>
     </>

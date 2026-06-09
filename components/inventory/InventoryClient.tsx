@@ -219,7 +219,7 @@ export function InventoryClient() {
 
         {/* Actions */}
         <div className="flex gap-2">
-          <Link href="/products/new" className="btn-primary flex items-center gap-1.5 whitespace-nowrap">
+          <Link href="/admin/products/new" className="btn-primary flex items-center gap-1.5 whitespace-nowrap">
             <PlusCircle className="w-3.5 h-3.5" />
             Add Item
           </Link>
@@ -364,7 +364,7 @@ export function InventoryClient() {
                       <td className="table-cell max-w-[180px]">
                         <div>
                           <Link
-                            href={`/products/${product.id}`}
+                            href={`/admin/products/${product.id}`}
                             className="font-jetbrains text-[#c0c0d8] hover:text-[#00ff88] font-bold transition-colors text-sm line-clamp-1"
                           >
                             {product.product_name}
@@ -412,7 +412,7 @@ export function InventoryClient() {
                       <td className="table-cell">
                         <div className="flex items-center gap-1">
                           <Link
-                            href={`/products/${product.id}`}
+                            href={`/admin/products/${product.id}`}
                             className="p-1.5 text-[#2e2e4a] hover:text-[#00ff88] hover:bg-[#00ff8810] transition-colors clip-chamfer-sm"
                             title="Edit"
                           >

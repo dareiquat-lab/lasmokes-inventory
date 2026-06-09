@@ -107,7 +107,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
         throw new Error(err.error || "Failed to save product");
       }
 
-      router.push("/inventory");
+      router.push("/admin/inventory");
       router.refresh();
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Something went wrong");
@@ -121,7 +121,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
     setIsDeleting(true);
     try {
       await fetch(`/api/products/${product.id}`, { method: "DELETE" });
-      router.push("/inventory");
+      router.push("/admin/inventory");
       router.refresh();
     } catch {
       setIsDeleting(false);
@@ -297,7 +297,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
               </button>
 
               <Link
-                href="/inventory"
+                href="/admin/inventory"
                 className="w-full btn-secondary flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />

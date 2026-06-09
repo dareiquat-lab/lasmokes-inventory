@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   let stats: DashboardStats | null = null;
   try {
-    stats = await getDashboardStats() as DashboardStats;
+    stats = await getDashboardStats() as unknown as DashboardStats;
   } catch {
     stats = null;
   }
