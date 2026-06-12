@@ -172,8 +172,8 @@ export function OrdersClient() {
     return () => clearTimeout(debounceRef.current);
   }, [search]);
 
-  const fetchOrders = useCallback(async () => {
-    setLoading(true);
+  const fetchOrders = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const params = new URLSearchParams({
         search: debouncedSearch,
@@ -187,7 +187,7 @@ export function OrdersClient() {
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [debouncedSearch, statusFilter, page]);
 
@@ -204,11 +204,14 @@ export function OrdersClient() {
         body: JSON.stringify({ status }),
       });
       if (!res.ok) {
-        setData(prev); // revert on failure
-        console.error("Failed to update order status");
+        setData(prev);
+        console.error("Failed to update order status", res.status, await res.text());
+      } else {
+        // Silent re-fetch confirms DB state without showing a loading spinner
+        fetchOrders(true);
       }
     } catch (e) {
-      setData(prev); // revert on error
+      setData(prev);
       console.error(e);
     }
   };

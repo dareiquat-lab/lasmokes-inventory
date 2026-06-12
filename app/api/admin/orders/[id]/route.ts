@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { updateOrderStatus } from "@/lib/db";
 import type { OrderStatus } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 const VALID_STATUSES: OrderStatus[] = ["new", "contacted", "ready", "completed", "cancelled"];
 
 export async function PATCH(
