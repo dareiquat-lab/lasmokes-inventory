@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateOrderStatus } from "@/lib/db";
+import { neon } from "@neondatabase/serverless";
 import type { OrderStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -16,19 +16,34 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
     }
 
-    const { status } = await request.json();
+    const body = await request.json();
+    const status: OrderStatus = body.status;
+
     if (!VALID_STATUSES.includes(status)) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+      return NextResponse.json({ error: `Invalid status: "${status}"` }, { status: 400 });
     }
 
-    const order = await updateOrderStatus(id, status);
-    if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ error: "DATABASE_URL not configured" }, { status: 500 });
     }
 
-    return NextResponse.json(order);
-  } catch (error) {
-    console.error("PATCH /api/admin/orders/[id] error:", error);
-    return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
+    // Fresh connection per-request — avoids any module-level caching issues
+    const sql = neon(process.env.DATABASE_URL);
+    const rows = await sql`
+      UPDATE orders
+      SET status = ${status}, updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING *
+    `;
+
+    if (!rows[0]) {
+      return NextResponse.json({ error: `Order ${id} not found in DB` }, { status: 404 });
+    }
+
+    return NextResponse.json(rows[0]);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("PATCH /api/admin/orders/[id]:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

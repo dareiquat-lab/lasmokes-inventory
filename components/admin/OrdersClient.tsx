@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp, Bell } from "lucide-react";
+import { Search, Filter, X, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
 import type { Order, OrderStatus } from "@/types";
@@ -26,45 +26,51 @@ function StatusBadge({ status }: { status: OrderStatus }) {
   );
 }
 
-function StatusSelector({ orderId, current, onChange }: {
+function StatusSelector({ orderId, current, onChange, error }: {
   orderId: number;
   current: OrderStatus;
   onChange: (id: number, status: OrderStatus) => void;
+  error?: string;
 }) {
   const s = ORDER_STATUSES.find(o => o.value === current);
   const color = s?.color ?? "#00ff88";
 
   return (
-    <select
-      value={current}
-      onChange={e => onChange(orderId, e.target.value as OrderStatus)}
-      className="font-orbitron text-[9px] uppercase tracking-wider cursor-pointer focus:outline-none"
-      style={{
-        background: "#0d0d17",
-        border: `1px solid ${color}50`,
-        color,
-        colorScheme: "dark",
-        padding: "3px 8px",
-        borderRadius: "2px",
-        minWidth: "100px",
-      }}
-    >
-      {ORDER_STATUSES.map(st => (
-        <option
-          key={st.value}
-          value={st.value}
-          style={{ background: "#0d0d17", color: st.color }}
-        >
-          {st.label}
-        </option>
-      ))}
-    </select>
+    <div className="flex flex-col gap-1">
+      <select
+        value={current}
+        onChange={e => onChange(orderId, e.target.value as OrderStatus)}
+        className="font-orbitron text-[9px] uppercase tracking-wider cursor-pointer focus:outline-none"
+        style={{
+          background: "#0d0d17",
+          border: `1px solid ${error ? "#ff336650" : color + "50"}`,
+          color: error ? "#ff3366" : color,
+          colorScheme: "dark",
+          padding: "3px 8px",
+          borderRadius: "2px",
+          minWidth: "100px",
+        }}
+      >
+        {ORDER_STATUSES.map(st => (
+          <option key={st.value} value={st.value} style={{ background: "#0d0d17", color: st.color }}>
+            {st.label}
+          </option>
+        ))}
+      </select>
+      {error && (
+        <div className="flex items-center gap-1 font-jetbrains text-[8px] text-[#ff3366]">
+          <AlertCircle className="w-2.5 h-2.5 flex-shrink-0" />
+          <span className="truncate max-w-[120px]" title={error}>Failed</span>
+        </div>
+      )}
+    </div>
   );
 }
 
-function OrderRow({ order, onStatusChange }: {
+function OrderRow({ order, onStatusChange, statusError }: {
   order: Order;
   onStatusChange: (id: number, status: OrderStatus) => void;
+  statusError?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const items = order.items || [];
@@ -104,7 +110,12 @@ function OrderRow({ order, onStatusChange }: {
           <StatusBadge status={order.status} />
         </td>
         <td className="table-cell" onClick={e => e.stopPropagation()}>
-          <StatusSelector orderId={order.id} current={order.status} onChange={onStatusChange} />
+          <StatusSelector
+            orderId={order.id}
+            current={order.status}
+            onChange={onStatusChange}
+            error={statusError}
+          />
         </td>
         <td className="table-cell w-8">
           {expanded
@@ -118,7 +129,6 @@ function OrderRow({ order, onStatusChange }: {
         <tr className="bg-[#00ff8804]">
           <td colSpan={8} className="px-4 py-3">
             <div className="space-y-2">
-              {/* Items */}
               {items.length > 0 ? (
                 <div className="space-y-1.5">
                   <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a] mb-2">
@@ -137,7 +147,6 @@ function OrderRow({ order, onStatusChange }: {
                 <p className="font-jetbrains text-xs text-[#2e2e4a]">No items recorded</p>
               )}
 
-              {/* Notes */}
               {order.notes && (
                 <div className="mt-2 pt-2 border-t border-[#1e1e2e]">
                   <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a] mb-1">
@@ -154,18 +163,19 @@ function OrderRow({ order, onStatusChange }: {
   );
 }
 
-const POLL_INTERVAL = 15_000; // 15 seconds
+const POLL_MS = 8_000;
 
 export function OrdersClient() {
   const [data, setData] = useState<PaginatedOrders | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newCount, setNewCount] = useState(0); // pending new-order banner
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
+  // per-order error map: orderId → error message
+  const [statusErrors, setStatusErrors] = useState<Record<number, string>>({});
   const debounceRef = useRef<NodeJS.Timeout>();
-  const knownTotalRef = useRef<number | null>(null);
+  const isIdlePage = !debouncedSearch && !statusFilter && page === 1;
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -176,77 +186,79 @@ export function OrdersClient() {
     return () => clearTimeout(debounceRef.current);
   }, [search]);
 
-  const buildParams = useCallback(() => new URLSearchParams({
+  const getParams = useCallback(() => new URLSearchParams({
     search: debouncedSearch,
     status: statusFilter,
     page: String(page),
     limit: "25",
   }), [debouncedSearch, statusFilter, page]);
 
-  const fetchOrders = useCallback(async () => {
-    setLoading(true);
+  const fetchOrders = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
-      const res = await fetch(`/api/admin/orders?${buildParams()}`);
+      const res = await fetch(`/api/admin/orders?${getParams()}`);
       const json: PaginatedOrders = await res.json();
       setData(json);
-      knownTotalRef.current = json.total;
-      setNewCount(0);
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
-  }, [buildParams]);
+  }, [getParams]);
 
-  // Poll for new orders without disturbing the current view
-  const pollForNew = useCallback(async () => {
-    // Only poll on page 1 with no filters so count is meaningful
-    if (page !== 1 || debouncedSearch || statusFilter) return;
-    try {
-      const res = await fetch(`/api/admin/orders?page=1&limit=25`);
-      const json: PaginatedOrders = await res.json();
-      if (knownTotalRef.current !== null && json.total > knownTotalRef.current) {
-        setNewCount(json.total - knownTotalRef.current);
-      }
-    } catch {
-      // silent — polling failure is non-critical
-    }
-  }, [page, debouncedSearch, statusFilter]);
-
+  // Initial load
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  // Background poll every 15 s
+  // Auto-poll: silently refresh on idle page, do nothing otherwise
   useEffect(() => {
-    const id = setInterval(pollForNew, POLL_INTERVAL);
+    if (!isIdlePage) return;
+    const id = setInterval(() => fetchOrders(true), POLL_MS);
     return () => clearInterval(id);
-  }, [pollForNew]);
+  }, [isIdlePage, fetchOrders]);
 
-  const handleStatusChange = async (id: number, status: OrderStatus) => {
+  const handleStatusChange = useCallback(async (id: number, status: OrderStatus) => {
+    // Clear any previous error for this order
+    setStatusErrors(e => { const n = { ...e }; delete n[id]; return n; });
+
+    // Capture previous state for rollback
     const prev = data;
-    // Optimistic update — instant feedback
-    setData(d => d ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status } : o) } : d);
+
+    // Optimistic update — show instantly
+    setData(d => d
+      ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status } : o) }
+      : d
+    );
+
     try {
       const res = await fetch(`/api/admin/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
+
+      const json = await res.json();
+
       if (!res.ok) {
+        // Roll back optimistic update
         setData(prev);
-        console.error("Status update failed", res.status);
+        const msg: string = json?.error ?? `Error ${res.status}`;
+        setStatusErrors(e => ({ ...e, [id]: msg }));
+        console.error(`Status update failed for order ${id}:`, msg);
         return;
       }
-      // Use the server-returned row to confirm the exact persisted value
-      const updated: Order = await res.json();
+
+      // Confirm with server-returned row (preserves items from local state)
       setData(d => d
-        ? { ...d, orders: d.orders.map(o => o.id === id ? { ...updated, items: o.items } : o) }
+        ? { ...d, orders: d.orders.map(o => o.id === id ? { ...json, items: o.items } : o) }
         : d
       );
     } catch (e) {
       setData(prev);
+      const msg = e instanceof Error ? e.message : "Network error";
+      setStatusErrors(err => ({ ...err, [id]: msg }));
       console.error(e);
     }
-  };
+  }, [data]);
 
   return (
     <div className="space-y-4">
@@ -286,24 +298,17 @@ export function OrdersClient() {
 
       {/* Stats */}
       {data && (
-        <div className="font-jetbrains text-[10px] text-[#2e2e4a]">
-          <span className="text-[#00ff8860]">//</span>{" "}
-          {data.total.toLocaleString()} order{data.total !== 1 ? "s" : ""}
-          {search && ` matching "${search}"`}
-          {statusFilter && ` · status: ${statusFilter}`}
+        <div className="flex items-center gap-3 font-jetbrains text-[10px] text-[#2e2e4a]">
+          <span>
+            <span className="text-[#00ff8860]">//</span>{" "}
+            {data.total.toLocaleString()} order{data.total !== 1 ? "s" : ""}
+            {search && ` matching "${search}"`}
+            {statusFilter && ` · status: ${statusFilter}`}
+          </span>
+          {isIdlePage && (
+            <span className="text-[#1e1e2e]">· live</span>
+          )}
         </div>
-      )}
-
-      {/* New orders banner */}
-      {newCount > 0 && (
-        <button
-          onClick={fetchOrders}
-          className="w-full flex items-center justify-center gap-2 py-2 font-orbitron text-[10px] uppercase tracking-widest text-black bg-[#00ff88] hover:bg-[#33ffaa] transition-all animate-pulse"
-          style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}
-        >
-          <Bell className="w-3 h-3" />
-          {newCount} new order{newCount !== 1 ? "s" : ""} — click to load
-        </button>
       )}
 
       {/* Table */}
@@ -346,7 +351,12 @@ export function OrdersClient() {
                 </tr>
               ) : (
                 data.orders.map(order => (
-                  <OrderRow key={order.id} order={order} onStatusChange={handleStatusChange} />
+                  <OrderRow
+                    key={order.id}
+                    order={order}
+                    onStatusChange={handleStatusChange}
+                    statusError={statusErrors[order.id]}
+                  />
                 ))
               )}
             </tbody>
