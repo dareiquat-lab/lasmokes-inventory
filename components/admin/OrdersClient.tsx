@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { Search, Filter, X, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
 import type { Order, OrderStatus } from "@/types";
@@ -26,51 +26,40 @@ function StatusBadge({ status }: { status: OrderStatus }) {
   );
 }
 
-function StatusSelector({ orderId, current, onChange, error }: {
+function StatusSelector({ orderId, current, onChange }: {
   orderId: number;
   current: OrderStatus;
   onChange: (id: number, status: OrderStatus) => void;
-  error?: string;
 }) {
   const s = ORDER_STATUSES.find(o => o.value === current);
   const color = s?.color ?? "#00ff88";
-
   return (
-    <div className="flex flex-col gap-0.5">
-      <select
-        value={current}
-        onChange={e => onChange(orderId, e.target.value as OrderStatus)}
-        className="font-orbitron text-[9px] uppercase tracking-wider cursor-pointer focus:outline-none"
-        style={{
-          background: "#0d0d17",
-          border: `1px solid ${error ? "#ff336650" : color + "50"}`,
-          color: error ? "#ff3366" : color,
-          colorScheme: "dark",
-          padding: "3px 8px",
-          borderRadius: "2px",
-          minWidth: "100px",
-        }}
-      >
-        {ORDER_STATUSES.map(st => (
-          <option key={st.value} value={st.value} style={{ background: "#0d0d17", color: st.color }}>
-            {st.label}
-          </option>
-        ))}
-      </select>
-      {error && (
-        <div className="flex items-center gap-1 font-jetbrains text-[8px] text-[#ff3366]" title={error}>
-          <AlertCircle className="w-2.5 h-2.5 flex-shrink-0" />
-          <span className="truncate max-w-[120px]">Save failed</span>
-        </div>
-      )}
-    </div>
+    <select
+      value={current}
+      onChange={e => onChange(orderId, e.target.value as OrderStatus)}
+      className="font-orbitron text-[9px] uppercase tracking-wider cursor-pointer focus:outline-none"
+      style={{
+        background: "#0d0d17",
+        border: `1px solid ${color}50`,
+        color,
+        colorScheme: "dark",
+        padding: "3px 8px",
+        borderRadius: "2px",
+        minWidth: "100px",
+      }}
+    >
+      {ORDER_STATUSES.map(st => (
+        <option key={st.value} value={st.value} style={{ background: "#0d0d17", color: st.color }}>
+          {st.label}
+        </option>
+      ))}
+    </select>
   );
 }
 
-function OrderRow({ order, onStatusChange, statusError }: {
+function OrderRow({ order, onStatusChange }: {
   order: Order;
   onStatusChange: (id: number, status: OrderStatus) => void;
-  statusError?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const items = order.items || [];
@@ -110,12 +99,7 @@ function OrderRow({ order, onStatusChange, statusError }: {
           <StatusBadge status={order.status} />
         </td>
         <td className="table-cell" onClick={e => e.stopPropagation()}>
-          <StatusSelector
-            orderId={order.id}
-            current={order.status}
-            onChange={onStatusChange}
-            error={statusError}
-          />
+          <StatusSelector orderId={order.id} current={order.status} onChange={onStatusChange} />
         </td>
         <td className="table-cell w-8">
           {expanded
@@ -162,8 +146,6 @@ function OrderRow({ order, onStatusChange, statusError }: {
   );
 }
 
-const POLL_MS = 5_000;
-
 export function OrdersClient() {
   const [data, setData] = useState<PaginatedOrders | null>(null);
   const [loading, setLoading] = useState(true);
@@ -171,9 +153,8 @@ export function OrdersClient() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
-  const [statusErrors, setStatusErrors] = useState<Record<number, string>>({});
   const debounceRef = useRef<NodeJS.Timeout>();
-  // Track order IDs with in-flight PATCH requests so polling doesn't overwrite them
+  // Order IDs with in-flight PATCH — excluded from silent poll merges
   const pendingIds = useRef<Set<number>>(new Set());
 
   useEffect(() => {
@@ -185,27 +166,26 @@ export function OrdersClient() {
     return () => clearTimeout(debounceRef.current);
   }, [search]);
 
-  const getParams = useCallback(() => new URLSearchParams({
-    search: debouncedSearch,
-    status: statusFilter,
-    page: String(page),
-    limit: "25",
-  }), [debouncedSearch, statusFilter, page]);
-
   const fetchOrders = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const res = await fetch(`/api/admin/orders?${getParams()}`);
+      const params = new URLSearchParams({
+        search: debouncedSearch,
+        status: statusFilter,
+        page: String(page),
+        limit: "25",
+      });
+      const res = await fetch(`/api/admin/orders?${params}`);
       const json: PaginatedOrders = await res.json();
       setData(prev => {
+        // Don't overwrite rows that have in-flight PATCH requests
         if (!prev || pendingIds.current.size === 0) return json;
-        // Preserve optimistic state for any orders currently being updated
         return {
           ...json,
-          orders: json.orders.map(serverOrder =>
-            pendingIds.current.has(serverOrder.id)
-              ? (prev.orders.find(o => o.id === serverOrder.id) ?? serverOrder)
-              : serverOrder
+          orders: json.orders.map(fresh =>
+            pendingIds.current.has(fresh.id)
+              ? (prev.orders.find(o => o.id === fresh.id) ?? fresh)
+              : fresh
           ),
         };
       });
@@ -214,74 +194,56 @@ export function OrdersClient() {
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [getParams]);
+  }, [debouncedSearch, statusFilter, page]);
 
-  // Initial load
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  // Poll every 5 s on the default view (page 1, no filters/search)
-  const isIdlePage = !debouncedSearch && !statusFilter && page === 1;
+  // Poll every 10 s — auto-refresh for new orders
   useEffect(() => {
-    if (!isIdlePage) return;
-    const id = setInterval(() => fetchOrders(true), POLL_MS);
+    const id = setInterval(() => fetchOrders(true), 10_000);
     return () => clearInterval(id);
-  }, [isIdlePage, fetchOrders]);
+  }, [fetchOrders]);
 
-  const handleStatusChange = useCallback(async (id: number, status: OrderStatus) => {
-    // Clear prior error for this order
-    setStatusErrors(e => { const n = { ...e }; delete n[id]; return n; });
+  const handleStatusChange = useCallback(async (orderId: number, status: OrderStatus) => {
+    const originalStatus = data?.orders.find(o => o.id === orderId)?.status;
 
-    // Remember original status in case we need to roll back
-    const originalStatus = data?.orders.find(o => o.id === id)?.status;
+    pendingIds.current.add(orderId);
 
-    // Mark as in-flight so polling won't overwrite it
-    pendingIds.current.add(id);
-
-    // Optimistic update — instant UI feedback
+    // Show new status immediately
     setData(d => d
-      ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status } : o) }
+      ? { ...d, orders: d.orders.map(o => o.id === orderId ? { ...o, status } : o) }
       : d
     );
 
     try {
-      const res = await fetch(`/api/admin/orders/${id}`, {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
 
-      const json = await res.json();
-
       if (!res.ok) {
-        // Roll back to original
-        if (originalStatus !== undefined) {
+        const err = await res.json().catch(() => ({}));
+        console.error("Status update failed:", err?.error ?? res.status);
+        // Revert to original on confirmed failure
+        if (originalStatus) {
           setData(d => d
-            ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status: originalStatus } : o) }
+            ? { ...d, orders: d.orders.map(o => o.id === orderId ? { ...o, status: originalStatus } : o) }
             : d
           );
         }
-        const errMsg: string = json?.error ?? `HTTP ${res.status}`;
-        setStatusErrors(e => ({ ...e, [id]: errMsg }));
-        console.error(`Order ${id} status update failed:`, errMsg);
-      } else {
-        // Confirm with server-returned row, preserve items from local state
+      }
+      // On success: optimistic value is already correct — no need to touch state
+    } catch (e) {
+      console.error(e);
+      if (originalStatus) {
         setData(d => d
-          ? { ...d, orders: d.orders.map(o => o.id === id ? { ...json, items: o.items } : o) }
+          ? { ...d, orders: d.orders.map(o => o.id === orderId ? { ...o, status: originalStatus } : o) }
           : d
         );
       }
-    } catch (err) {
-      if (originalStatus !== undefined) {
-        setData(d => d
-          ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status: originalStatus } : o) }
-          : d
-        );
-      }
-      const errMsg = err instanceof Error ? err.message : "Network error";
-      setStatusErrors(e => ({ ...e, [id]: errMsg }));
-      console.error(err);
     } finally {
-      pendingIds.current.delete(id);
+      pendingIds.current.delete(orderId);
     }
   }, [data]);
 
@@ -304,7 +266,6 @@ export function OrdersClient() {
             </button>
           )}
         </div>
-
         <div className="relative">
           <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2e2e4a] pointer-events-none" />
           <select
@@ -328,7 +289,6 @@ export function OrdersClient() {
           {data.total.toLocaleString()} order{data.total !== 1 ? "s" : ""}
           {search && ` matching "${search}"`}
           {statusFilter && ` · status: ${statusFilter}`}
-          {isIdlePage && <span className="text-[#1e1e2e]"> · live</span>}
         </div>
       )}
 
@@ -364,20 +324,13 @@ export function OrdersClient() {
                   <td colSpan={8} className="table-cell text-center py-16">
                     <div className="flex flex-col items-center gap-2">
                       <Search className="w-8 h-8 text-[#1e1e2e]" />
-                      <p className="font-orbitron text-xs text-[#2e2e4a] uppercase tracking-widest">
-                        No orders found
-                      </p>
+                      <p className="font-orbitron text-xs text-[#2e2e4a] uppercase tracking-widest">No orders found</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 data.orders.map(order => (
-                  <OrderRow
-                    key={order.id}
-                    order={order}
-                    onStatusChange={handleStatusChange}
-                    statusError={statusErrors[order.id]}
-                  />
+                  <OrderRow key={order.id} order={order} onStatusChange={handleStatusChange} />
                 ))
               )}
             </tbody>

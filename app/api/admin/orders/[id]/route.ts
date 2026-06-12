@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { updateOrderStatus } from "@/lib/db";
 import type { OrderStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -23,17 +23,12 @@ export async function PATCH(
       return NextResponse.json({ error: `Invalid status: "${status}"` }, { status: 400 });
     }
 
-    // Function-call form — same as getOrders, avoids any tagged-template issues with pooler
-    const rows = await sql(
-      "UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
-      [status, id]
-    );
-
-    if (!rows[0]) {
+    const order = await updateOrderStatus(id, status);
+    if (!order) {
       return NextResponse.json({ error: `Order ${id} not found` }, { status: 404 });
     }
 
-    return NextResponse.json(rows[0]);
+    return NextResponse.json(order);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("PATCH /api/admin/orders/[id]:", msg);
