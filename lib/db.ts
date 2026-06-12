@@ -344,9 +344,10 @@ export async function getOrderByNumber(orderNumber: string) {
 }
 
 export async function updateOrderStatus(id: number, status: OrderStatus) {
-  const result = await sql`
-    UPDATE orders SET status = ${status}, updated_at = NOW()
-    WHERE id = ${id} RETURNING *
-  `;
+  // Use function-call form (not tagged template) — matches what getOrders uses and works reliably with the pooler URL
+  const result = await sql(
+    "UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+    [status, id]
+  );
   return result[0] || null;
 }

@@ -36,7 +36,7 @@ function StatusSelector({ orderId, current, onChange, error }: {
   const color = s?.color ?? "#00ff88";
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-0.5">
       <select
         value={current}
         onChange={e => onChange(orderId, e.target.value as OrderStatus)}
@@ -58,9 +58,9 @@ function StatusSelector({ orderId, current, onChange, error }: {
         ))}
       </select>
       {error && (
-        <div className="flex items-center gap-1 font-jetbrains text-[8px] text-[#ff3366]">
+        <div className="flex items-center gap-1 font-jetbrains text-[8px] text-[#ff3366]" title={error}>
           <AlertCircle className="w-2.5 h-2.5 flex-shrink-0" />
-          <span className="truncate max-w-[120px]" title={error}>Failed</span>
+          <span className="truncate max-w-[120px]">Save failed</span>
         </div>
       )}
     </div>
@@ -146,7 +146,6 @@ function OrderRow({ order, onStatusChange, statusError }: {
               ) : (
                 <p className="font-jetbrains text-xs text-[#2e2e4a]">No items recorded</p>
               )}
-
               {order.notes && (
                 <div className="mt-2 pt-2 border-t border-[#1e1e2e]">
                   <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a] mb-1">
@@ -163,7 +162,7 @@ function OrderRow({ order, onStatusChange, statusError }: {
   );
 }
 
-const POLL_MS = 8_000;
+const POLL_MS = 5_000;
 
 export function OrdersClient() {
   const [data, setData] = useState<PaginatedOrders | null>(null);
@@ -172,10 +171,10 @@ export function OrdersClient() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
-  // per-order error map: orderId → error message
   const [statusErrors, setStatusErrors] = useState<Record<number, string>>({});
   const debounceRef = useRef<NodeJS.Timeout>();
-  const isIdlePage = !debouncedSearch && !statusFilter && page === 1;
+  // Track order IDs with in-flight PATCH requests so polling doesn't overwrite them
+  const pendingIds = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -198,7 +197,18 @@ export function OrdersClient() {
     try {
       const res = await fetch(`/api/admin/orders?${getParams()}`);
       const json: PaginatedOrders = await res.json();
-      setData(json);
+      setData(prev => {
+        if (!prev || pendingIds.current.size === 0) return json;
+        // Preserve optimistic state for any orders currently being updated
+        return {
+          ...json,
+          orders: json.orders.map(serverOrder =>
+            pendingIds.current.has(serverOrder.id)
+              ? (prev.orders.find(o => o.id === serverOrder.id) ?? serverOrder)
+              : serverOrder
+          ),
+        };
+      });
     } catch (e) {
       console.error(e);
     } finally {
@@ -209,7 +219,8 @@ export function OrdersClient() {
   // Initial load
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  // Auto-poll: silently refresh on idle page, do nothing otherwise
+  // Poll every 5 s on the default view (page 1, no filters/search)
+  const isIdlePage = !debouncedSearch && !statusFilter && page === 1;
   useEffect(() => {
     if (!isIdlePage) return;
     const id = setInterval(() => fetchOrders(true), POLL_MS);
@@ -217,13 +228,16 @@ export function OrdersClient() {
   }, [isIdlePage, fetchOrders]);
 
   const handleStatusChange = useCallback(async (id: number, status: OrderStatus) => {
-    // Clear any previous error for this order
+    // Clear prior error for this order
     setStatusErrors(e => { const n = { ...e }; delete n[id]; return n; });
 
-    // Capture previous state for rollback
-    const prev = data;
+    // Remember original status in case we need to roll back
+    const originalStatus = data?.orders.find(o => o.id === id)?.status;
 
-    // Optimistic update — show instantly
+    // Mark as in-flight so polling won't overwrite it
+    pendingIds.current.add(id);
+
+    // Optimistic update — instant UI feedback
     setData(d => d
       ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status } : o) }
       : d
@@ -239,24 +253,35 @@ export function OrdersClient() {
       const json = await res.json();
 
       if (!res.ok) {
-        // Roll back optimistic update
-        setData(prev);
-        const msg: string = json?.error ?? `Error ${res.status}`;
-        setStatusErrors(e => ({ ...e, [id]: msg }));
-        console.error(`Status update failed for order ${id}:`, msg);
-        return;
+        // Roll back to original
+        if (originalStatus !== undefined) {
+          setData(d => d
+            ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status: originalStatus } : o) }
+            : d
+          );
+        }
+        const errMsg: string = json?.error ?? `HTTP ${res.status}`;
+        setStatusErrors(e => ({ ...e, [id]: errMsg }));
+        console.error(`Order ${id} status update failed:`, errMsg);
+      } else {
+        // Confirm with server-returned row, preserve items from local state
+        setData(d => d
+          ? { ...d, orders: d.orders.map(o => o.id === id ? { ...json, items: o.items } : o) }
+          : d
+        );
       }
-
-      // Confirm with server-returned row (preserves items from local state)
-      setData(d => d
-        ? { ...d, orders: d.orders.map(o => o.id === id ? { ...json, items: o.items } : o) }
-        : d
-      );
-    } catch (e) {
-      setData(prev);
-      const msg = e instanceof Error ? e.message : "Network error";
-      setStatusErrors(err => ({ ...err, [id]: msg }));
-      console.error(e);
+    } catch (err) {
+      if (originalStatus !== undefined) {
+        setData(d => d
+          ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status: originalStatus } : o) }
+          : d
+        );
+      }
+      const errMsg = err instanceof Error ? err.message : "Network error";
+      setStatusErrors(e => ({ ...e, [id]: errMsg }));
+      console.error(err);
+    } finally {
+      pendingIds.current.delete(id);
     }
   }, [data]);
 
@@ -298,16 +323,12 @@ export function OrdersClient() {
 
       {/* Stats */}
       {data && (
-        <div className="flex items-center gap-3 font-jetbrains text-[10px] text-[#2e2e4a]">
-          <span>
-            <span className="text-[#00ff8860]">//</span>{" "}
-            {data.total.toLocaleString()} order{data.total !== 1 ? "s" : ""}
-            {search && ` matching "${search}"`}
-            {statusFilter && ` · status: ${statusFilter}`}
-          </span>
-          {isIdlePage && (
-            <span className="text-[#1e1e2e]">· live</span>
-          )}
+        <div className="font-jetbrains text-[10px] text-[#2e2e4a]">
+          <span className="text-[#00ff8860]">//</span>{" "}
+          {data.total.toLocaleString()} order{data.total !== 1 ? "s" : ""}
+          {search && ` matching "${search}"`}
+          {statusFilter && ` · status: ${statusFilter}`}
+          {isIdlePage && <span className="text-[#1e1e2e]"> · live</span>}
         </div>
       )}
 
@@ -363,7 +384,6 @@ export function OrdersClient() {
           </table>
         </div>
 
-        {/* Pagination */}
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-[#1e1e2e]">
             <span className="font-jetbrains text-[10px] text-[#2e2e4a]">
