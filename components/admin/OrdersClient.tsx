@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Filter, X, ChevronDown, ChevronUp, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
 import type { Order, OrderStatus } from "@/types";
@@ -154,14 +154,18 @@ function OrderRow({ order, onStatusChange }: {
   );
 }
 
+const POLL_INTERVAL = 15_000; // 15 seconds
+
 export function OrdersClient() {
   const [data, setData] = useState<PaginatedOrders | null>(null);
   const [loading, setLoading] = useState(true);
+  const [newCount, setNewCount] = useState(0); // pending new-order banner
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const debounceRef = useRef<NodeJS.Timeout>();
+  const knownTotalRef = useRef<number | null>(null);
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -172,30 +176,54 @@ export function OrdersClient() {
     return () => clearTimeout(debounceRef.current);
   }, [search]);
 
-  const fetchOrders = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
+  const buildParams = useCallback(() => new URLSearchParams({
+    search: debouncedSearch,
+    status: statusFilter,
+    page: String(page),
+    limit: "25",
+  }), [debouncedSearch, statusFilter, page]);
+
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
     try {
-      const params = new URLSearchParams({
-        search: debouncedSearch,
-        status: statusFilter,
-        page: String(page),
-        limit: "25",
-      });
-      const res = await fetch(`/api/admin/orders?${params}`);
-      const json = await res.json();
+      const res = await fetch(`/api/admin/orders?${buildParams()}`);
+      const json: PaginatedOrders = await res.json();
       setData(json);
+      knownTotalRef.current = json.total;
+      setNewCount(0);
     } catch (e) {
       console.error(e);
     } finally {
-      if (!silent) setLoading(false);
+      setLoading(false);
     }
-  }, [debouncedSearch, statusFilter, page]);
+  }, [buildParams]);
+
+  // Poll for new orders without disturbing the current view
+  const pollForNew = useCallback(async () => {
+    // Only poll on page 1 with no filters so count is meaningful
+    if (page !== 1 || debouncedSearch || statusFilter) return;
+    try {
+      const res = await fetch(`/api/admin/orders?page=1&limit=25`);
+      const json: PaginatedOrders = await res.json();
+      if (knownTotalRef.current !== null && json.total > knownTotalRef.current) {
+        setNewCount(json.total - knownTotalRef.current);
+      }
+    } catch {
+      // silent — polling failure is non-critical
+    }
+  }, [page, debouncedSearch, statusFilter]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
+  // Background poll every 15 s
+  useEffect(() => {
+    const id = setInterval(pollForNew, POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [pollForNew]);
+
   const handleStatusChange = async (id: number, status: OrderStatus) => {
     const prev = data;
-    // Optimistic update — reflect change immediately
+    // Optimistic update — instant feedback
     setData(d => d ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status } : o) } : d);
     try {
       const res = await fetch(`/api/admin/orders/${id}`, {
@@ -205,11 +233,15 @@ export function OrdersClient() {
       });
       if (!res.ok) {
         setData(prev);
-        console.error("Failed to update order status", res.status, await res.text());
-      } else {
-        // Silent re-fetch confirms DB state without showing a loading spinner
-        fetchOrders(true);
+        console.error("Status update failed", res.status);
+        return;
       }
+      // Use the server-returned row to confirm the exact persisted value
+      const updated: Order = await res.json();
+      setData(d => d
+        ? { ...d, orders: d.orders.map(o => o.id === id ? { ...updated, items: o.items } : o) }
+        : d
+      );
     } catch (e) {
       setData(prev);
       console.error(e);
@@ -260,6 +292,18 @@ export function OrdersClient() {
           {search && ` matching "${search}"`}
           {statusFilter && ` · status: ${statusFilter}`}
         </div>
+      )}
+
+      {/* New orders banner */}
+      {newCount > 0 && (
+        <button
+          onClick={fetchOrders}
+          className="w-full flex items-center justify-center gap-2 py-2 font-orbitron text-[10px] uppercase tracking-widest text-black bg-[#00ff88] hover:bg-[#33ffaa] transition-all animate-pulse"
+          style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}
+        >
+          <Bell className="w-3 h-3" />
+          {newCount} new order{newCount !== 1 ? "s" : ""} — click to load
+        </button>
       )}
 
       {/* Table */}
