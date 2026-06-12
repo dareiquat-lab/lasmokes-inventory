@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { Search, Filter, X, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
 import type { Order, OrderStatus } from "@/types";
@@ -31,60 +31,34 @@ function StatusSelector({ orderId, current, onChange }: {
   current: OrderStatus;
   onChange: (id: number, status: OrderStatus) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const [updating, setUpdating] = useState(false);
-
-  const select = async (status: OrderStatus) => {
-    if (status === current) { setOpen(false); return; }
-    setUpdating(true);
-    setOpen(false);
-    await onChange(orderId, status);
-    setUpdating(false);
-  };
+  const s = ORDER_STATUSES.find(o => o.value === current);
+  const color = s?.color ?? "#00ff88";
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        disabled={updating}
-        className="flex items-center gap-1.5 font-orbitron text-[9px] uppercase tracking-wider border px-2 py-1 clip-chamfer-sm transition-all disabled:opacity-40"
-        style={{
-          borderColor: "#00ff8830",
-          color: "#00ff88",
-          background: "#00ff8808",
-        }}
-      >
-        {updating ? (
-          <RefreshCw className="w-3 h-3 animate-spin" />
-        ) : (
-          <>
-            <StatusBadge status={current} />
-            <ChevronDown className="w-3 h-3" />
-          </>
-        )}
-      </button>
-
-      {open && (
-        <div
-          className="absolute right-0 top-full mt-1 z-20 bg-[#0d0d17] border border-[#00ff8830] min-w-[130px] shadow-[0_0_20px_#00ff8820]"
-          style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
+    <select
+      value={current}
+      onChange={e => onChange(orderId, e.target.value as OrderStatus)}
+      className="font-orbitron text-[9px] uppercase tracking-wider cursor-pointer focus:outline-none"
+      style={{
+        background: "#0d0d17",
+        border: `1px solid ${color}50`,
+        color,
+        colorScheme: "dark",
+        padding: "3px 8px",
+        borderRadius: "2px",
+        minWidth: "100px",
+      }}
+    >
+      {ORDER_STATUSES.map(st => (
+        <option
+          key={st.value}
+          value={st.value}
+          style={{ background: "#0d0d17", color: st.color }}
         >
-          {ORDER_STATUSES.map(s => (
-            <button
-              key={s.value}
-              onClick={() => select(s.value)}
-              className={cn(
-                "w-full text-left px-3 py-2 font-orbitron text-[9px] uppercase tracking-wider transition-colors",
-                s.value === current ? "opacity-40 cursor-default" : "hover:bg-[#ffffff08]"
-              )}
-              style={{ color: s.color }}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+          {st.label}
+        </option>
+      ))}
+    </select>
   );
 }
 
@@ -220,14 +194,21 @@ export function OrdersClient() {
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
   const handleStatusChange = async (id: number, status: OrderStatus) => {
+    const prev = data;
+    // Optimistic update — reflect change immediately
+    setData(d => d ? { ...d, orders: d.orders.map(o => o.id === id ? { ...o, status } : o) } : d);
     try {
-      await fetch(`/api/admin/orders/${id}`, {
+      const res = await fetch(`/api/admin/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      fetchOrders();
+      if (!res.ok) {
+        setData(prev); // revert on failure
+        console.error("Failed to update order status");
+      }
     } catch (e) {
+      setData(prev); // revert on error
       console.error(e);
     }
   };
@@ -257,11 +238,12 @@ export function OrdersClient() {
           <select
             value={statusFilter}
             onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-            className="input-field pl-9 pr-8 appearance-none min-w-[160px] cursor-pointer"
+            className="input-field pl-9 pr-8 min-w-[160px] cursor-pointer"
+            style={{ colorScheme: "dark" }}
           >
-            <option value="">All Statuses</option>
+            <option value="" style={{ background: "#0d0d17", color: "#e0e0f0" }}>All Statuses</option>
             {ORDER_STATUSES.map(s => (
-              <option key={s.value} value={s.value}>{s.label}</option>
+              <option key={s.value} value={s.value} style={{ background: "#0d0d17", color: s.color }}>{s.label}</option>
             ))}
           </select>
         </div>

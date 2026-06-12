@@ -96,7 +96,7 @@ export function StorefrontNav() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="fixed top-16 left-0 right-0 z-40 bg-[#0a0a0f]/98 border-b border-[#00ff8818] p-4 space-y-1 md:hidden"
+            className="fixed top-16 left-0 right-0 z-40 bg-[#0a0a0f] border-b border-[#00ff8830] p-4 space-y-1 md:hidden"
           >
             {links.map(link => (
               <Link
@@ -116,7 +116,7 @@ export function StorefrontNav() {
             <Link
               href="/admin"
               onClick={() => setMobileOpen(false)}
-              className="block font-orbitron text-[8px] uppercase tracking-widest px-3 py-3 text-[#2e2e4a] border-l-2 border-transparent"
+              className="block font-orbitron text-[8px] uppercase tracking-widest px-3 py-3 text-[#4a4a6a] border-l-2 border-transparent hover:text-[#00ff88] hover:border-[#00ff8840] transition-all"
             >
               Admin Login
             </Link>

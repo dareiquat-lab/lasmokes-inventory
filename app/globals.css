@@ -127,10 +127,18 @@
     @apply w-full bg-[#0d0d17] border border-[#1e1e2e] text-[#e0e0f0] placeholder-[#2e2e4a] px-3 py-2 text-sm transition-all duration-150 focus:outline-none;
     font-family: var(--font-jetbrains), monospace;
     clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+    color-scheme: dark;
   }
   .input-field:focus {
     border-color: #00ff8880;
     box-shadow: 0 0 12px #00ff8820, inset 0 0 8px #00ff8808;
+  }
+
+  /* Native select options always dark */
+  select, select option {
+    background-color: #0d0d17;
+    color: #e0e0f0;
+    color-scheme: dark;
   }
 
   /* Label */
