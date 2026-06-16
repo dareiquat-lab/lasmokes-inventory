@@ -218,6 +218,7 @@
 
 /* ─── Utility overrides ──────────────────────────────────────── */
 @layer utilities {
+  .font-sans      { font-family: var(--font-inter), "Inter", system-ui, sans-serif; }
   .font-inter     { font-family: var(--font-inter), "Inter", system-ui, sans-serif; }
   .font-jetbrains { font-family: var(--font-jetbrains), "JetBrains Mono", monospace; }
   .font-orbitron  { font-family: var(--font-inter), "Inter", system-ui, sans-serif; }

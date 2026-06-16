@@ -88,7 +88,7 @@ export function LowStockClient() {
         >
           <TrendingUp className="w-8 h-8 text-green-500" />
         </div>
-        <p className="font-sans text-sm font-black text-green-600 uppercase tracking-widest mb-1">
+        <p className="font-sans text-sm font-black text-[#00856f] uppercase tracking-widest mb-1">
           All Stocked Up
         </p>
         <p className="font-jetbrains text-[#4a5568] text-sm">No products are running low on stock.</p>

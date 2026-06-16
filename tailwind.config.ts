@@ -22,6 +22,8 @@ const config: Config = {
         },
       },
       fontFamily: {
+        /* sans remapped so font-sans → Inter everywhere */
+        sans:      ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
         /* orbitron is remapped to Inter so all font-orbitron classes use Inter */
         orbitron:  ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
         inter:     ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
