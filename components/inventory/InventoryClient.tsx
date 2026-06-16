@@ -165,16 +165,16 @@ export function InventoryClient() {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortBy !== field) return <ChevronUp className="w-3 h-3 text-[#2e2e4a]" />;
+    if (sortBy !== field) return <ChevronUp className="w-3 h-3 text-[#babecc]" />;
     return sortOrder === "asc"
-      ? <ChevronUp className="w-3 h-3 text-[#00ff88]" />
-      : <ChevronDown className="w-3 h-3 text-[#00ff88]" />;
+      ? <ChevronUp className="w-3 h-3 text-[#ff4757]" />
+      : <ChevronDown className="w-3 h-3 text-[#ff4757]" />;
   };
 
   const SortHeader = ({ field, label }: { field: SortField; label: string }) => (
     <button
       onClick={() => handleSort(field)}
-      className="flex items-center gap-1 font-orbitron text-[9px] font-bold uppercase tracking-widest text-[#4a4a6a] hover:text-[#00ff88] transition-colors"
+      className="flex items-center gap-1 font-jetbrains text-[9px] font-bold uppercase tracking-widest text-[#4a5568] hover:text-[#ff4757] transition-colors"
     >
       {label}
       <SortIcon field={field} />
@@ -189,7 +189,7 @@ export function InventoryClient() {
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2e2e4a]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc]" />
           <input
             type="text"
             value={search}
@@ -198,7 +198,7 @@ export function InventoryClient() {
             className="input-field pl-9 pr-8"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2e2e4a] hover:text-[#00ff88]">
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#babecc] hover:text-[#ff4757]">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -206,7 +206,7 @@ export function InventoryClient() {
 
         {/* Category filter */}
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2e2e4a] pointer-events-none" />
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc] pointer-events-none" />
           <select
             value={category}
             onChange={e => { setCategory(e.target.value); setPage(1); }}
@@ -232,36 +232,38 @@ export function InventoryClient() {
 
       {/* Stats bar */}
       {data && (
-        <div className="flex items-center justify-between font-jetbrains text-[10px] text-[#2e2e4a]">
+        <div className="flex items-center justify-between font-jetbrains text-[10px] text-[#babecc]">
           <span>
-            <span className="text-[#00ff8860]">//</span>{" "}
             {data.total.toLocaleString()} record{data.total !== 1 ? "s" : ""}
             {search && ` matching "${search}"`}
             {category && ` in ${category}`}
           </span>
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2">
-              <span className="text-[#00ff88] font-bold">{selectedIds.size} selected</span>
+              <span className="text-[#ff4757] font-bold">{selectedIds.size} selected</span>
               <div className="flex gap-1.5">
                 <button
                   onClick={() => { setBulkAction("update_quantity"); setBulkModal(true); }}
-                  className="font-orbitron text-[9px] text-[#4a4a6a] hover:text-[#00ff88] bg-[#0d0d17] border border-[#1e1e2e] hover:border-[#00ff8840] px-2 py-1 clip-chamfer-sm transition-all"
+                  className="font-jetbrains text-[9px] text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] px-2 py-1 rounded-lg transition-all"
+                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
                 >
                   Update Qty
                 </button>
                 <button
                   onClick={() => { setBulkAction("update_category"); setBulkModal(true); }}
-                  className="font-orbitron text-[9px] text-[#4a4a6a] hover:text-[#00ff88] bg-[#0d0d17] border border-[#1e1e2e] hover:border-[#00ff8840] px-2 py-1 clip-chamfer-sm transition-all"
+                  className="font-jetbrains text-[9px] text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] px-2 py-1 rounded-lg transition-all"
+                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
                 >
                   Set Category
                 </button>
                 <button
                   onClick={() => { setBulkAction("delete"); setBulkModal(true); }}
-                  className="font-orbitron text-[9px] text-[#ff3366] bg-[#ff336610] border border-[#ff336630] hover:bg-[#ff336620] px-2 py-1 clip-chamfer-sm transition-all"
+                  className="font-jetbrains text-[9px] text-[#c0392b] bg-[#e0e5ec] px-2 py-1 rounded-lg transition-all"
+                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
                 >
                   Delete
                 </button>
-                <button onClick={() => setSelectedIds(new Set())} className="text-[#2e2e4a] hover:text-[#ff3366]">
+                <button onClick={() => setSelectedIds(new Set())} className="text-[#babecc] hover:text-[#c0392b]">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -271,15 +273,18 @@ export function InventoryClient() {
       )}
 
       {/* Table */}
-      <div className="card overflow-hidden">
+      <div
+        className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
+        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+      >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#1e1e2e]">
+              <tr style={{ borderBottom: "1px solid #babecc" }}>
                 <th className="table-header w-10">
-                  <button onClick={toggleSelectAll} className="text-[#2e2e4a] hover:text-[#00ff88] transition-colors">
+                  <button onClick={toggleSelectAll} className="text-[#babecc] hover:text-[#ff4757] transition-colors">
                     {allSelected
-                      ? <CheckSquare className="w-4 h-4 text-[#00ff88]" />
+                      ? <CheckSquare className="w-4 h-4 text-[#ff4757]" />
                       : <Square className="w-4 h-4" />
                     }
                   </button>
@@ -297,28 +302,33 @@ export function InventoryClient() {
             <tbody>
               {loading ? (
                 Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} className="border-b border-[#0d0d17] animate-pulse">
-                    <td className="table-cell"><div className="w-4 h-4 bg-[#0d0d17] rounded" /></td>
-                    <td className="table-cell"><div className="w-8 h-8 bg-[#0d0d17] clip-chamfer-sm" /></td>
-                    <td className="table-cell"><div className="h-4 bg-[#0d0d17] rounded w-40" /></td>
-                    <td className="table-cell hidden sm:table-cell"><div className="h-4 bg-[#0a0a0f] rounded w-20" /></td>
-                    <td className="table-cell hidden md:table-cell"><div className="h-4 bg-[#0a0a0f] rounded w-16" /></td>
-                    <td className="table-cell"><div className="h-4 bg-[#0d0d17] rounded w-8" /></td>
-                    <td className="table-cell hidden lg:table-cell"><div className="h-4 bg-[#0a0a0f] rounded w-12" /></td>
-                    <td className="table-cell hidden xl:table-cell"><div className="h-4 bg-[#0a0a0f] rounded w-20" /></td>
-                    <td className="table-cell"><div className="h-6 bg-[#0a0a0f] rounded w-12" /></td>
+                  <tr key={i} style={{ borderBottom: "1px solid #f0f2f5" }} className="animate-pulse">
+                    <td className="table-cell"><div className="w-4 h-4 bg-[#d1d9e6] rounded" /></td>
+                    <td className="table-cell"><div className="w-8 h-8 bg-[#d1d9e6] rounded-lg" /></td>
+                    <td className="table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-40" /></td>
+                    <td className="table-cell hidden sm:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-20" /></td>
+                    <td className="table-cell hidden md:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-16" /></td>
+                    <td className="table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-8" /></td>
+                    <td className="table-cell hidden lg:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-12" /></td>
+                    <td className="table-cell hidden xl:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-20" /></td>
+                    <td className="table-cell"><div className="h-6 bg-[#d1d9e6] rounded w-12" /></td>
                   </tr>
                 ))
               ) : data?.products.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="table-cell text-center py-16">
                     <div className="flex flex-col items-center gap-2">
-                      <Search className="w-8 h-8 text-[#1e1e2e]" />
-                      <p className="font-orbitron text-xs text-[#2e2e4a] uppercase tracking-widest">No records found</p>
+                      <div
+                        className="w-12 h-12 rounded-xl bg-[#e0e5ec] flex items-center justify-center"
+                        style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                      >
+                        <Search className="w-5 h-5 text-[#babecc]" />
+                      </div>
+                      <p className="font-jetbrains text-xs text-[#babecc] uppercase tracking-widest">No records found</p>
                       {(search || category) && (
                         <button
                           onClick={() => { setSearch(""); setCategory(""); }}
-                          className="font-orbitron text-[9px] text-[#00ff88] hover:text-[#33ffaa] uppercase tracking-widest"
+                          className="font-jetbrains text-[9px] text-[#ff4757] hover:text-[#ff6b7a] uppercase tracking-widest font-bold"
                         >
                           Clear filters
                         </button>
@@ -333,14 +343,15 @@ export function InventoryClient() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className={cn(
-                        "border-b border-[#0d0d17] hover:bg-[#00ff8804] transition-colors",
-                        selectedIds.has(product.id) && "bg-[#00ff8808]"
+                        "transition-colors",
+                        selectedIds.has(product.id) ? "bg-[#ff475708]" : "hover:bg-[#ff475704]"
                       )}
+                      style={{ borderBottom: "1px solid #f0f2f5" }}
                     >
                       <td className="table-cell">
-                        <button onClick={() => toggleSelect(product.id)} className="text-[#2e2e4a] hover:text-[#00ff88] transition-colors">
+                        <button onClick={() => toggleSelect(product.id)} className="text-[#babecc] hover:text-[#ff4757] transition-colors">
                           {selectedIds.has(product.id)
-                            ? <CheckSquare className="w-4 h-4 text-[#00ff88]" />
+                            ? <CheckSquare className="w-4 h-4 text-[#ff4757]" />
                             : <Square className="w-4 h-4" />
                           }
                         </button>
@@ -348,8 +359,8 @@ export function InventoryClient() {
                       <td className="table-cell">
                         {product.image_url ? (
                           <div
-                            className="w-8 h-8 overflow-hidden flex-shrink-0 border border-[#00ff8820]"
-                            style={{ clipPath: "polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))" }}
+                            className="w-8 h-8 overflow-hidden flex-shrink-0 rounded-lg"
+                            style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
                           >
                             <img
                               src={product.image_url}
@@ -365,7 +376,7 @@ export function InventoryClient() {
                         <div>
                           <Link
                             href={`/admin/products/${product.id}`}
-                            className="font-jetbrains text-[#c0c0d8] hover:text-[#00ff88] font-bold transition-colors text-sm line-clamp-1"
+                            className="font-sans text-[#2d3436] hover:text-[#ff4757] font-bold transition-colors text-sm line-clamp-1"
                           >
                             {product.product_name}
                           </Link>
@@ -379,11 +390,11 @@ export function InventoryClient() {
                       </td>
                       <td className="table-cell hidden md:table-cell">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-jetbrains text-xs text-[#4a4a6a]">{product.sku}</span>
+                          <span className="font-jetbrains text-xs text-[#4a5568]">{product.sku}</span>
                           {product.barcode && (
                             <button
                               onClick={() => setBarcodeModal(product)}
-                              className="text-[#2e2e4a] hover:text-[#00d4ff] transition-colors"
+                              className="text-[#babecc] hover:text-[#0984e3] transition-colors"
                               title="View barcode"
                             >
                               <Barcode className="w-3.5 h-3.5" />
@@ -395,32 +406,32 @@ export function InventoryClient() {
                         <div className="flex flex-col gap-1">
                           <span className={cn(
                             "font-jetbrains text-sm font-bold",
-                            product.quantity === 0   ? "text-[#ff3366]"  :
-                            product.quantity <= 10   ? "text-[#cccc00]"  : "text-[#00ff88]"
+                            product.quantity === 0  ? "text-[#c0392b]" :
+                            product.quantity <= 10  ? "text-[#c0602a]" : "text-[#00856f]"
                           )}>
                             {product.quantity}
                           </span>
                           <StockBadge quantity={product.quantity} />
                         </div>
                       </td>
-                      <td className="table-cell hidden lg:table-cell font-jetbrains text-[#4a4a6a]">
+                      <td className="table-cell hidden lg:table-cell font-jetbrains text-[#4a5568]">
                         {formatCurrency(product.price)}
                       </td>
-                      <td className="table-cell hidden xl:table-cell font-jetbrains text-[#2e2e4a] text-xs">
+                      <td className="table-cell hidden xl:table-cell font-jetbrains text-[#babecc] text-xs">
                         {formatDate(product.updated_at)}
                       </td>
                       <td className="table-cell">
                         <div className="flex items-center gap-1">
                           <Link
                             href={`/admin/products/${product.id}`}
-                            className="p-1.5 text-[#2e2e4a] hover:text-[#00ff88] hover:bg-[#00ff8810] transition-colors clip-chamfer-sm"
+                            className="p-1.5 text-[#babecc] hover:text-[#ff4757] rounded-lg transition-colors hover:bg-[#ff475710]"
                             title="Edit"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Link>
                           <button
                             onClick={() => setDeleteTarget(product)}
-                            className="p-1.5 text-[#2e2e4a] hover:text-[#ff3366] hover:bg-[#ff336610] transition-colors clip-chamfer-sm"
+                            className="p-1.5 text-[#babecc] hover:text-[#c0392b] rounded-lg transition-colors hover:bg-[#c0392b10]"
                             title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -437,15 +448,15 @@ export function InventoryClient() {
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[#1e1e2e]">
-            <span className="font-jetbrains text-[10px] text-[#2e2e4a]">
+          <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid #babecc" }}>
+            <span className="font-jetbrains text-[10px] text-[#babecc]">
               Page {data.page} of {data.totalPages} · {data.total} total
             </span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="p-1.5 text-[#2e2e4a] hover:text-[#00ff88] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#00ff8810] clip-chamfer-sm transition-colors"
+                className="p-1.5 text-[#babecc] hover:text-[#ff4757] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors hover:bg-[#ff475710]"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -460,11 +471,15 @@ export function InventoryClient() {
                     key={p}
                     onClick={() => setPage(p)}
                     className={cn(
-                      "w-7 h-7 font-orbitron text-[9px] clip-chamfer-sm transition-all",
+                      "w-7 h-7 font-jetbrains text-[9px] rounded-lg transition-all",
                       page === p
-                        ? "bg-[#00ff88] text-black font-black shadow-[0_0_10px_#00ff8860]"
-                        : "text-[#4a4a6a] hover:text-[#00ff88] hover:bg-[#00ff8810]"
+                        ? "bg-[#ff4757] text-white font-black"
+                        : "text-[#4a5568] hover:text-[#ff4757]"
                     )}
+                    style={page === p
+                      ? { boxShadow: "3px 3px 6px rgba(166,50,60,0.3), -2px -2px 4px rgba(255,100,110,0.2)" }
+                      : undefined
+                    }
                   >
                     {p}
                   </button>
@@ -474,7 +489,7 @@ export function InventoryClient() {
               <button
                 onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
                 disabled={page === data.totalPages}
-                className="p-1.5 text-[#2e2e4a] hover:text-[#00ff88] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#00ff8810] clip-chamfer-sm transition-colors"
+                className="p-1.5 text-[#babecc] hover:text-[#ff4757] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors hover:bg-[#ff475710]"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -506,7 +521,7 @@ export function InventoryClient() {
         }
       >
         <div className="space-y-4">
-          <p className="font-jetbrains text-[#4a4a6a] text-sm">
+          <p className="font-jetbrains text-[#4a5568] text-sm">
             Affects {selectedIds.size} selected product{selectedIds.size !== 1 ? "s" : ""}.
           </p>
 
@@ -539,7 +554,10 @@ export function InventoryClient() {
           )}
 
           {bulkAction === "delete" && (
-            <p className="font-jetbrains text-[#ff3366] text-sm bg-[#ff336610] border border-[#ff336630] p-3 clip-chamfer-sm">
+            <p
+              className="font-jetbrains text-[#c0392b] text-sm rounded-lg p-3"
+              style={{ background: "rgba(192,57,43,0.08)", border: "1px solid rgba(192,57,43,0.2)" }}
+            >
               ⚠ This will permanently delete {selectedIds.size} product{selectedIds.size !== 1 ? "s" : ""}. Cannot be undone.
             </p>
           )}
@@ -564,13 +582,16 @@ export function InventoryClient() {
       <Modal isOpen={!!barcodeModal} onClose={() => setBarcodeModal(null)} title="Barcode">
         {barcodeModal && (
           <div className="text-center space-y-3">
-            <p className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#00ff88]">
+            <p className="font-sans text-xs font-black uppercase tracking-wider text-[#ff4757]">
               {barcodeModal.product_name}
             </p>
-            <div className="bg-white p-4 inline-block clip-chamfer-sm">
-              <p className="font-mono text-black text-xl font-bold tracking-widest">{barcodeModal.barcode}</p>
+            <div
+              className="bg-[#e0e5ec] p-4 inline-block rounded-xl"
+              style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+            >
+              <p className="font-mono text-[#2d3436] text-xl font-bold tracking-widest">{barcodeModal.barcode}</p>
             </div>
-            <p className="font-jetbrains text-[#2e2e4a] text-xs">ID: {barcodeModal.barcode}</p>
+            <p className="font-jetbrains text-[#babecc] text-xs">ID: {barcodeModal.barcode}</p>
           </div>
         )}
       </Modal>

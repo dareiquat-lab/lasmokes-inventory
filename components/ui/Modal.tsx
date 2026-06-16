@@ -39,40 +39,30 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-md" 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-[#2d3436]/40 backdrop-blur-sm"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: "spring", damping: 30, stiffness: 400 }}
-            className={`relative w-full ${maxWidth} bg-[#0d0d17] border border-[#00ff8830] shadow-[0_0_30px_#00ff8815]`}
-            style={{
-              clipPath: "polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px))",
-            }}
+            className={`relative w-full ${maxWidth} bg-[#e0e5ec] rounded-2xl`}
+            style={{ boxShadow: "12px 12px 24px #babecc, -12px -12px 24px #ffffff" }}
           >
-            {/* Scanlines */}
-            <div
-              className="absolute inset-0 pointer-events-none z-0"
-              style={{
-                background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,136,0.012) 3px, rgba(0,255,136,0.012) 4px)",
-              }}
-            />
-
             {title && (
-              <div className="relative z-10 flex items-center justify-between px-5 py-4 border-b border-[#00ff8820]">
-                <h2 className="font-orbitron text-sm font-black uppercase tracking-wider text-[#00ff88]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#babecc]">
+                <h2 className="font-jetbrains text-sm font-black uppercase tracking-wider text-[#2d3436]">
                   {title}
                 </h2>
                 <button
                   onClick={onClose}
-                  className="text-[#2e2e4a] hover:text-[#00ff88] transition-colors"
+                  className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1 rounded-lg hover:bg-[#ff475710]"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             )}
-            <div className="relative z-10 p-5">{children}</div>
+            <div className="p-5">{children}</div>
           </motion.div>
         </div>
       )}
@@ -103,7 +93,7 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
-      <p className="font-jetbrains text-[#4a4a6a] text-sm mb-5">{message}</p>
+      <p className="font-jetbrains text-[#4a5568] text-sm mb-5">{message}</p>
       <div className="flex gap-3 justify-end">
         <button onClick={onClose} className="btn-secondary">
           Cancel

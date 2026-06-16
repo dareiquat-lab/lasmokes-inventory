@@ -8,15 +8,15 @@ interface BadgeProps {
 
 export function Badge({ children, className, variant = "default" }: BadgeProps) {
   const variantClasses = {
-    default: "bg-[#1e1e2e] text-[#4a4a6a] border-[#2e2e4a]",
-    success: "bg-[#00ff8810] text-[#00ff88] border-[#00ff8830]",
-    warning: "bg-[#ffff0010] text-[#cccc00] border-[#ffff0030]",
-    danger:  "bg-[#ff336610] text-[#ff3366] border-[#ff336630]",
-    info:    "bg-[#00d4ff10] text-[#00d4ff] border-[#00d4ff30]",
+    default: "bg-[#e0e5ec] text-[#4a5568] border border-[#babecc]",
+    success: "bg-[#00b89415] text-[#00856f] border border-[#00b89440]",
+    warning: "bg-[#e1705515] text-[#c0602a] border border-[#e1705540]",
+    danger:  "bg-[#ff475715] text-[#c0392b] border border-[#ff475740]",
+    info:    "bg-[#0984e315] text-[#0773c5] border border-[#0984e340]",
   };
 
   return (
-    <span className={cn("badge font-orbitron", variantClasses[variant], className)}>
+    <span className={cn("badge", variantClasses[variant], className)}>
       {children}
     </span>
   );
@@ -24,7 +24,7 @@ export function Badge({ children, className, variant = "default" }: BadgeProps) 
 
 export function CategoryBadge({ category }: { category: string }) {
   return (
-    <span className="badge font-orbitron bg-[#00d4ff08] text-[#00d4ff] border-[#00d4ff20]">
+    <span className="badge bg-[#0984e310] text-[#0773c5] border border-[#0984e330]">
       {category}
     </span>
   );

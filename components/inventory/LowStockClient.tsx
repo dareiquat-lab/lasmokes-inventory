@@ -60,11 +60,15 @@ export function LowStockClient() {
     return (
       <div className="space-y-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="card p-4 animate-pulse flex gap-3">
-            <div className="w-10 h-10 bg-[#0d0d17] clip-chamfer-sm" />
+          <div
+            key={i}
+            className="bg-[#e0e5ec] rounded-xl p-4 animate-pulse flex gap-3"
+            style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+          >
+            <div className="w-10 h-10 bg-[#d1d9e6] rounded-lg" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-[#0d0d17] rounded w-48" />
-              <div className="h-3 bg-[#0a0a0f] rounded w-24" />
+              <div className="h-4 bg-[#d1d9e6] rounded w-48" />
+              <div className="h-3 bg-[#d1d9e6] rounded w-24" />
             </div>
           </div>
         ))}
@@ -74,12 +78,20 @@ export function LowStockClient() {
 
   if (products.length === 0) {
     return (
-      <div className="card p-12 text-center border-[#00ff8820]">
-        <TrendingUp className="w-12 h-12 text-[#00ff88] mx-auto mb-3 drop-shadow-[0_0_10px_#00ff88]" />
-        <p className="font-orbitron text-sm font-black text-[#00ff88] uppercase tracking-widest mb-1">
+      <div
+        className="bg-[#e0e5ec] rounded-2xl p-12 text-center"
+        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+      >
+        <div
+          className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#e0e5ec] mb-3"
+          style={{ boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff" }}
+        >
+          <TrendingUp className="w-8 h-8 text-green-500" />
+        </div>
+        <p className="font-sans text-sm font-black text-green-600 uppercase tracking-widest mb-1">
           All Stocked Up
         </p>
-        <p className="font-jetbrains text-[#4a4a6a] text-sm">No products are running low on stock.</p>
+        <p className="font-jetbrains text-[#4a5568] text-sm">No products are running low on stock.</p>
       </div>
     );
   }
@@ -88,20 +100,26 @@ export function LowStockClient() {
     <div className="space-y-4">
       {/* Warning banner */}
       <div
-        className="border border-[#ffff0030] bg-[#ffff0008] px-4 py-3 flex items-center gap-2 clip-chamfer-md"
-        style={{ boxShadow: "0 0 15px #ffff0010" }}
+        className="bg-[#e0e5ec] rounded-xl px-4 py-3 flex items-center gap-2"
+        style={{
+          boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff",
+          border: "1px solid rgba(225,112,85,0.3)",
+        }}
       >
-        <AlertTriangle className="w-4 h-4 text-[#cccc00] flex-shrink-0 drop-shadow-[0_0_6px_#cccc00]" />
-        <p className="font-orbitron text-[10px] font-black text-[#cccc00] uppercase tracking-widest">
+        <AlertTriangle className="w-4 h-4 text-[#e17055] flex-shrink-0" />
+        <p className="font-jetbrains text-[10px] font-black text-[#c0602a] uppercase tracking-widest">
           {products.length} item{products.length !== 1 ? "s" : ""} at or below low stock threshold
         </p>
       </div>
 
-      <div className="card overflow-hidden">
+      <div
+        className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
+        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+      >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#1e1e2e]">
+              <tr style={{ borderBottom: "1px solid #babecc" }}>
                 <th className="table-header w-10">IMG</th>
                 <th className="table-header">Product</th>
                 <th className="table-header hidden sm:table-cell">Category</th>
@@ -115,13 +133,14 @@ export function LowStockClient() {
               {products.map((product) => (
                 <tr
                   key={product.id}
-                  className="border-b border-[#0d0d17] hover:bg-[#ffff0004] transition-colors"
+                  className="transition-colors hover:bg-[#e1705508]"
+                  style={{ borderBottom: "1px solid #f0f2f5" }}
                 >
                   <td className="table-cell">
                     {product.image_url ? (
                       <div
-                        className="w-8 h-8 overflow-hidden border border-[#ffff0020]"
-                        style={{ clipPath: "polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))" }}
+                        className="w-8 h-8 overflow-hidden rounded-lg"
+                        style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
                       >
                         <img src={product.image_url} alt={product.product_name} className="w-full h-full object-cover" />
                       </div>
@@ -132,7 +151,7 @@ export function LowStockClient() {
                   <td className="table-cell">
                     <Link
                       href={`/admin/products/${product.id}`}
-                      className="font-jetbrains text-[#c0c0d8] hover:text-[#00ff88] font-bold transition-colors text-sm"
+                      className="font-sans text-[#2d3436] hover:text-[#ff4757] font-bold transition-colors text-sm"
                     >
                       {product.product_name}
                     </Link>
@@ -141,37 +160,40 @@ export function LowStockClient() {
                     <CategoryBadge category={product.category} />
                   </td>
                   <td className="table-cell hidden md:table-cell">
-                    <span className="font-jetbrains text-xs text-[#4a4a6a]">{product.sku}</span>
+                    <span className="font-jetbrains text-xs text-[#4a5568]">{product.sku}</span>
                   </td>
                   <td className="table-cell">
                     <div className="flex items-center gap-2">
                       <span className={cn(
                         "font-jetbrains text-lg font-black",
-                        product.quantity === 0 ? "text-[#ff3366] drop-shadow-[0_0_6px_#ff3366]" : "text-[#cccc00]"
+                        product.quantity === 0 ? "text-[#c0392b]" : "text-[#c0602a]"
                       )}>
                         {product.quantity}
                       </span>
                       {product.quantity === 0 && (
-                        <span className="badge font-orbitron bg-[#ff336610] text-[#ff3366] border-[#ff336630]">
+                        <span
+                          className="badge text-[#c0392b] border-[#c0392b30] bg-[#c0392b10]"
+                        >
                           OUT
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="table-cell hidden lg:table-cell font-jetbrains text-[#4a4a6a]">
+                  <td className="table-cell hidden lg:table-cell font-jetbrains text-[#4a5568]">
                     {formatCurrency(product.price)}
                   </td>
                   <td className="table-cell">
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openQuickEdit(product)}
-                        className="font-orbitron text-[9px] text-[#00ff88] font-black bg-[#00ff8810] border border-[#00ff8830] hover:bg-[#00ff8820] px-2 py-1 clip-chamfer-sm transition-all uppercase tracking-wider"
+                        className="font-jetbrains text-[9px] text-white font-black bg-[#ff4757] px-2 py-1 rounded-lg transition-all uppercase tracking-wider hover:brightness-110 active:translate-y-px"
+                        style={{ boxShadow: "2px 2px 6px rgba(166,50,60,0.3), -1px -1px 3px rgba(255,100,110,0.2)" }}
                       >
                         Restock
                       </button>
                       <Link
                         href={`/admin/products/${product.id}`}
-                        className="p-1.5 text-[#2e2e4a] hover:text-[#00ff88] hover:bg-[#00ff8810] clip-chamfer-sm transition-colors"
+                        className="p-1.5 text-[#babecc] hover:text-[#ff4757] rounded-lg transition-colors hover:bg-[#ff475710]"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </Link>
@@ -193,10 +215,10 @@ export function LowStockClient() {
         {quickEditProduct && (
           <div className="space-y-4">
             <div>
-              <p className="font-orbitron text-xs font-black uppercase tracking-wider text-[#00ff88]">
+              <p className="font-sans text-xs font-black uppercase tracking-wider text-[#ff4757]">
                 {quickEditProduct.product_name}
               </p>
-              <p className="font-jetbrains text-[#4a4a6a] text-xs mt-0.5">
+              <p className="font-jetbrains text-[#4a5568] text-xs mt-0.5">
                 Current: {quickEditProduct.quantity} units
               </p>
             </div>

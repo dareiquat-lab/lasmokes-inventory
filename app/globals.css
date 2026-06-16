@@ -2,273 +2,243 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── CSS Variables ─────────────────────────────────────── */
+/* ─── Industrial Skeuomorphism Design Tokens ─────────────────── */
 :root {
-  color-scheme: dark;
-  --color-bg:       #0a0a0f;
-  --color-surface:  #0d0d17;
-  --color-border:   #1e1e2e;
-  --color-green:    #00ff88;
-  --color-magenta:  #ff00ff;
-  --color-cyan:     #00d4ff;
-  --color-muted:    #4a4a6a;
-  --color-text:     #e0e0f0;
+  --background:     #e0e5ec;
+  --foreground:     #f0f2f5;
+  --muted:          #d1d9e6;
+  --text:           #2d3436;
+  --text-muted:     #4a5568;
+  --accent:         #ff4757;
+  --accent-fg:      #ffffff;
+  --border-shadow:  #babecc;
+  --border-light:   #ffffff;
+  --border-dark:    #a3b1c6;
+
+  --shadow-card:     8px 8px 16px #babecc, -8px -8px 16px #ffffff;
+  --shadow-floating: 12px 12px 24px #babecc, -12px -12px 24px #ffffff, inset 1px 1px 0 rgba(255,255,255,0.5);
+  --shadow-pressed:  inset 6px 6px 12px #babecc, inset -6px -6px 12px #ffffff;
+  --shadow-recessed: inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff;
 }
 
-/* ─── Base ──────────────────────────────────────────────── */
+/* ─── Base ──────────────────────────────────────────────────── */
 @layer base {
   * { box-sizing: border-box; }
 
   html { scroll-behavior: smooth; }
 
   body {
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    font-family: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: var(--font-inter), "Inter", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   /* Scrollbar */
-  ::-webkit-scrollbar       { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: #05050a; }
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--muted); }
   ::-webkit-scrollbar-thumb {
-    background: #00ff8840;
-    border-radius: 2px;
+    background: var(--border-shadow);
+    border-radius: 3px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: #00ff8880; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-dark); }
 
   /* Selection */
   ::selection {
-    background: #00ff8830;
-    color: #00ff88;
+    background: rgba(255, 71, 87, 0.15);
+    color: var(--accent);
   }
 }
 
-/* ─── Component Classes ──────────────────────────────────── */
+/* ─── Component Classes ──────────────────────────────────────── */
 @layer components {
 
-  /* Card with chamfered top-right corner */
+  /* Card — neumorphic panel bolted to chassis */
   .card {
-    @apply bg-[#0d0d17] border border-[#1e1e2e] relative;
-    clip-path: polygon(
-      0 0,
-      calc(100% - 14px) 0,
-      100% 14px,
-      100% 100%,
-      14px 100%,
-      0 calc(100% - 14px)
-    );
+    @apply bg-[#e0e5ec] relative;
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
   }
 
-  .card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 3px,
-      rgba(0, 255, 136, 0.015) 3px,
-      rgba(0, 255, 136, 0.015) 4px
-    );
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Neon glow card variant */
-  .card-glow {
+  /* Elevated card */
+  .card-elevated {
     @apply card;
-    border-color: #00ff8830;
-    box-shadow: 0 0 20px #00ff8810, inset 0 0 20px #00ff8808;
+    box-shadow: var(--shadow-floating);
   }
 
-  /* Primary button – neon green */
+  /* Primary button — safety red, tactile press */
   .btn-primary {
-    @apply relative text-black font-bold px-4 py-2 text-xs uppercase tracking-widest transition-all duration-150 cursor-pointer;
-    background: var(--color-green);
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-    box-shadow: 0 0 12px #00ff8860;
+    @apply relative font-bold px-4 py-2.5 text-xs uppercase tracking-widest
+           transition-all duration-150 cursor-pointer rounded-lg;
+    background: var(--accent);
+    color: var(--accent-fg);
+    box-shadow: 4px 4px 8px rgba(166,50,60,0.35), -2px -2px 6px rgba(255,100,110,0.3);
+    border: 1px solid rgba(255,255,255,0.25);
   }
   .btn-primary:hover {
-    background: #33ffaa;
-    box-shadow: 0 0 20px #00ff88a0;
+    filter: brightness(1.08);
+    box-shadow: 6px 6px 12px rgba(166,50,60,0.4), -3px -3px 8px rgba(255,100,110,0.35);
+  }
+  .btn-primary:active {
+    transform: translateY(2px);
+    box-shadow: var(--shadow-pressed);
   }
   .btn-primary:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
     box-shadow: none;
   }
 
-  /* Secondary button – outlined */
+  /* Secondary button — chassis material */
   .btn-secondary {
-    @apply relative text-[#00ff88] font-bold px-4 py-2 text-xs uppercase tracking-widest border border-[#00ff8850] bg-transparent transition-all duration-150 cursor-pointer;
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    @apply relative font-bold px-4 py-2.5 text-xs uppercase tracking-widest
+           transition-all duration-150 cursor-pointer rounded-lg;
+    background: var(--background);
+    color: var(--text-muted);
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(255,255,255,0.7);
   }
   .btn-secondary:hover {
-    border-color: #00ff88;
-    background: #00ff8810;
-    box-shadow: 0 0 12px #00ff8840;
+    color: var(--accent);
+    box-shadow: var(--shadow-floating);
+  }
+  .btn-secondary:active {
+    transform: translateY(2px);
+    box-shadow: var(--shadow-pressed);
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
 
-  /* Danger button – magenta */
+  /* Danger button */
   .btn-danger {
-    @apply relative text-[#ff3366] font-bold px-4 py-2 text-xs uppercase tracking-widest border border-[#ff336640] bg-[#ff336610] transition-all duration-150 cursor-pointer;
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    @apply relative font-bold px-4 py-2.5 text-xs uppercase tracking-widest
+           transition-all duration-150 cursor-pointer rounded-lg;
+    background: var(--background);
+    color: #c0392b;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(192,57,43,0.2);
   }
   .btn-danger:hover {
-    border-color: #ff3366;
-    background: #ff336620;
-    box-shadow: 0 0 12px #ff336640;
+    background: rgba(192,57,43,0.06);
+    box-shadow: var(--shadow-floating);
+  }
+  .btn-danger:active {
+    transform: translateY(2px);
+    box-shadow: var(--shadow-pressed);
+  }
+  .btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
-  /* Input field */
+  /* Input field — recessed well machined into chassis */
   .input-field {
-    @apply w-full bg-[#0d0d17] border border-[#1e1e2e] text-[#e0e0f0] placeholder-[#2e2e4a] px-3 py-2 text-sm transition-all duration-150 focus:outline-none;
-    font-family: var(--font-jetbrains), monospace;
-    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-    color-scheme: dark;
+    @apply w-full px-4 py-3 text-sm transition-all duration-150
+           focus:outline-none rounded-lg;
+    background: var(--background);
+    color: var(--text);
+    border: none;
+    box-shadow: var(--shadow-recessed);
+    font-family: var(--font-jetbrains), "JetBrains Mono", monospace;
+  }
+  .input-field::placeholder {
+    color: var(--border-shadow);
+    opacity: 1;
   }
   .input-field:focus {
-    border-color: #00ff8880;
-    box-shadow: 0 0 12px #00ff8820, inset 0 0 8px #00ff8808;
+    box-shadow: var(--shadow-recessed), 0 0 0 2px var(--accent);
+  }
+  .input-field:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
-  /* Native select options always dark */
+  /* Native select */
   select, select option {
-    background-color: #0d0d17;
-    color: #e0e0f0;
-    color-scheme: dark;
+    background: var(--background);
+    color: var(--text);
   }
 
-  /* Label */
+  /* Label — stamped uppercase */
   .label {
-    @apply block text-[10px] font-bold uppercase tracking-widest text-[#4a4a6a] mb-1.5;
-    font-family: var(--font-orbitron), monospace;
+    @apply block text-[10px] font-bold uppercase tracking-widest mb-1.5;
+    color: var(--text-muted);
+    font-family: var(--font-jetbrains), monospace;
   }
 
   /* Badge base */
   .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border;
-    clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold
+           uppercase tracking-wider rounded-md;
+    box-shadow: 2px 2px 4px #babecc, -1px -1px 2px #ffffff;
+    background: var(--background);
   }
 
   /* Table header */
   .table-header {
     @apply text-[10px] font-bold uppercase tracking-widest text-left py-3 px-4;
-    color: var(--color-muted);
-    font-family: var(--font-orbitron), monospace;
+    color: var(--text-muted);
+    font-family: var(--font-jetbrains), monospace;
+    background: var(--muted);
   }
 
   /* Table cell */
   .table-cell {
-    @apply py-3 px-4 text-sm text-[#c0c0d8];
+    @apply py-3 px-4 text-sm;
+    color: var(--text);
   }
 
   /* Sidebar link */
   .sidebar-link {
-    @apply flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-150;
-    font-family: var(--font-orbitron), monospace;
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    @apply flex items-center gap-3 px-3 py-2.5 text-xs font-bold
+           uppercase tracking-widest transition-all duration-150 rounded-lg;
+    font-family: var(--font-jetbrains), monospace;
   }
 
   .sidebar-link-active {
-    background: #00ff8812;
-    color: var(--color-green);
-    border-left: 2px solid var(--color-green);
-    box-shadow: inset 0 0 16px #00ff8808, 0 0 12px #00ff8820;
+    color: var(--accent);
+    box-shadow: var(--shadow-pressed);
+    background: var(--background);
   }
 
   .sidebar-link-inactive {
-    color: var(--color-muted);
-    border-left: 2px solid transparent;
+    color: var(--text-muted);
   }
   .sidebar-link-inactive:hover {
-    color: var(--color-text);
-    background: #ffffff08;
-    border-left-color: #00ff8840;
-  }
-
-  /* Glitch heading utility */
-  .glitch {
-    animation: glitch 6s infinite;
-  }
-
-  /* Scanline overlay utility */
-  .scanlines {
-    position: relative;
-    overflow: hidden;
-  }
-  .scanlines::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.12) 2px,
-      rgba(0, 0, 0, 0.12) 4px
-    );
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  /* Neon text helpers */
-  .neon-green {
-    color: var(--color-green);
-    text-shadow: 0 0 8px #00ff88, 0 0 20px #00ff8880;
-  }
-  .neon-magenta {
-    color: var(--color-magenta);
-    text-shadow: 0 0 8px #ff00ff, 0 0 20px #ff00ff80;
-  }
-  .neon-cyan {
-    color: var(--color-cyan);
-    text-shadow: 0 0 8px #00d4ff, 0 0 20px #00d4ff80;
-  }
-
-  /* Corner accent */
-  .corner-tl::before,
-  .corner-br::after {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-color: var(--color-green);
-    border-style: solid;
-    opacity: 0.6;
-  }
-  .corner-tl::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-  .corner-br::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
-
-  /* Terminal cursor blink */
-  .cursor-blink::after {
-    content: '_';
-    animation: flicker 1s step-end infinite;
+    background: var(--background);
+    color: var(--text);
+    box-shadow: var(--shadow-card);
   }
 }
 
-/* ─── Utility overrides ─────────────────────────────────── */
+/* ─── Utility overrides ──────────────────────────────────────── */
 @layer utilities {
-  .font-orbitron { font-family: var(--font-orbitron), monospace; }
-  .font-jetbrains { font-family: var(--font-jetbrains), monospace; }
+  .font-inter     { font-family: var(--font-inter), "Inter", system-ui, sans-serif; }
+  .font-jetbrains { font-family: var(--font-jetbrains), "JetBrains Mono", monospace; }
+  .font-orbitron  { font-family: var(--font-inter), "Inter", system-ui, sans-serif; }
 
-  .clip-chamfer-sm {
-    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-  }
-  .clip-chamfer-md {
-    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-  }
-  .clip-chamfer-lg {
-    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-  }
+  .shadow-card     { box-shadow: var(--shadow-card); }
+  .shadow-floating { box-shadow: var(--shadow-floating); }
+  .shadow-pressed  { box-shadow: var(--shadow-pressed); }
+  .shadow-recessed { box-shadow: var(--shadow-recessed); }
 
-  .border-neon-green { border-color: #00ff8860; }
-  .border-neon-magenta { border-color: #ff00ff60; }
-  .border-neon-cyan { border-color: #00d4ff60; }
+  /* Keep clip-chamfer as no-ops so existing classes don't break layout */
+  .clip-chamfer-sm { border-radius: 8px; }
+  .clip-chamfer-md { border-radius: 16px; }
+  .clip-chamfer-lg { border-radius: 20px; }
 
-  .shadow-neon-green { box-shadow: 0 0 12px #00ff8850, 0 0 30px #00ff8820; }
-  .shadow-neon-magenta { box-shadow: 0 0 12px #ff00ff50, 0 0 30px #ff00ff20; }
-  .shadow-neon-cyan { box-shadow: 0 0 12px #00d4ff50, 0 0 30px #00d4ff20; }
+  /* Legacy neon border classes → subtle borders */
+  .border-neon-green  { border-color: #ff475730; }
+  .border-neon-magenta { border-color: #6c5ce730; }
+  .border-neon-cyan   { border-color: #0984e330; }
+
+  /* Legacy shadow classes → neumorphic */
+  .shadow-neon-green   { box-shadow: var(--shadow-card); }
+  .shadow-neon-magenta { box-shadow: var(--shadow-card); }
+  .shadow-neon-cyan    { box-shadow: var(--shadow-card); }
 }

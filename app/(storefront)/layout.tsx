@@ -7,7 +7,7 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
     <CartProvider>
       <StorefrontNav />
       <CartSheet />
-      <main className="pt-16 min-h-screen bg-[#0a0a0f]">
+      <main className="pt-16 min-h-screen bg-[#e0e5ec]">
         {children}
       </main>
     </CartProvider>

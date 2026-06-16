@@ -19,10 +19,10 @@ export default async function CategoriesPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
       <div className="mb-8">
-        <h1 className="font-orbitron text-2xl font-black text-[#e0e0f0] tracking-wider">
-          <span className="text-[#ff00ff60]">&gt;</span> CATEGORIES
+        <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
+          Categories
         </h1>
-        <p className="font-jetbrains text-xs text-[#4a4a6a] mt-1">
+        <p className="font-jetbrains text-xs text-[#4a5568] mt-1">
           Browse by product type
         </p>
       </div>
@@ -34,17 +34,17 @@ export default async function CategoriesPage() {
             <Link
               key={cat}
               href={`/products?category=${encodeURIComponent(cat)}`}
-              className="group flex flex-col items-center gap-3 p-6 bg-[#0d0d17] border border-[#1e1e2e] hover:border-[#00ff8840] hover:bg-[#00ff8808] transition-all"
-              style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}
+              className="group flex flex-col items-center gap-3 p-6 bg-[#e0e5ec] rounded-2xl transition-all duration-200 hover:-translate-y-1"
+              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
             >
-              <span className="text-3xl group-hover:scale-110 transition-transform">
+              <span className="text-3xl group-hover:scale-110 transition-transform duration-200">
                 {CATEGORY_ICONS[cat]}
               </span>
               <div className="text-center">
-                <div className="font-orbitron text-[10px] font-black uppercase tracking-wider text-[#e0e0f0] group-hover:text-[#00ff88] transition-colors">
+                <div className="font-sans text-[10px] font-bold uppercase tracking-wider text-[#2d3436] group-hover:text-[#ff4757] transition-colors">
                   {cat}
                 </div>
-                <div className="font-jetbrains text-[9px] text-[#4a4a6a] mt-1">
+                <div className="font-jetbrains text-[9px] text-[#4a5568] mt-1">
                   {count} product{count !== 1 ? "s" : ""}
                 </div>
               </div>

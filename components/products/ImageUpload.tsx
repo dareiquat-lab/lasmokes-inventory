@@ -111,21 +111,22 @@ export function ImageUpload({ currentImageUrl, onImageChange }: ImageUploadProps
 
       {preview ? (
         <div
-          className="relative w-full aspect-square max-w-[200px] overflow-hidden border border-[#00ff8830] bg-[#0d0d17] group"
-          style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}
+          className="relative w-full aspect-square max-w-[200px] overflow-hidden rounded-xl bg-[#e0e5ec] group"
+          style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="Product" className="w-full h-full object-cover" />
           {isUploading && (
-            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-              <div className="w-6 h-6 border-2 border-[#00ff8830] border-t-[#00ff88] rounded-full animate-spin" />
+            <div className="absolute inset-0 bg-[#e0e5ec]/70 flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-[#babecc] border-t-[#ff4757] rounded-full animate-spin" />
             </div>
           )}
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+          <div className="absolute inset-0 bg-[#2d3436]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="bg-[#0d0d17]/80 border border-[#00ff8840] p-2 text-[#00ff88] hover:bg-[#00ff8815] transition-colors clip-chamfer-sm"
+              className="bg-[#e0e5ec] p-2 text-[#4a5568] hover:text-[#ff4757] transition-colors rounded-lg"
+              style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
               title="Replace image"
             >
               <Camera className="w-4 h-4" />
@@ -133,7 +134,8 @@ export function ImageUpload({ currentImageUrl, onImageChange }: ImageUploadProps
             <button
               type="button"
               onClick={handleRemove}
-              className="bg-[#ff336615] border border-[#ff336640] p-2 text-[#ff3366] hover:bg-[#ff336625] transition-colors clip-chamfer-sm"
+              className="bg-[#e0e5ec] p-2 text-[#c0392b] hover:text-[#e74c3c] transition-colors rounded-lg"
+              style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
               title="Remove image"
             >
               <X className="w-4 h-4" />
@@ -148,21 +150,21 @@ export function ImageUpload({ currentImageUrl, onImageChange }: ImageUploadProps
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           className={cn(
-            "w-full aspect-square max-w-[200px] border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all",
+            "w-full aspect-square max-w-[200px] border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all",
             isDragging
-              ? "border-[#00ff88] bg-[#00ff8810] shadow-[0_0_20px_#00ff8820]"
-              : "border-[#1e1e2e] hover:border-[#00ff8840] bg-[#0d0d17] hover:bg-[#00ff8808]"
+              ? "border-[#ff4757] bg-[#ff475710]"
+              : "border-[#babecc] bg-[#e0e5ec] hover:border-[#ff475750] hover:bg-[#ff475706]"
           )}
-          style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}
+          style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
         >
           {isUploading ? (
-            <div className="w-6 h-6 border-2 border-[#00ff8830] border-t-[#00ff88] rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-[#babecc] border-t-[#ff4757] rounded-full animate-spin" />
           ) : (
             <>
-              <Upload className="w-6 h-6 text-[#2e2e4a]" />
+              <Upload className="w-6 h-6 text-[#babecc]" />
               <div className="text-center">
-                <p className="font-jetbrains text-[10px] text-[#4a4a6a]">Drop image here</p>
-                <p className="font-jetbrains text-[9px] text-[#1e1e2e] mt-0.5">or click to browse</p>
+                <p className="font-jetbrains text-[10px] text-[#4a5568]">Drop image here</p>
+                <p className="font-jetbrains text-[9px] text-[#babecc] mt-0.5">or click to browse</p>
               </div>
             </>
           )}
@@ -181,13 +183,13 @@ export function ImageUpload({ currentImageUrl, onImageChange }: ImageUploadProps
       />
 
       {error && (
-        <div className="flex items-center gap-1.5 font-jetbrains text-[#ff3366] text-xs">
+        <div className="flex items-center gap-1.5 font-jetbrains text-[#c0392b] text-xs">
           <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
           {error}
         </div>
       )}
 
-      <p className="font-jetbrains text-[9px] text-[#1e1e2e]">
+      <p className="font-jetbrains text-[9px] text-[#babecc]">
         JPEG · PNG · WebP · GIF — auto-compressed
       </p>
     </div>

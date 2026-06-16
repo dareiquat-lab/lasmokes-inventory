@@ -85,17 +85,17 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
         {/* Back */}
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a] hover:text-[#00ff88] transition-colors"
+          className="flex items-center gap-1.5 font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] hover:text-[#ff4757] transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Cart
         </button>
 
         <div>
-          <h3 className="font-orbitron text-xs font-black text-[#00ff88] uppercase tracking-wider mb-1">
+          <h3 className="font-sans text-xs font-bold text-[#2d3436] uppercase tracking-wider mb-1">
             Contact Details
           </h3>
-          <p className="font-jetbrains text-[9px] text-[#2e2e4a] leading-relaxed">
+          <p className="font-jetbrains text-[9px] text-[#babecc] leading-relaxed">
             No payment required. We will contact you to confirm your order.
           </p>
         </div>
@@ -110,7 +110,7 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
               className="input-field"
               placeholder="Your full name"
             />
-            {errors.name && <p className="font-jetbrains text-[#ff3366] text-[10px] mt-1">{errors.name}</p>}
+            {errors.name && <p className="font-jetbrains text-[#c0392b] text-[10px] mt-1">{errors.name}</p>}
           </div>
 
           <div>
@@ -122,7 +122,7 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
               className="input-field"
               placeholder="Your phone number"
             />
-            {errors.phone && <p className="font-jetbrains text-[#ff3366] text-[10px] mt-1">{errors.phone}</p>}
+            {errors.phone && <p className="font-jetbrains text-[#c0392b] text-[10px] mt-1">{errors.phone}</p>}
           </div>
 
           <div>
@@ -134,7 +134,7 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
               className="input-field"
               placeholder="your@email.com"
             />
-            {errors.email && <p className="font-jetbrains text-[#ff3366] text-[10px] mt-1">{errors.email}</p>}
+            {errors.email && <p className="font-jetbrains text-[#c0392b] text-[10px] mt-1">{errors.email}</p>}
           </div>
 
           <div>
@@ -150,26 +150,28 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
 
           {/* Order summary */}
           <div
-            className="bg-[#0a0a0f] border border-[#1e1e2e] p-3 space-y-1.5"
-            style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}
+            className="bg-[#e0e5ec] rounded-xl p-3 space-y-1.5"
+            style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
           >
-            <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a] mb-2">
+            <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-2">
               Order Summary
             </div>
             {items.map(item => (
               <div key={item.id} className="flex justify-between font-jetbrains text-[10px]">
-                <span className="text-[#4a4a6a] truncate">{item.product_name} ×{item.quantity}</span>
-                <span className="text-[#00ff88] ml-2 flex-shrink-0">${(Number(item.price) * item.quantity).toFixed(2)}</span>
+                <span className="text-[#4a5568] truncate">{item.product_name} ×{item.quantity}</span>
+                <span className="text-[#ff4757] ml-2 flex-shrink-0 font-bold">${(Number(item.price) * item.quantity).toFixed(2)}</span>
               </div>
             ))}
-            <div className="flex justify-between font-jetbrains text-xs font-bold pt-1.5 border-t border-[#1e1e2e]">
-              <span className="text-[#e0e0f0]">Total</span>
-              <span className="text-[#00ff88]">${subtotal.toFixed(2)}</span>
+            <div className="flex justify-between font-jetbrains text-xs font-bold pt-1.5" style={{ borderTop: "1px solid #babecc" }}>
+              <span className="text-[#2d3436]">Total</span>
+              <span className="text-[#ff4757]">${subtotal.toFixed(2)}</span>
             </div>
           </div>
 
           {errors.form && (
-            <div className="font-jetbrains text-[#ff3366] text-xs bg-[#ff336610] border border-[#ff336630] px-3 py-2 clip-chamfer-sm">
+            <div className="font-jetbrains text-[#c0392b] text-xs bg-[#c0392b10] rounded-lg px-3 py-2"
+              style={{ border: "1px solid rgba(192,57,43,0.2)" }}
+            >
               {errors.form}
             </div>
           )}
@@ -181,7 +183,7 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
           >
             {submitting ? (
               <>
-                <div className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Submitting...
               </>
             ) : (

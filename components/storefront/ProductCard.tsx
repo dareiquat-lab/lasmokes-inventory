@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useCart } from "./CartContext";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { cn } from "@/lib/utils";
@@ -42,15 +42,21 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`} className="group block">
       <div
         className={cn(
-          "bg-[#0d0d17] border transition-all duration-200",
+          "bg-[#e0e5ec] rounded-2xl transition-all duration-300",
           outOfStock
-            ? "border-[#1e1e2e] opacity-60"
-            : "border-[#1e1e2e] hover:border-[#00ff8840] hover:shadow-[0_0_20px_#00ff8810]"
+            ? "opacity-65"
+            : "hover:-translate-y-1"
         )}
-        style={{ clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}
+        style={{
+          boxShadow: outOfStock
+            ? "4px 4px 10px #babecc, -4px -4px 10px #ffffff"
+            : "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+        }}
       >
         {/* Image */}
-        <div className="aspect-square overflow-hidden bg-[#0a0a0f] border-b border-[#1e1e2e] relative">
+        <div className="aspect-square overflow-hidden bg-[#d1d9e6] rounded-t-2xl relative"
+          style={{ borderBottom: "1px solid #babecc" }}
+        >
           {product.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -66,10 +72,9 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Out of stock overlay */}
           {outOfStock && (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-              <span
-                className="font-orbitron text-[10px] font-black text-[#ff3366] uppercase tracking-widest border border-[#ff336640] px-3 py-1.5 bg-[#ff336610]"
-                style={{ clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))" }}
+            <div className="absolute inset-0 bg-[#e0e5ec]/70 flex items-center justify-center">
+              <span className="font-jetbrains text-[10px] font-black text-[#c0392b] uppercase tracking-widest px-3 py-1.5 bg-[#e0e5ec] rounded-lg"
+                style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
               >
                 Out of Stock
               </span>
@@ -79,9 +84,8 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Low stock indicator */}
           {!outOfStock && product.quantity <= 10 && (
             <div className="absolute top-2 right-2">
-              <span
-                className="font-orbitron text-[8px] font-black text-[#cccc00] uppercase tracking-wider border border-[#ffff0030] px-1.5 py-0.5 bg-[#ffff0010]"
-                style={{ clipPath: "polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))" }}
+              <span className="font-jetbrains text-[8px] font-black text-[#c0602a] uppercase tracking-wider px-1.5 py-0.5 bg-[#e0e5ec] rounded-md"
+                style={{ boxShadow: "2px 2px 4px #babecc, -1px -1px 2px #ffffff" }}
               >
                 Low Stock
               </span>
@@ -91,27 +95,29 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Content */}
         <div className="p-3 space-y-2">
-          <div className="font-orbitron text-[8px] uppercase tracking-widest text-[#4a4a6a]">
+          <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[#4a5568]">
             {product.category}
           </div>
-          <h3 className="font-orbitron text-xs font-black text-[#e0e0f0] line-clamp-2 leading-tight group-hover:text-[#00ff88] transition-colors">
+          <h3 className="font-sans text-xs font-bold text-[#2d3436] line-clamp-2 leading-tight group-hover:text-[#ff4757] transition-colors">
             {product.product_name}
           </h3>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="font-jetbrains text-sm font-bold text-[#00ff88]">
+            <span className="font-jetbrains text-sm font-bold text-[#ff4757]">
               ${Number(product.price).toFixed(2)}
             </span>
             <button
               onClick={e => { e.preventDefault(); handleAdd(e); }}
               disabled={outOfStock}
               className={cn(
-                "flex items-center gap-1 font-orbitron text-[8px] uppercase tracking-wider px-2 py-1.5 transition-all",
+                "flex items-center gap-1 font-jetbrains text-[8px] uppercase tracking-wider px-2 py-1.5 rounded-lg transition-all",
                 outOfStock
-                  ? "text-[#2e2e4a] border border-[#1e1e2e] cursor-not-allowed opacity-40"
-                  : "text-black bg-[#00ff88] hover:bg-[#33ffaa] shadow-[0_0_8px_#00ff8840] hover:shadow-[0_0_12px_#00ff8880]"
+                  ? "text-[#babecc] cursor-not-allowed opacity-40"
+                  : "text-white bg-[#ff4757] active:translate-y-px"
               )}
-              style={{ clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px))" }}
+              style={!outOfStock ? {
+                boxShadow: "3px 3px 6px rgba(166,50,60,0.3), -2px -2px 4px rgba(255,100,110,0.2)"
+              } : undefined}
             >
               <Plus className="w-3 h-3" />
               <span>Add</span>

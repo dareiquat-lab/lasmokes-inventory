@@ -9,66 +9,35 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cyber: {
-          green:   "#00ff88",
-          magenta: "#ff00ff",
-          cyan:    "#00d4ff",
-          yellow:  "#ffff00",
-          red:     "#ff3366",
-        },
-        void: {
-          950: "#05050a",
-          900: "#0a0a0f",
-          800: "#0d0d17",
-          700: "#12121f",
-          600: "#181826",
-          500: "#1e1e2e",
-          400: "#252538",
-          300: "#2e2e4a",
-        },
-        neon: {
-          green:   "#00ff88",
-          magenta: "#ff00ff",
-          cyan:    "#00d4ff",
+        industrial: {
+          chassis:      "#e0e5ec",
+          panel:        "#f0f2f5",
+          muted:        "#d1d9e6",
+          text:         "#2d3436",
+          "text-muted": "#4a5568",
+          accent:       "#ff4757",
+          shadow:       "#babecc",
+          light:        "#ffffff",
+          dark:         "#a3b1c6",
         },
       },
       fontFamily: {
-        orbitron:  ["var(--font-orbitron)", "monospace"],
+        /* orbitron is remapped to Inter so all font-orbitron classes use Inter */
+        orbitron:  ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        inter:     ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
         mono:      ["var(--font-jetbrains)", "JetBrains Mono", "monospace"],
-      },
-      animation: {
-        glitch:    "glitch 6s infinite",
-        scanline:  "scanline 8s linear infinite",
-        flicker:   "flicker 3s infinite",
-        "neon-pulse": "neonPulse 2s ease-in-out infinite",
-      },
-      keyframes: {
-        glitch: {
-          "0%, 92%, 100%": { transform: "none",            textShadow: "none" },
-          "93%":           { transform: "translateX(-2px)", textShadow: "2px 0 #ff00ff" },
-          "94%":           { transform: "translateX(2px)",  textShadow: "-2px 0 #00d4ff" },
-          "95%":           { transform: "translateX(-1px)", textShadow: "1px 0 #ff00ff" },
-          "96%":           { transform: "translateX(1px)",  textShadow: "none" },
-          "97%":           { transform: "none",             textShadow: "none" },
-        },
-        scanline: {
-          "0%":   { transform: "translateY(-100%)" },
-          "100%": { transform: "translateY(100vh)" },
-        },
-        flicker: {
-          "0%, 19%, 21%, 23%, 25%, 54%, 56%, 100%": { opacity: "1" },
-          "20%, 24%, 55%":                           { opacity: "0.6" },
-        },
-        neonPulse: {
-          "0%, 100%": { boxShadow: "0 0 8px #00ff8840, 0 0 20px #00ff8820" },
-          "50%":      { boxShadow: "0 0 16px #00ff8880, 0 0 40px #00ff8840" },
-        },
+        jetbrains: ["var(--font-jetbrains)", "JetBrains Mono", "monospace"],
       },
       boxShadow: {
-        "neon-green":   "0 0 10px #00ff8860, 0 0 30px #00ff8830",
-        "neon-magenta": "0 0 10px #ff00ff60, 0 0 30px #ff00ff30",
-        "neon-cyan":    "0 0 10px #00d4ff60, 0 0 30px #00d4ff30",
-        "neon-red":     "0 0 10px #ff336660, 0 0 30px #ff336630",
+        "card":       "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+        "floating":   "12px 12px 24px #babecc, -12px -12px 24px #ffffff, inset 1px 1px 0 rgba(255,255,255,0.5)",
+        "pressed":    "inset 6px 6px 12px #babecc, inset -6px -6px 12px #ffffff",
+        "recessed":   "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff",
+        "glow-red":   "0 0 10px 2px rgba(255, 71, 87, 0.5)",
+        "glow-green": "0 0 10px 2px rgba(34, 197, 94, 0.5)",
+      },
+      animation: {
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

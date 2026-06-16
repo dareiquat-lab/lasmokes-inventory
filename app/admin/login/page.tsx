@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, Terminal } from "lucide-react";
+import { Lock } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -43,12 +43,12 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
-      {/* Background grid */}
+    <div className="min-h-screen bg-[#e0e5ec] flex items-center justify-center p-4">
+      {/* Subtle grid */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.03]"
         style={{
-          backgroundImage: "linear-gradient(#00ff88 1px, transparent 1px), linear-gradient(90deg, #00ff88 1px, transparent 1px)",
+          backgroundImage: "linear-gradient(#4a5568 1px, transparent 1px), linear-gradient(90deg, #4a5568 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
@@ -56,89 +56,95 @@ function LoginForm() {
       <div className="w-full max-w-sm relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#00ff8812] border border-[#00ff8840] mb-4 clip-chamfer-md mx-auto">
-            <Lock className="w-7 h-7 text-[#00ff88] drop-shadow-[0_0_8px_#00ff88]" />
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 bg-[#e0e5ec] rounded-2xl mb-4"
+            style={{ boxShadow: "6px 6px 14px #babecc, -6px -6px 14px #ffffff" }}
+          >
+            <Lock className="w-7 h-7 text-[#ff4757]" />
           </div>
-          <h1 className="font-orbitron text-2xl font-black text-[#00ff88] tracking-wider glitch">
+          <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
             LA SMOKES
           </h1>
-          <p className="font-orbitron text-[9px] text-[#4a4a6a] uppercase tracking-widest mt-1">
+          <p className="font-jetbrains text-[9px] text-[#4a5568] uppercase tracking-widest mt-1">
             Admin Portal Access
           </p>
         </div>
 
         {/* Login card */}
         <div
-          className="bg-[#0d0d17] border border-[#00ff8830] p-6 relative overflow-hidden"
-          style={{
-            clipPath: "polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px))",
-            boxShadow: "0 0 30px #00ff8810",
-          }}
+          className="bg-[#e0e5ec] rounded-2xl p-6 relative overflow-hidden"
+          style={{ boxShadow: "12px 12px 24px #babecc, -12px -12px 24px #ffffff" }}
         >
-          {/* Scanlines */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,136,0.012) 3px, rgba(0,255,136,0.012) 4px)",
-            }}
-          />
+          {/* Corner vents decoration */}
+          <div className="absolute top-3 right-4 flex gap-1">
+            {[0, 1, 2].map(i => (
+              <div
+                key={i}
+                className="w-1 h-5 rounded-full"
+                style={{
+                  background: "#d1d9e6",
+                  boxShadow: "inset 1px 1px 2px #babecc, inset -1px -1px 1px #ffffff",
+                }}
+              />
+            ))}
+          </div>
 
-          <div className="relative z-10">
-            {/* Terminal prompt */}
-            <div className="flex items-center gap-2 mb-5 pb-3 border-b border-[#1e1e2e]">
-              <Terminal className="w-3.5 h-3.5 text-[#00ff8860]" />
-              <span className="font-jetbrains text-[10px] text-[#2e2e4a]">
-                <span className="text-[#00ff8870]">admin@lasmokes</span>
-                <span className="text-[#1e1e2e]">:</span>
-                <span className="text-[#00d4ff70]">~</span>
-                <span className="text-[#2e2e4a]"> $ authenticate</span>
-              </span>
+          <div className="flex items-center gap-2 mb-5 pb-3" style={{ borderBottom: "1px solid #babecc" }}>
+            <div
+              className="w-2 h-2 rounded-full bg-green-500 animate-pulse"
+              style={{ boxShadow: "0 0 6px rgba(34,197,94,0.8)" }}
+            />
+            <span className="font-jetbrains text-[10px] text-[#4a5568] uppercase tracking-widest">
+              Authentication Required
+            </span>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="label">Access Code</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="input-field"
+                placeholder="Enter admin password"
+                autoFocus
+                autoComplete="current-password"
+              />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="label">Access Code</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="input-field"
-                  placeholder="Enter admin password"
-                  autoFocus
-                  autoComplete="current-password"
-                />
-              </div>
-
-              {error && (
-                <div className="font-jetbrains text-[#ff3366] text-xs bg-[#ff336610] border border-[#ff336630] px-3 py-2 clip-chamfer-sm">
-                  ⚠ {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading || !password}
-                className="w-full btn-primary flex items-center justify-center gap-2"
+            {error && (
+              <div
+                className="font-jetbrains text-[#c0392b] text-xs rounded-lg px-3 py-2"
+                style={{ background: "rgba(192,57,43,0.08)", border: "1px solid rgba(192,57,43,0.2)" }}
               >
-                {loading ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                    Authenticating...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-3.5 h-3.5" />
-                    Access Portal
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
+                ⚠ {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || !password}
+              className="w-full btn-primary flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                <>
+                  <Lock className="w-3.5 h-3.5" />
+                  Access Portal
+                </>
+              )}
+            </button>
+          </form>
         </div>
 
         {/* Back to store */}
         <p className="text-center mt-4">
-          <a href="/" className="font-jetbrains text-[10px] text-[#2e2e4a] hover:text-[#00ff88] transition-colors">
+          <a href="/" className="font-jetbrains text-[10px] text-[#babecc] hover:text-[#ff4757] transition-colors">
             ← Back to storefront
           </a>
         </p>
@@ -150,8 +156,10 @@ function LoginForm() {
 export default function AdminLoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#00ff8830] border-t-[#00ff88] rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#e0e5ec] flex items-center justify-center">
+        <div
+          className="w-8 h-8 rounded-full border-2 border-[#babecc] border-t-[#ff4757] animate-spin"
+        />
       </div>
     }>
       <LoginForm />

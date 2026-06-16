@@ -18,10 +18,8 @@ export function CategoryIcon({ category, size = "md", className }: CategoryIconP
 
   return (
     <div
-      className={`${sizeClass} bg-[#0d0d17] border border-[#00ff8820] flex items-center justify-center flex-shrink-0 ${className || ""}`}
-      style={{
-        clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px))",
-      }}
+      className={`${sizeClass} bg-[#e0e5ec] rounded-lg flex items-center justify-center flex-shrink-0 ${className || ""}`}
+      style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
     >
       <span>{icon}</span>
     </div>

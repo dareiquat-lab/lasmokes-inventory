@@ -139,11 +139,14 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main form */}
           <div className="lg:col-span-2 space-y-5">
-            <div className="card p-5 space-y-5 border-[#00ff8818]">
+            <div
+              className="bg-[#e0e5ec] rounded-2xl p-5 space-y-5"
+              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            >
               {/* Section heading */}
-              <div className="pb-3 border-b border-[#1e1e2e]">
-                <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a]">
-                  <span className="text-[#00ff8860]">&gt;</span> Product Information
+              <div className="pb-3" style={{ borderBottom: "1px solid #babecc" }}>
+                <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+                  Product Information
                 </h2>
               </div>
 
@@ -156,7 +159,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   className="input-field"
                 />
                 {errors.product_name && (
-                  <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.product_name.message}</p>
+                  <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.product_name.message}</p>
                 )}
               </div>
 
@@ -173,7 +176,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                   {errors.category && (
-                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.category.message}</p>
+                    <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.category.message}</p>
                   )}
                 </div>
 
@@ -181,7 +184,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   <label className="label">
                     SKU *
                     {skuSuggesting && (
-                      <span className="text-[#00ff88] ml-2 text-[9px] animate-pulse">Auto-generating...</span>
+                      <span className="text-[#ff4757] ml-2 text-[9px] animate-pulse">Auto-generating...</span>
                     )}
                   </label>
                   <input
@@ -191,7 +194,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     className="input-field"
                   />
                   {errors.sku && (
-                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.sku.message}</p>
+                    <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.sku.message}</p>
                   )}
                 </div>
               </div>
@@ -207,25 +210,25 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     className="input-field"
                   />
                   {errors.quantity && (
-                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.quantity.message}</p>
+                    <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.quantity.message}</p>
                   )}
                 </div>
 
                 <div>
                   <label className="label">Price *</label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-[#2e2e4a] text-sm">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-jetbrains text-[#babecc] text-sm">$</span>
                     <input
                       {...register("price")}
                       type="number"
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      className="input-field pl-6"
+                      className="input-field pl-7"
                     />
                   </div>
                   {errors.price && (
-                    <p className="font-jetbrains text-[#ff3366] text-xs mt-1">{errors.price.message}</p>
+                    <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.price.message}</p>
                   )}
                 </div>
               </div>
@@ -238,7 +241,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   placeholder="e.g. 012345678901"
                   className="input-field"
                 />
-                <p className="font-jetbrains text-[9px] text-[#1e1e2e] mt-1">
+                <p className="font-jetbrains text-[9px] text-[#babecc] mt-1">
                   For barcode scanner support
                 </p>
               </div>
@@ -258,7 +261,10 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
           {/* Sidebar */}
           <div className="space-y-5">
             {/* Image upload */}
-            <div className="card p-5 border-[#00ff8818]">
+            <div
+              className="bg-[#e0e5ec] rounded-2xl p-5"
+              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            >
               <ImageUpload
                 currentImageUrl={imageUrl}
                 onImageChange={setImageUrl}
@@ -267,13 +273,19 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
             </div>
 
             {/* Actions */}
-            <div className="card p-5 space-y-3 border-[#00ff8818]">
-              <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a]">
-                <span className="text-[#00ff8860]">&gt;</span> Actions
+            <div
+              className="bg-[#e0e5ec] rounded-2xl p-5 space-y-3"
+              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            >
+              <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+                Actions
               </h2>
 
               {saveError && (
-                <div className="font-jetbrains bg-[#ff336610] border border-[#ff336630] text-[#ff3366] clip-chamfer-sm px-3 py-2 text-xs">
+                <div
+                  className="font-jetbrains text-[#c0392b] rounded-lg px-3 py-2 text-xs"
+                  style={{ background: "rgba(192,57,43,0.08)", border: "1px solid rgba(192,57,43,0.2)" }}
+                >
                   {saveError}
                 </div>
               )}
@@ -285,7 +297,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
               >
                 {isSaving ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Saving...
                   </>
                 ) : (
@@ -318,22 +330,25 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
 
             {/* Product meta */}
             {isEditing && product && (
-              <div className="card p-5 space-y-2 border-[#00d4ff18]">
-                <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a] mb-3">
-                  <span className="text-[#00d4ff60]">&gt;</span> Record Info
+              <div
+                className="bg-[#e0e5ec] rounded-2xl p-5 space-y-2"
+                style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              >
+                <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+                  Record Info
                 </h2>
                 <div className="font-jetbrains text-xs space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-[#2e2e4a]">ID</span>
-                    <span className="text-[#00d4ff]">#{product.id}</span>
+                    <span className="text-[#babecc]">ID</span>
+                    <span className="text-[#0984e3] font-bold">#{product.id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#2e2e4a]">Created</span>
-                    <span className="text-[#4a4a6a]">{new Date(product.created_at).toLocaleDateString()}</span>
+                    <span className="text-[#babecc]">Created</span>
+                    <span className="text-[#4a5568]">{new Date(product.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#2e2e4a]">Updated</span>
-                    <span className="text-[#4a4a6a]">{new Date(product.updated_at).toLocaleDateString()}</span>
+                    <span className="text-[#babecc]">Updated</span>
+                    <span className="text-[#4a5568]">{new Date(product.updated_at).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>

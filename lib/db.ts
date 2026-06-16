@@ -2,8 +2,10 @@ import { neon } from "@neondatabase/serverless";
 import type { Order, OrderItem, OrderStatus } from "@/types";
 
 // Falls back to a placeholder URL so the module loads during `next build` without a live DB.
+// fetchOptions: no-store prevents Next.js from caching the underlying fetch() calls the driver makes.
 export const sql = neon(
-  process.env.DATABASE_URL ?? "postgresql://placeholder:placeholder@localhost/placeholder"
+  process.env.DATABASE_URL ?? "postgresql://placeholder:placeholder@localhost/placeholder",
+  { fetchOptions: { cache: "no-store" } }
 );
 
 // ─── Products ─────────────────────────────────────────────────────────────────

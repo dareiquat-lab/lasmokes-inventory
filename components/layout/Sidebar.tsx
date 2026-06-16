@@ -17,11 +17,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { href: "/admin",             label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/inventory",   label: "Inventory",  icon: Package         },
-  { href: "/admin/orders",      label: "Orders",     icon: ShoppingCart    },
-  { href: "/admin/low-stock",   label: "Low Stock",  icon: AlertTriangle   },
-  { href: "/admin/products/new",label: "Add Item",   icon: PlusCircle      },
+  { href: "/admin",              label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/inventory",    label: "Inventory",  icon: Package         },
+  { href: "/admin/orders",       label: "Orders",     icon: ShoppingCart    },
+  { href: "/admin/low-stock",    label: "Low Stock",  icon: AlertTriangle   },
+  { href: "/admin/products/new", label: "Add Item",   icon: PlusCircle      },
 ];
 
 function NavLink({ href, label, icon: Icon, onClick }: {
@@ -42,10 +42,12 @@ function NavLink({ href, label, icon: Icon, onClick }: {
         isActive ? "sidebar-link-active" : "sidebar-link-inactive"
       )}
     >
-      <Icon className={cn("w-4 h-4 flex-shrink-0", isActive && "drop-shadow-[0_0_6px_#00ff88]")} />
+      <Icon className={cn("w-4 h-4 flex-shrink-0", isActive && "text-[#ff4757]")} />
       <span>{label}</span>
       {isActive && (
-        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00ff88] shadow-[0_0_6px_#00ff88]" />
+        <span className="ml-auto w-2 h-2 rounded-full bg-[#ff4757]"
+          style={{ boxShadow: "0 0 6px rgba(255,71,87,0.7)" }}
+        />
       )}
     </Link>
   );
@@ -59,9 +61,10 @@ export function Sidebar() {
       {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-[#0d0d17] border border-[#00ff8830] p-2 clip-chamfer-sm"
+        className="md:hidden fixed top-4 left-4 z-50 bg-[#e0e5ec] rounded-lg p-2"
+        style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
       >
-        <Menu className="w-5 h-5 text-[#00ff88]" />
+        <Menu className="w-5 h-5 text-[#4a5568]" />
       </button>
 
       {/* Mobile overlay */}
@@ -72,7 +75,7 @@ export function Sidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setMobileOpen(false)}
-            className="md:hidden fixed inset-0 bg-black/80 z-40 backdrop-blur-sm"
+            className="md:hidden fixed inset-0 bg-[#2d3436]/40 z-40 backdrop-blur-sm"
           />
         )}
       </AnimatePresence>
@@ -85,7 +88,8 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="md:hidden fixed left-0 top-0 bottom-0 w-64 bg-[#0a0a0f] border-r border-[#00ff8820] z-50 flex flex-col"
+            className="md:hidden fixed left-0 top-0 bottom-0 w-64 bg-[#e0e5ec] z-50 flex flex-col"
+            style={{ boxShadow: "8px 0 24px #babecc" }}
           >
             <SidebarContent onClose={() => setMobileOpen(false)} showClose />
           </motion.div>
@@ -93,7 +97,10 @@ export function Sidebar() {
       </AnimatePresence>
 
       {/* Desktop sidebar */}
-      <div className="hidden md:flex w-56 bg-[#0a0a0f] border-r border-[#00ff8818] flex-col flex-shrink-0">
+      <div
+        className="hidden md:flex w-56 bg-[#e0e5ec] flex-col flex-shrink-0"
+        style={{ boxShadow: "4px 0 12px #babecc" }}
+      >
         <SidebarContent />
       </div>
     </>
@@ -111,41 +118,46 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
   return (
     <>
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-[#00ff8818] relative">
+      <div className="px-4 py-5 relative" style={{ borderBottom: "1px solid #babecc" }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#00ff8812] border border-[#00ff8840] flex items-center justify-center clip-chamfer-sm">
+            <div
+              className="w-9 h-9 bg-[#ff4757] rounded-lg flex items-center justify-center"
+              style={{ boxShadow: "3px 3px 8px rgba(166,50,60,0.3), -2px -2px 5px rgba(255,100,110,0.2)" }}
+            >
               <span className="text-base">🏪</span>
             </div>
             <div>
-              <div className="font-orbitron text-sm font-black text-[#00ff88] leading-tight tracking-wider glitch">
+              <div className="font-jetbrains text-sm font-black text-[#2d3436] leading-tight tracking-wider uppercase">
                 LA SMOKES
               </div>
-              <div className="font-orbitron text-[8px] text-[#4a4a6a] leading-tight tracking-widest uppercase">
+              <div className="font-jetbrains text-[8px] text-[#4a5568] leading-tight tracking-widest uppercase">
                 Admin Portal
               </div>
             </div>
           </div>
           {showClose && (
-            <button onClick={onClose} className="text-[#4a4a6a] hover:text-[#00ff88] transition-colors">
+            <button onClick={onClose} className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1">
               <X className="w-5 h-5" />
             </button>
           )}
         </div>
-        <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-[#00ff8840] to-transparent" />
       </div>
 
       {/* System status */}
-      <div className="px-4 py-2 border-b border-[#00ff8810]">
+      <div className="px-4 py-2" style={{ borderBottom: "1px solid #babecc" }}>
         <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse shadow-[0_0_4px_#00ff88]" />
-          <span className="font-orbitron text-[8px] text-[#4a4a6a] uppercase tracking-widest">System Online</span>
+          <span
+            className="w-2 h-2 rounded-full bg-green-500 animate-pulse"
+            style={{ boxShadow: "0 0 5px rgba(34,197,94,0.8)" }}
+          />
+          <span className="font-jetbrains text-[8px] text-[#4a5568] uppercase tracking-widest">System Online</span>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        <div className="font-orbitron text-[8px] text-[#2e2e4a] uppercase tracking-widest px-3 py-2">
+        <div className="font-jetbrains text-[8px] text-[#babecc] uppercase tracking-widest px-3 py-2">
           Navigation
         </div>
         {navLinks.map((link) => (
@@ -153,7 +165,7 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
         ))}
 
         {/* Storefront link */}
-        <div className="font-orbitron text-[8px] text-[#2e2e4a] uppercase tracking-widest px-3 py-2 mt-3">
+        <div className="font-jetbrains text-[8px] text-[#babecc] uppercase tracking-widest px-3 py-2 mt-3">
           Storefront
         </div>
         <Link
@@ -168,16 +180,16 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
       </nav>
 
       {/* Logout */}
-      <div className="p-3 border-t border-[#00ff8810]">
+      <div className="p-3" style={{ borderTop: "1px solid #babecc" }}>
         <button
           onClick={handleLogout}
-          className="sidebar-link sidebar-link-inactive w-full text-left text-[#ff3366] hover:text-[#ff3366] hover:bg-[#ff336610] hover:border-l-[#ff336640]"
+          className="sidebar-link sidebar-link-inactive w-full text-left text-[#c0392b] hover:text-[#c0392b] hover:bg-[#c0392b10]"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
           <span>Logout</span>
         </button>
-        <div className="font-jetbrains text-[9px] text-[#2e2e4a] mt-3 leading-relaxed">
-          <div className="text-[#00ff8840]">v1.0.0 // LASMOKES-INV</div>
+        <div className="font-jetbrains text-[9px] text-[#babecc] mt-3 leading-relaxed">
+          <div>v1.0.0 // LASMOKES-INV</div>
         </div>
       </div>
     </>

@@ -39,10 +39,10 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
       {/* Page header */}
       <div className="mb-6">
-        <h1 className="font-orbitron text-2xl font-black text-[#e0e0f0] tracking-wider">
-          <span className="text-[#00ff8860]">&gt;</span> ALL PRODUCTS
+        <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
+          All Products
         </h1>
-        <p className="font-jetbrains text-xs text-[#4a4a6a] mt-1">
+        <p className="font-jetbrains text-xs text-[#4a5568] mt-1">
           {data.total.toLocaleString()} product{data.total !== 1 ? "s" : ""} available
           {category && ` in ${category}`}
           {search && ` matching "${search}"`}
@@ -53,7 +53,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <form className="relative flex-1" action="/products" method="GET">
           {category && <input type="hidden" name="category" value={category} />}
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2e2e4a] pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc] pointer-events-none" />
           <input
             type="text"
             name="search"
@@ -66,11 +66,15 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         <div className="flex flex-wrap gap-2">
           <Link
             href={buildUrl({ category: "", page: 1 })}
-            className={`font-orbitron text-[8px] uppercase tracking-widest px-3 py-2 border clip-chamfer-sm transition-all ${
+            className={`font-jetbrains text-[8px] uppercase tracking-widest px-3 py-2 rounded-lg transition-all ${
               !category
-                ? "text-[#00ff88] border-[#00ff8840] bg-[#00ff8810]"
-                : "text-[#4a4a6a] border-[#1e1e2e] hover:border-[#00ff8030] hover:text-[#e0e0f0]"
+                ? "text-[#ff4757] font-bold"
+                : "text-[#4a5568]"
             }`}
+            style={!category
+              ? { boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }
+              : { boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }
+            }
           >
             All
           </Link>
@@ -78,11 +82,15 @@ export default async function ProductsPage({ searchParams }: PageProps) {
             <Link
               key={cat}
               href={buildUrl({ category: cat, page: 1 })}
-              className={`font-orbitron text-[8px] uppercase tracking-widest px-3 py-2 border clip-chamfer-sm transition-all ${
+              className={`font-jetbrains text-[8px] uppercase tracking-widest px-3 py-2 rounded-lg transition-all ${
                 category === cat
-                  ? "text-[#00ff88] border-[#00ff8840] bg-[#00ff8810]"
-                  : "text-[#4a4a6a] border-[#1e1e2e] hover:border-[#00ff8030] hover:text-[#e0e0f0]"
+                  ? "text-[#ff4757] font-bold"
+                  : "text-[#4a5568]"
               }`}
+              style={category === cat
+                ? { boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }
+                : { boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }
+              }
             >
               {cat}
             </Link>
@@ -93,10 +101,15 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       {/* Grid */}
       {data.products.length === 0 ? (
         <div className="text-center py-20">
-          <Search className="w-12 h-12 text-[#1e1e2e] mx-auto mb-4" />
-          <p className="font-orbitron text-sm text-[#2e2e4a] uppercase tracking-widest">No products found</p>
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#e0e5ec] mb-4"
+            style={{ boxShadow: "inset 4px 4px 10px #babecc, inset -4px -4px 10px #ffffff" }}
+          >
+            <Search className="w-7 h-7 text-[#babecc]" />
+          </div>
+          <p className="font-sans text-sm font-bold text-[#4a5568] uppercase tracking-widest">No products found</p>
           {(search || category) && (
-            <Link href="/products" className="font-orbitron text-[9px] text-[#00ff88] hover:text-[#33ffaa] mt-3 inline-block uppercase tracking-widest">
+            <Link href="/products" className="font-jetbrains text-[9px] text-[#ff4757] hover:text-[#ff6b7a] mt-3 inline-block uppercase tracking-widest font-bold">
               Clear filters
             </Link>
           )}
@@ -117,7 +130,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
               ← Prev
             </Link>
           )}
-          <span className="font-jetbrains text-xs text-[#4a4a6a]">
+          <span className="font-jetbrains text-xs text-[#4a5568]">
             {page} / {data.totalPages}
           </span>
           {page < data.totalPages && (

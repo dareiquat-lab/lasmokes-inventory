@@ -23,44 +23,44 @@ export default async function ConfirmationPage({
     <div className="max-w-lg mx-auto px-4 md:px-6 py-16">
       {/* Success icon */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-[#00ff8812] border border-[#00ff8840] mb-4 clip-chamfer-md mx-auto">
-          <CheckCircle className="w-8 h-8 text-[#00ff88] drop-shadow-[0_0_10px_#00ff88]" />
+        <div
+          className="inline-flex items-center justify-center w-16 h-16 bg-[#e0e5ec] rounded-2xl mb-4"
+          style={{ boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff" }}
+        >
+          <CheckCircle className="w-8 h-8 text-green-500" />
         </div>
-        <h1 className="font-orbitron text-2xl font-black text-[#00ff88] tracking-wider glitch mb-2">
-          ORDER SUBMITTED
+        <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight mb-2">
+          Order Submitted
         </h1>
-        <p className="font-jetbrains text-sm text-[#4a4a6a]">
+        <p className="font-jetbrains text-sm text-[#4a5568]">
           We received your request and will contact you shortly.
         </p>
       </div>
 
       {/* Order card */}
       <div
-        className="bg-[#0d0d17] border border-[#00ff8830] p-5 space-y-4 mb-6"
-        style={{
-          clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))",
-          boxShadow: "0 0 20px #00ff8810",
-        }}
+        className="bg-[#e0e5ec] rounded-2xl p-5 space-y-4 mb-6"
+        style={{ boxShadow: "8px 8px 20px #babecc, -8px -8px 20px #ffffff" }}
       >
         {/* Order number */}
-        <div className="flex items-center justify-between border-b border-[#1e1e2e] pb-3">
-          <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a]">Order Number</div>
-          <div className="font-jetbrains text-sm font-black text-[#00ff88]">{params.orderNumber}</div>
+        <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid #babecc" }}>
+          <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">Order Number</div>
+          <div className="font-jetbrains text-sm font-black text-[#ff4757]">{params.orderNumber}</div>
         </div>
 
         {order && (
           <>
             {/* Customer info */}
             <div className="space-y-2">
-              <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a]">Contact</div>
-              <div className="flex items-center gap-2 font-jetbrains text-xs text-[#c0c0d8]">
+              <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">Contact</div>
+              <div className="flex items-center gap-2 font-jetbrains text-xs text-[#2d3436]">
                 <span className="font-bold">{order.customer_name}</span>
               </div>
-              <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[#4a4a6a]">
+              <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[#4a5568]">
                 <Phone className="w-3 h-3 flex-shrink-0" />
                 {order.customer_phone}
               </div>
-              <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[#4a4a6a]">
+              <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[#4a5568]">
                 <Mail className="w-3 h-3 flex-shrink-0" />
                 {order.customer_email}
               </div>
@@ -68,17 +68,17 @@ export default async function ConfirmationPage({
 
             {/* Items */}
             {items.length > 0 && (
-              <div className="space-y-2 border-t border-[#1e1e2e] pt-3">
-                <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a]">Items Requested</div>
+              <div className="space-y-2 pt-3" style={{ borderTop: "1px solid #babecc" }}>
+                <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">Items Requested</div>
                 {items.map((item: { product_name: string; product_sku: string | null; quantity: number; price: number }, i: number) => (
                   <div key={i} className="flex justify-between font-jetbrains text-xs">
-                    <span className="text-[#c0c0d8]">{item.product_name} ×{item.quantity}</span>
-                    <span className="text-[#00ff88]">${(Number(item.price) * item.quantity).toFixed(2)}</span>
+                    <span className="text-[#4a5568]">{item.product_name} ×{item.quantity}</span>
+                    <span className="text-[#ff4757] font-bold">${(Number(item.price) * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
-                <div className="flex justify-between font-jetbrains text-xs font-bold border-t border-[#1e1e2e] pt-2">
-                  <span className="text-[#e0e0f0]">Total</span>
-                  <span className="text-[#00ff88]">${subtotal.toFixed(2)}</span>
+                <div className="flex justify-between font-jetbrains text-xs font-bold pt-2" style={{ borderTop: "1px solid #babecc" }}>
+                  <span className="text-[#2d3436]">Total</span>
+                  <span className="text-[#ff4757]">${subtotal.toFixed(2)}</span>
                 </div>
               </div>
             )}
@@ -86,26 +86,26 @@ export default async function ConfirmationPage({
         )}
 
         {!order && (
-          <p className="font-jetbrains text-xs text-[#4a4a6a]">
-            Your order has been received with number <strong className="text-[#00ff88]">{params.orderNumber}</strong>.
+          <p className="font-jetbrains text-xs text-[#4a5568]">
+            Your order has been received with number <strong className="text-[#ff4757]">{params.orderNumber}</strong>.
           </p>
         )}
       </div>
 
       {/* What happens next */}
       <div
-        className="bg-[#0d0d17] border border-[#1e1e2e] p-4 space-y-2 mb-6"
-        style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}
+        className="bg-[#e0e5ec] rounded-xl p-4 space-y-2 mb-6"
+        style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
       >
-        <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a] mb-2">What happens next?</div>
+        <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-2">What happens next?</div>
         {[
           "We review your order request",
           "We contact you by phone or email to confirm",
           "Your order is prepared for pickup",
         ].map((step, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="font-orbitron text-[8px] text-[#00ff88] w-4">{i + 1}.</span>
-            <span className="font-jetbrains text-[10px] text-[#4a4a6a]">{step}</span>
+            <span className="font-jetbrains text-[8px] text-[#ff4757] font-bold w-4">{i + 1}.</span>
+            <span className="font-jetbrains text-[10px] text-[#4a5568]">{step}</span>
           </div>
         ))}
       </div>

@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
       page: parseInt(searchParams.get("page") || "1"),
       limit: parseInt(searchParams.get("limit") || "25"),
     });
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
+    });
   } catch (error) {
     console.error("GET /api/admin/orders error:", error);
     return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });

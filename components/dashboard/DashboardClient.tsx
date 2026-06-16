@@ -30,30 +30,30 @@ interface DashboardClientProps {
   initialStats: DashboardStats | null;
 }
 
-const NEON_SHADES = [
-  "#00ff88", "#00d4ff", "#ff00ff", "#ffff00",
-  "#00ff88cc", "#00d4ffcc", "#ff00ffcc",
-  "#33ffaa", "#33eeff",
+const INDUSTRIAL_COLORS = [
+  "#ff4757", "#0984e3", "#6c5ce7", "#00b894",
+  "#e17055", "#fdcb6e", "#e84393", "#74b9ff",
+  "#a29bfe", "#55efc4",
 ];
 
 function StatCard({
   label,
   value,
   icon: Icon,
-  color = "green",
+  color = "red",
   delay = 0,
 }: {
   label: string;
   value: string | number;
   icon: React.ElementType;
-  color?: "green" | "cyan" | "magenta" | "red";
+  color?: "red" | "blue" | "purple" | "orange";
   delay?: number;
 }) {
   const colorMap = {
-    green:   { text: "#00ff88", border: "#00ff8830", bg: "#00ff8810", glow: "#00ff8840" },
-    cyan:    { text: "#00d4ff", border: "#00d4ff30", bg: "#00d4ff10", glow: "#00d4ff40" },
-    magenta: { text: "#ff00ff", border: "#ff00ff30", bg: "#ff00ff10", glow: "#ff00ff40" },
-    red:     { text: "#ff3366", border: "#ff336630", bg: "#ff336610", glow: "#ff336640" },
+    red:    { text: "#ff4757", bg: "rgba(255,71,87,0.1)",  iconBg: "rgba(255,71,87,0.12)" },
+    blue:   { text: "#0984e3", bg: "rgba(9,132,227,0.1)",  iconBg: "rgba(9,132,227,0.12)" },
+    purple: { text: "#6c5ce7", bg: "rgba(108,92,231,0.1)", iconBg: "rgba(108,92,231,0.12)" },
+    orange: { text: "#e17055", bg: "rgba(225,112,85,0.1)", iconBg: "rgba(225,112,85,0.12)" },
   };
   const c = colorMap[color];
 
@@ -61,31 +61,28 @@ function StatCard({
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.35 }}
-      className="card p-5 relative overflow-hidden"
-      style={{ borderColor: c.border }}
+      transition={{ delay, duration: 0.35, type: "spring", stiffness: 200 }}
+      className="bg-[#e0e5ec] rounded-2xl p-5 relative overflow-hidden"
+      style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ boxShadow: `inset 0 0 20px ${c.glow}18` }}
-      />
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-4">
-          <div
-            className="w-10 h-10 flex items-center justify-center clip-chamfer-sm border"
-            style={{ background: c.bg, borderColor: c.border, boxShadow: `0 0 10px ${c.glow}` }}
-          >
-            <Icon className="w-5 h-5" style={{ color: c.text }} />
-          </div>
-        </div>
+      <div className="flex items-start justify-between mb-4">
         <div
-          className="font-orbitron text-2xl font-black mb-0.5"
-          style={{ color: c.text, textShadow: `0 0 10px ${c.glow}` }}
+          className="w-10 h-10 flex items-center justify-center rounded-xl"
+          style={{
+            background: c.iconBg,
+            boxShadow: "3px 3px 8px #babecc, -3px -3px 8px #ffffff",
+          }}
         >
-          {value}
+          <Icon className="w-5 h-5" style={{ color: c.text }} />
         </div>
-        <div className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a]">{label}</div>
       </div>
+      <div
+        className="font-jetbrains text-2xl font-black mb-0.5"
+        style={{ color: c.text }}
+      >
+        {value}
+      </div>
+      <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">{label}</div>
     </motion.div>
   );
 }
@@ -93,9 +90,12 @@ function StatCard({
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#0d0d17] border border-[#00ff8830] px-3 py-2 text-sm clip-chamfer-sm">
-        <p className="font-orbitron text-[9px] uppercase tracking-widest text-[#4a4a6a] mb-1">{label}</p>
-        <p className="font-jetbrains text-[#00ff88] font-bold">{payload[0].value} items</p>
+      <div
+        className="bg-[#e0e5ec] px-3 py-2 text-sm rounded-lg"
+        style={{ boxShadow: "4px 4px 10px #babecc, -4px -4px 10px #ffffff" }}
+      >
+        <p className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-1">{label}</p>
+        <p className="font-jetbrains text-[#ff4757] font-bold">{payload[0].value} items</p>
       </div>
     );
   }
@@ -124,10 +124,14 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="card p-5 animate-pulse">
-            <div className="w-10 h-10 bg-[#0d0d17] clip-chamfer-sm mb-4 border border-[#1e1e2e]" />
-            <div className="h-7 bg-[#0d0d17] rounded w-16 mb-1" />
-            <div className="h-3 bg-[#0a0a0f] rounded w-24" />
+          <div
+            key={i}
+            className="bg-[#e0e5ec] rounded-2xl p-5 animate-pulse"
+            style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          >
+            <div className="w-10 h-10 bg-[#d1d9e6] rounded-xl mb-4" />
+            <div className="h-7 bg-[#d1d9e6] rounded w-16 mb-1" />
+            <div className="h-3 bg-[#d1d9e6] rounded w-24" />
           </div>
         ))}
       </div>
@@ -136,8 +140,11 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
 
   if (!stats) {
     return (
-      <div className="card p-8 text-center border-[#ff336630]">
-        <p className="font-jetbrains text-[#ff3366] text-sm">
+      <div
+        className="bg-[#e0e5ec] rounded-2xl p-8 text-center"
+        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff", border: "1px solid rgba(192,57,43,0.2)" }}
+      >
+        <p className="font-jetbrains text-[#c0392b] text-sm">
           Unable to load dashboard. Check your database connection.
         </p>
       </div>
@@ -149,11 +156,11 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-orbitron text-2xl font-black text-[#e0e0f0] tracking-wider glitch">
-            DASHBOARD
+          <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
+            Dashboard
           </h1>
-          <p className="font-jetbrains text-xs text-[#4a4a6a] mt-1 tracking-wider">
-            <span className="text-[#00ff8860]">//</span> LA Smokes Inventory Overview
+          <p className="font-jetbrains text-xs text-[#4a5568] mt-1 tracking-wider">
+            LA Smokes Inventory Overview
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -174,28 +181,28 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           label="Total Products"
           value={(stats.totalProducts ?? 0).toLocaleString()}
           icon={Package}
-          color="green"
+          color="red"
           delay={0}
         />
         <StatCard
           label="Total Units"
           value={(stats.totalUnits ?? 0).toLocaleString()}
           icon={TrendingUp}
-          color="cyan"
+          color="blue"
           delay={0.05}
         />
         <StatCard
           label="Low Stock"
           value={stats.lowStockCount ?? 0}
           icon={AlertTriangle}
-          color={(stats.lowStockCount ?? 0) > 0 ? "red" : "green"}
+          color={(stats.lowStockCount ?? 0) > 0 ? "orange" : "red"}
           delay={0.1}
         />
         <StatCard
           label="Categories"
           value={stats.categoryBreakdown?.length ?? 0}
           icon={BarChart2}
-          color="magenta"
+          color="purple"
           delay={0.15}
         />
       </div>
@@ -207,16 +214,17 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="card p-5 lg:col-span-2 border-[#00ff8820]"
+          className="bg-[#e0e5ec] rounded-2xl p-5 lg:col-span-2"
+          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
         >
-          <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a] mb-4">
-            <span className="text-[#00ff8860]">&gt;</span> Products by Category
+          <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-4">
+            Products by Category
           </h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={stats.categoryBreakdown ?? []} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
               <XAxis
                 dataKey="category"
-                tick={{ fill: "#4a4a6a", fontSize: 9, fontFamily: "var(--font-orbitron)" }}
+                tick={{ fill: "#4a5568", fontSize: 9, fontFamily: "var(--font-jetbrains)" }}
                 axisLine={false}
                 tickLine={false}
                 interval={0}
@@ -225,14 +233,14 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
                 height={50}
               />
               <YAxis
-                tick={{ fill: "#4a4a6a", fontSize: 10, fontFamily: "var(--font-jetbrains)" }}
+                tick={{ fill: "#4a5568", fontSize: 10, fontFamily: "var(--font-jetbrains)" }}
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "#00ff8808" }} />
-              <Bar dataKey="count" radius={[2, 2, 0, 0]}>
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(186,190,204,0.3)" }} />
+              <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                 {(stats.categoryBreakdown ?? []).map((_, index) => (
-                  <Cell key={index} fill={NEON_SHADES[index % NEON_SHADES.length]} />
+                  <Cell key={index} fill={INDUSTRIAL_COLORS[index % INDUSTRIAL_COLORS.length]} />
                 ))}
               </Bar>
             </BarChart>
@@ -244,17 +252,18 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="card p-5 border-[#00d4ff20]"
+          className="bg-[#e0e5ec] rounded-2xl p-5"
+          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a]">
-              <span className="text-[#00d4ff60]">&gt;</span> Recently Updated
+            <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+              Recently Updated
             </h2>
-            <Clock className="w-3.5 h-3.5 text-[#2e2e4a]" />
+            <Clock className="w-3.5 h-3.5 text-[#babecc]" />
           </div>
           <div className="space-y-3">
             {(stats.recentlyUpdated ?? []).length === 0 ? (
-              <p className="font-jetbrains text-[#2e2e4a] text-xs">No products yet</p>
+              <p className="font-jetbrains text-[#babecc] text-xs">No products yet</p>
             ) : (
               (stats.recentlyUpdated ?? []).map((product) => (
                 <Link
@@ -264,10 +273,10 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
                 >
                   <CategoryIcon category={product.category} size="sm" />
                   <div className="min-w-0 flex-1">
-                    <p className="font-jetbrains text-xs font-bold text-[#c0c0d8] truncate group-hover:text-[#00ff88] transition-colors">
+                    <p className="font-sans text-xs font-bold text-[#2d3436] truncate group-hover:text-[#ff4757] transition-colors">
                       {product.product_name}
                     </p>
-                    <p className="font-jetbrains text-[9px] text-[#2e2e4a] mt-0.5">
+                    <p className="font-jetbrains text-[9px] text-[#babecc] mt-0.5">
                       {formatDateTime(product.updated_at)} · Qty: {product.quantity}
                     </p>
                   </div>
@@ -278,7 +287,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           </div>
           <Link
             href="/admin/inventory"
-            className="mt-4 font-orbitron text-[9px] text-[#00ff88] hover:text-[#33ffaa] flex items-center gap-1 transition-colors uppercase tracking-widest"
+            className="mt-4 font-jetbrains text-[9px] text-[#ff4757] hover:text-[#ff6b7a] flex items-center gap-1 transition-colors uppercase tracking-widest font-bold"
           >
             View all →
           </Link>
@@ -291,21 +300,25 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="border border-[#ff336630] bg-[#ff336608] p-4 flex items-center gap-3 clip-chamfer-md"
-          style={{ boxShadow: "0 0 20px #ff336610" }}
+          className="bg-[#e0e5ec] rounded-xl p-4 flex items-center gap-3"
+          style={{
+            boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+            border: "1px solid rgba(225,112,85,0.3)",
+          }}
         >
-          <AlertTriangle className="w-5 h-5 text-[#ff3366] flex-shrink-0 drop-shadow-[0_0_6px_#ff3366]" />
+          <AlertTriangle className="w-5 h-5 text-[#e17055] flex-shrink-0" />
           <div className="flex-1">
-            <p className="font-orbitron text-xs font-black text-[#ff3366] uppercase tracking-wider">
+            <p className="font-sans text-xs font-black text-[#c0602a] uppercase tracking-wider">
               {stats.lowStockCount ?? 0} item{(stats.lowStockCount ?? 0) !== 1 ? "s" : ""} low on stock
             </p>
-            <p className="font-jetbrains text-[10px] text-[#ff336670] mt-0.5">
+            <p className="font-jetbrains text-[10px] text-[#e17055] mt-0.5">
               Review and restock to avoid outages
             </p>
           </div>
           <Link
             href="/admin/low-stock"
-            className="font-orbitron text-[9px] text-[#ff3366] font-black border border-[#ff336640] px-3 py-1.5 uppercase tracking-widest hover:bg-[#ff336615] transition-colors clip-chamfer-sm flex-shrink-0"
+            className="btn-secondary text-[#e17055] hover:text-[#e17055] flex-shrink-0"
+            style={{ fontSize: "9px" }}
           >
             View →
           </Link>
@@ -317,24 +330,26 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
-        className="card p-5"
+        className="bg-[#e0e5ec] rounded-2xl p-5"
+        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
       >
-        <h2 className="font-orbitron text-[10px] font-black uppercase tracking-widest text-[#4a4a6a] mb-4">
-          <span className="text-[#ff00ff60]">&gt;</span> Inventory by Category
+        <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-4">
+          Inventory by Category
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {(stats.categoryBreakdown ?? []).map((item) => (
             <Link
               key={item.category}
               href={`/admin/inventory?category=${encodeURIComponent(item.category)}`}
-              className="flex flex-col items-center gap-2 p-3 bg-[#0a0a0f] border border-[#1e1e2e] hover:border-[#00ff8840] hover:bg-[#00ff8808] transition-all group clip-chamfer-sm"
+              className="flex flex-col items-center gap-2 p-3 bg-[#e0e5ec] rounded-xl transition-all duration-200 hover:-translate-y-0.5 group"
+              style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
             >
               <CategoryIcon category={item.category} size="sm" />
               <div className="text-center">
-                <div className="font-orbitron text-sm font-black text-[#00ff88] group-hover:text-[#33ffaa]">
+                <div className="font-jetbrains text-sm font-black text-[#ff4757] group-hover:text-[#ff6b7a]">
                   {item.count}
                 </div>
-                <div className="font-jetbrains text-[9px] text-[#4a4a6a] leading-tight">{item.category}</div>
+                <div className="font-jetbrains text-[9px] text-[#4a5568] leading-tight">{item.category}</div>
               </div>
             </Link>
           ))}
