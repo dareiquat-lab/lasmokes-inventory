@@ -74,6 +74,23 @@ export interface CartItem {
   stock: number;
 }
 
+export interface CategoryRecord {
+  id: number;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InvoiceActivity {
+  id: number;
+  order_id: number;
+  action_type: "printed" | "emailed";
+  performed_at: string;
+  recipient_email: string | null;
+  notes: string | null;
+}
+
 export const ORDER_STATUSES: { value: OrderStatus; label: string; color: string }[] = [
   { value: "new",       label: "New",       color: "#1565C0" },
   { value: "contacted", label: "Contacted", color: "#6A1B9A" },

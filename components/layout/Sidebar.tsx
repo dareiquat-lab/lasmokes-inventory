@@ -12,16 +12,18 @@ import {
   X,
   ShoppingCart,
   LogOut,
+  Tag,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { href: "/admin",              label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/inventory",    label: "Inventory",  icon: Package         },
-  { href: "/admin/orders",       label: "Orders",     icon: ShoppingCart    },
-  { href: "/admin/low-stock",    label: "Low Stock",  icon: AlertTriangle   },
-  { href: "/admin/products/new", label: "Add Item",   icon: PlusCircle      },
+  { href: "/admin",               label: "Dashboard",  icon: LayoutDashboard },
+  { href: "/admin/inventory",     label: "Inventory",  icon: Package         },
+  { href: "/admin/orders",        label: "Orders",     icon: ShoppingCart    },
+  { href: "/admin/categories",    label: "Categories", icon: Tag             },
+  { href: "/admin/low-stock",     label: "Low Stock",  icon: AlertTriangle   },
+  { href: "/admin/products/new",  label: "Add Item",   icon: PlusCircle      },
 ];
 
 function NavLink({ href, label, icon: Icon, onClick }: {

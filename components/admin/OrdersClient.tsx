@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
-import type { Order, OrderStatus } from "@/types";
+import type { Order, OrderStatus, InvoiceActivity } from "@/types";
+import { EmailInvoiceModal } from "@/components/admin/EmailInvoiceModal";
 
 interface PaginatedOrders {
   orders: Order[];
@@ -55,12 +56,63 @@ function StatusSelector({ orderId, current, onChange }: {
   );
 }
 
-function OrderRow({ order, onStatusChange }: {
+function OrderRow({
+  order,
+  onStatusChange,
+  onEmail,
+}: {
   order: Order;
   onStatusChange: (id: number, status: OrderStatus) => void;
+  onEmail: (order: Order) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [activity, setActivity] = useState<InvoiceActivity[] | null>(null);
+  const [activityLoading, setActivityLoading] = useState(false);
   const items = order.items || [];
+
+  const handleExpand = useCallback(() => {
+    setExpanded((e) => {
+      const next = !e;
+      if (next && activity === null) {
+        setActivityLoading(true);
+        fetch(`/api/admin/orders/${order.id}/activity`)
+          .then((r) => r.json())
+          .then((d) => setActivity(d.activity || []))
+          .catch(() => setActivity([]))
+          .finally(() => setActivityLoading(false));
+      }
+      return next;
+    });
+  }, [order.id, activity]);
+
+  const handlePrint = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      window.open(`/admin/orders/${order.id}/invoice`, "_blank");
+      // Log print activity
+      fetch(`/api/admin/orders/${order.id}/activity`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action_type: "printed" }),
+      })
+        .then((r) => r.json())
+        .then((entry) => {
+          if (activity !== null) {
+            setActivity((prev) => (prev ? [entry, ...prev] : [entry]));
+          }
+        })
+        .catch(() => {});
+    },
+    [order.id, activity]
+  );
+
+  const handleEmailClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onEmail(order);
+    },
+    [onEmail, order]
+  );
 
   return (
     <>
@@ -70,7 +122,7 @@ function OrderRow({ order, onStatusChange }: {
           expanded ? "bg-[#ff475706]" : "hover:bg-[#ff475704]"
         )}
         style={{ borderBottom: "1px solid #f0f2f5" }}
-        onClick={() => setExpanded(e => !e)}
+        onClick={handleExpand}
       >
         <td className="table-cell">
           <span className="font-jetbrains text-[#ff4757] text-xs font-bold">{order.order_number}</span>
@@ -97,14 +149,33 @@ function OrderRow({ order, onStatusChange }: {
         <td className="table-cell">
           <StatusBadge status={order.status} />
         </td>
-        <td className="table-cell" onClick={e => e.stopPropagation()}>
+        <td className="table-cell" onClick={(e) => e.stopPropagation()}>
           <StatusSelector orderId={order.id} current={order.status} onChange={onStatusChange} />
         </td>
-        <td className="table-cell w-8">
-          {expanded
-            ? <ChevronUp className="w-3.5 h-3.5 text-[#babecc]" />
-            : <ChevronDown className="w-3.5 h-3.5 text-[#babecc]" />
-          }
+        <td className="table-cell" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handlePrint}
+              title="Print invoice"
+              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#2d3436] hover:bg-[#babecc30] transition-all"
+            >
+              <Printer className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleEmailClick}
+              title="Email invoice"
+              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#ff4757] hover:bg-[#ff475710] transition-all"
+            >
+              <Mail className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={handleExpand} className="p-1.5">
+              {expanded ? (
+                <ChevronUp className="w-3.5 h-3.5 text-[#babecc]" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-[#babecc]" />
+              )}
+            </button>
+          </div>
         </td>
       </tr>
 
@@ -137,6 +208,44 @@ function OrderRow({ order, onStatusChange }: {
                   <p className="font-jetbrains text-xs text-[#4a5568]">{order.notes}</p>
                 </div>
               )}
+              {/* Activity log */}
+              <div className="mt-2 pt-2" style={{ borderTop: "1px solid #babecc" }}>
+                <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-2">
+                  Invoice Activity
+                </div>
+                {activityLoading ? (
+                  <div className="font-jetbrains text-[10px] text-[#babecc] animate-pulse">Loading...</div>
+                ) : activity && activity.length > 0 ? (
+                  <div className="space-y-1">
+                    {activity.map((a) => (
+                      <div key={a.id} className="flex items-center gap-3 font-jetbrains text-[10px]">
+                        <span
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white font-bold uppercase tracking-wide"
+                          style={{
+                            fontSize: 8,
+                            background: a.action_type === "emailed" ? "#6A1B9A" : "#374151",
+                          }}
+                        >
+                          {a.action_type === "emailed" ? (
+                            <Mail className="w-2.5 h-2.5" />
+                          ) : (
+                            <Printer className="w-2.5 h-2.5" />
+                          )}
+                          {a.action_type}
+                        </span>
+                        {a.recipient_email && (
+                          <span className="text-[#4a5568]">{a.recipient_email}</span>
+                        )}
+                        <span className="text-[#babecc] ml-auto">
+                          {new Date(a.performed_at).toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="font-jetbrains text-[10px] text-[#babecc]">No activity yet</p>
+                )}
+              </div>
             </div>
           </td>
         </tr>
@@ -154,6 +263,7 @@ export function OrdersClient() {
   const [page, setPage] = useState(1);
   const debounceRef = useRef<NodeJS.Timeout>();
   const pendingIds = useRef<Set<number>>(new Set());
+  const [emailModalOrder, setEmailModalOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -328,8 +438,13 @@ export function OrdersClient() {
                   </td>
                 </tr>
               ) : (
-                data.orders.map(order => (
-                  <OrderRow key={order.id} order={order} onStatusChange={handleStatusChange} />
+                data.orders.map((order) => (
+                  <OrderRow
+                    key={order.id}
+                    order={order}
+                    onStatusChange={handleStatusChange}
+                    onEmail={setEmailModalOrder}
+                  />
                 ))
               )}
             </tbody>
@@ -362,6 +477,15 @@ export function OrdersClient() {
           </div>
         )}
       </div>
+
+      {emailModalOrder && (
+        <EmailInvoiceModal
+          order={emailModalOrder}
+          isOpen={!!emailModalOrder}
+          onClose={() => setEmailModalOrder(null)}
+          onSent={() => setEmailModalOrder(null)}
+        />
+      )}
     </div>
   );
 }

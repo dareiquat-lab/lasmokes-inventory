@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,6 @@ import { Save, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { ImageUpload } from "./ImageUpload";
 import { ConfirmModal } from "@/components/ui/Modal";
-import { CATEGORIES } from "@/types";
 import type { Product } from "@/types";
 
 const productSchema = z.object({
@@ -38,6 +37,16 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [skuSuggesting, setSkuSuggesting] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/categories")
+      .then((r) => r.json())
+      .then((data) =>
+        setCategories((data.categories || []).map((c: { name: string }) => c.name))
+      )
+      .catch(() => {});
+  }, []);
 
   const {
     register,
@@ -173,7 +182,11 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     className="input-field appearance-none"
                   >
                     <option value="">Select category</option>
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    {categories.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
                   </select>
                   {errors.category && (
                     <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.category.message}</p>

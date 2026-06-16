@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateOrderStatus } from "@/lib/db";
+import { updateOrderStatus, getOrderById } from "@/lib/db";
 import type { OrderStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
 
 const VALID_STATUSES: OrderStatus[] = ["new", "contacted", "ready", "completed", "cancelled"];
+
+export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const id = parseInt(params.id);
+    if (isNaN(id)) return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
+    const order = await getOrderById(id);
+    if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    return NextResponse.json(order, { headers: { "Cache-Control": "no-store" } });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: "Failed to fetch order" }, { status: 500 });
+  }
+}
 
 export async function PATCH(
   request: NextRequest,

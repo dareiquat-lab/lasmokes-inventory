@@ -352,3 +352,140 @@ export async function updateOrderStatus(id: number, status: OrderStatus) {
   `;
   return result[0] || null;
 }
+
+// ─── Categories ───────────────────────────────────────────────────────────────
+
+const SEED_CATEGORIES = [
+  "Cigarettes", "Cigars", "Wraps", "Rolling Papers", "Lighters",
+  "Batteries", "Butane", "Incense", "Medication", "Accessories", "Eye Care", "Condoms",
+];
+
+export async function ensureCategoriesTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS categories (
+      id SERIAL PRIMARY KEY,
+      name TEXT UNIQUE NOT NULL,
+      description TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  // Seed with existing categories if empty
+  const existing = await sql`SELECT COUNT(*) as count FROM categories`;
+  if (parseInt(existing[0].count) === 0) {
+    for (const name of SEED_CATEGORIES) {
+      await sql`INSERT INTO categories (name) VALUES (${name}) ON CONFLICT (name) DO NOTHING`;
+    }
+  }
+}
+
+export async function getCategories() {
+  await ensureCategoriesTable();
+  return sql`SELECT * FROM categories ORDER BY name ASC`;
+}
+
+export async function createCategory(name: string, description?: string) {
+  await ensureCategoriesTable();
+  const result = await sql`
+    INSERT INTO categories (name, description) VALUES (${name}, ${description || null})
+    RETURNING *
+  `;
+  return result[0];
+}
+
+export async function updateCategory(id: number, name: string, description?: string) {
+  await ensureCategoriesTable();
+  const existing = await sql`SELECT name FROM categories WHERE id = ${id}`;
+  if (!existing[0]) return null;
+  const oldName = existing[0].name;
+  const result = await sql`
+    UPDATE categories SET name=${name}, description=${description || null}, updated_at=NOW()
+    WHERE id=${id} RETURNING *
+  `;
+  if (oldName !== name) {
+    await sql`UPDATE products SET category=${name}, updated_at=NOW() WHERE category=${oldName}`;
+  }
+  return result[0];
+}
+
+export async function deleteCategory(id: number, reassignTo?: string) {
+  await ensureCategoriesTable();
+  const existing = await sql`SELECT name FROM categories WHERE id=${id}`;
+  if (!existing[0]) return false;
+  const categoryName = existing[0].name;
+  if (reassignTo) {
+    await sql`UPDATE products SET category=${reassignTo}, updated_at=NOW() WHERE category=${categoryName}`;
+  }
+  await sql`DELETE FROM categories WHERE id=${id}`;
+  return true;
+}
+
+export async function getCategoryProductCount(id: number) {
+  await ensureCategoriesTable();
+  const cat = await sql`SELECT name FROM categories WHERE id=${id}`;
+  if (!cat[0]) return 0;
+  const result = await sql`SELECT COUNT(*) as count FROM products WHERE category=${cat[0].name}`;
+  return parseInt(result[0].count);
+}
+
+// ─── Invoice Activity ─────────────────────────────────────────────────────────
+
+export async function ensureInvoiceActivityTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS invoice_activity (
+      id SERIAL PRIMARY KEY,
+      order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      action_type TEXT NOT NULL CHECK (action_type IN ('printed','emailed')),
+      performed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      recipient_email TEXT,
+      notes TEXT
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_invoice_activity_order_id ON invoice_activity(order_id)`;
+}
+
+export async function logInvoiceActivity(data: {
+  order_id: number;
+  action_type: "printed" | "emailed";
+  recipient_email?: string;
+  notes?: string;
+}) {
+  await ensureInvoiceActivityTable();
+  const result = await sql`
+    INSERT INTO invoice_activity (order_id, action_type, recipient_email, notes)
+    VALUES (${data.order_id}, ${data.action_type}, ${data.recipient_email || null}, ${data.notes || null})
+    RETURNING *
+  `;
+  return result[0];
+}
+
+export async function getOrderActivity(order_id: number) {
+  await ensureInvoiceActivityTable();
+  return sql`
+    SELECT * FROM invoice_activity WHERE order_id=${order_id} ORDER BY performed_at DESC
+  `;
+}
+
+export async function getOrderById(id: number) {
+  const result = await sql`
+    SELECT o.*,
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'id', oi.id,
+            'product_id', oi.product_id,
+            'product_name', oi.product_name,
+            'product_sku', oi.product_sku,
+            'quantity', oi.quantity,
+            'price', oi.price
+          )
+        ) FILTER (WHERE oi.id IS NOT NULL),
+        '[]'
+      ) as items
+    FROM orders o
+    LEFT JOIN order_items oi ON oi.order_id = o.id
+    WHERE o.id=${id}
+    GROUP BY o.id
+  `;
+  return (result[0] as unknown as import("@/types").Order) || null;
+}
