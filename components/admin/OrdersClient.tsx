@@ -18,13 +18,8 @@ function StatusBadge({ status }: { status: OrderStatus }) {
   if (!s) return null;
   return (
     <span
-      className="badge"
-      style={{
-        color: s.color,
-        borderColor: `${s.color}40`,
-        background: `${s.color}12`,
-        boxShadow: "2px 2px 4px #babecc, -1px -1px 2px #ffffff",
-      }}
+      className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"
+      style={{ background: s.color, color: "#ffffff" }}
     >
       {s.label}
     </span>
@@ -37,23 +32,22 @@ function StatusSelector({ orderId, current, onChange }: {
   onChange: (id: number, status: OrderStatus) => void;
 }) {
   const s = ORDER_STATUSES.find(o => o.value === current);
-  const color = s?.color ?? "#ff4757";
+  const color = s?.color ?? "#1565C0";
   return (
     <select
       value={current}
       onChange={e => onChange(orderId, e.target.value as OrderStatus)}
-      className="font-jetbrains text-[9px] uppercase tracking-wider cursor-pointer focus:outline-none rounded-lg"
+      className="font-jetbrains text-[9px] uppercase tracking-wider cursor-pointer focus:outline-none rounded-lg font-bold"
       style={{
-        background: "#e0e5ec",
-        border: `1px solid ${color}40`,
-        color,
-        padding: "4px 8px",
+        background: color,
+        border: "none",
+        color: "#ffffff",
+        padding: "5px 10px",
         minWidth: "110px",
-        boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff",
       }}
     >
       {ORDER_STATUSES.map(st => (
-        <option key={st.value} value={st.value} style={{ background: "#e0e5ec", color: st.color }}>
+        <option key={st.value} value={st.value} style={{ background: st.color, color: "#ffffff" }}>
           {st.label}
         </option>
       ))}

@@ -75,11 +75,11 @@ export interface CartItem {
 }
 
 export const ORDER_STATUSES: { value: OrderStatus; label: string; color: string }[] = [
-  { value: "new",       label: "New",       color: "#00d4ff" },
-  { value: "contacted", label: "Contacted", color: "#ff00ff" },
-  { value: "ready",     label: "Ready",     color: "#ffff00" },
-  { value: "completed", label: "Completed", color: "#00ff88" },
-  { value: "cancelled", label: "Cancelled", color: "#ff3366" },
+  { value: "new",       label: "New",       color: "#1565C0" },
+  { value: "contacted", label: "Contacted", color: "#6A1B9A" },
+  { value: "ready",     label: "Ready",     color: "#E65100" },
+  { value: "completed", label: "Completed", color: "#2E7D32" },
+  { value: "cancelled", label: "Cancelled", color: "#B71C1C" },
 ];
 
 export const CATEGORIES = [
@@ -115,16 +115,16 @@ export const CATEGORY_ICONS: Record<string, string> = {
 };
 
 export const CATEGORY_COLORS: Record<string, string> = {
-  Cigarettes: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  Cigars: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  Wraps: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  "Rolling Papers": "bg-lime-500/10 text-lime-400 border-lime-500/20",
-  Lighters: "bg-red-500/10 text-red-400 border-red-500/20",
-  Batteries: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  Butane: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  Incense: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  Medication: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-  Accessories: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-  "Eye Care": "bg-teal-500/10 text-teal-400 border-teal-500/20",
-  Condoms: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+  Cigarettes: "bg-amber-100 text-amber-900 border border-amber-300",
+  Cigars: "bg-orange-100 text-orange-900 border border-orange-300",
+  Wraps: "bg-yellow-100 text-yellow-900 border border-yellow-400",
+  "Rolling Papers": "bg-lime-100 text-lime-900 border border-lime-300",
+  Lighters: "bg-red-100 text-red-900 border border-red-300",
+  Batteries: "bg-blue-100 text-blue-900 border border-blue-300",
+  Butane: "bg-cyan-100 text-cyan-900 border border-cyan-300",
+  Incense: "bg-purple-100 text-purple-900 border border-purple-300",
+  Medication: "bg-pink-100 text-pink-900 border border-pink-300",
+  Accessories: "bg-indigo-100 text-indigo-900 border border-indigo-300",
+  "Eye Care": "bg-teal-100 text-teal-900 border border-teal-300",
+  Condoms: "bg-rose-100 text-rose-900 border border-rose-300",
 };

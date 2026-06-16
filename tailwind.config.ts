@@ -22,11 +22,10 @@ const config: Config = {
         },
       },
       fontFamily: {
-        /* sans remapped so font-sans → Inter everywhere */
-        sans:      ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        /* orbitron is remapped to Inter so all font-orbitron classes use Inter */
-        orbitron:  ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        inter:     ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        /* all sans-family classes → DM Sans */
+        sans:      ["var(--font-dm-sans)", "DM Sans", "system-ui", "sans-serif"],
+        orbitron:  ["var(--font-dm-sans)", "DM Sans", "system-ui", "sans-serif"],
+        inter:     ["var(--font-dm-sans)", "DM Sans", "system-ui", "sans-serif"],
         mono:      ["var(--font-jetbrains)", "JetBrains Mono", "monospace"],
         jetbrains: ["var(--font-jetbrains)", "JetBrains Mono", "monospace"],
       },
