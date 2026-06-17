@@ -15,9 +15,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, description } = await request.json();
+    const { name, description, icon } = await request.json();
     if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    const category = await createCategory(name.trim(), description?.trim());
+    const category = await createCategory(name.trim(), description?.trim(), icon?.trim());
     return NextResponse.json(category, { status: 201 });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "";

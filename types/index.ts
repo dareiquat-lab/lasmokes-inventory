@@ -78,6 +78,7 @@ export interface CategoryRecord {
   id: number;
   name: string;
   description: string | null;
+  icon: string;
   created_at: string;
   updated_at: string;
 }

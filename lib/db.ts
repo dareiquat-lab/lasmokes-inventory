@@ -355,9 +355,19 @@ export async function updateOrderStatus(id: number, status: OrderStatus) {
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 
-const SEED_CATEGORIES = [
-  "Cigarettes", "Cigars", "Wraps", "Rolling Papers", "Lighters",
-  "Batteries", "Butane", "Incense", "Medication", "Accessories", "Eye Care", "Condoms",
+const SEED_CATEGORIES: { name: string; icon: string }[] = [
+  { name: "Cigarettes",     icon: "🚬" },
+  { name: "Cigars",         icon: "🍫" },
+  { name: "Wraps",          icon: "📜" },
+  { name: "Rolling Papers", icon: "📄" },
+  { name: "Lighters",       icon: "🔥" },
+  { name: "Batteries",      icon: "🔋" },
+  { name: "Butane",         icon: "💨" },
+  { name: "Incense",        icon: "🕯️" },
+  { name: "Medication",     icon: "💊" },
+  { name: "Accessories",    icon: "⚙️" },
+  { name: "Eye Care",       icon: "👁️" },
+  { name: "Condoms",        icon: "🛡️" },
 ];
 
 export async function ensureCategoriesTable() {
@@ -366,15 +376,25 @@ export async function ensureCategoriesTable() {
       id SERIAL PRIMARY KEY,
       name TEXT UNIQUE NOT NULL,
       description TEXT,
+      icon TEXT NOT NULL DEFAULT '📦',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  // Add icon column to existing tables that pre-date this migration
+  await sql`
+    ALTER TABLE categories ADD COLUMN IF NOT EXISTS icon TEXT NOT NULL DEFAULT '📦'
+  `;
   // Seed with existing categories if empty
   const existing = await sql`SELECT COUNT(*) as count FROM categories`;
   if (parseInt(existing[0].count) === 0) {
-    for (const name of SEED_CATEGORIES) {
-      await sql`INSERT INTO categories (name) VALUES (${name}) ON CONFLICT (name) DO NOTHING`;
+    for (const cat of SEED_CATEGORIES) {
+      await sql`INSERT INTO categories (name, icon) VALUES (${cat.name}, ${cat.icon}) ON CONFLICT (name) DO NOTHING`;
+    }
+  } else {
+    // Backfill icons for the 12 original categories that were seeded without icons
+    for (const cat of SEED_CATEGORIES) {
+      await sql`UPDATE categories SET icon=${cat.icon} WHERE name=${cat.name} AND icon='📦'`;
     }
   }
 }
@@ -384,22 +404,23 @@ export async function getCategories() {
   return sql`SELECT * FROM categories ORDER BY name ASC`;
 }
 
-export async function createCategory(name: string, description?: string) {
+export async function createCategory(name: string, description?: string, icon?: string) {
   await ensureCategoriesTable();
   const result = await sql`
-    INSERT INTO categories (name, description) VALUES (${name}, ${description || null})
+    INSERT INTO categories (name, description, icon)
+    VALUES (${name}, ${description || null}, ${icon || "📦"})
     RETURNING *
   `;
   return result[0];
 }
 
-export async function updateCategory(id: number, name: string, description?: string) {
+export async function updateCategory(id: number, name: string, description?: string, icon?: string) {
   await ensureCategoriesTable();
   const existing = await sql`SELECT name FROM categories WHERE id = ${id}`;
   if (!existing[0]) return null;
   const oldName = existing[0].name;
   const result = await sql`
-    UPDATE categories SET name=${name}, description=${description || null}, updated_at=NOW()
+    UPDATE categories SET name=${name}, description=${description || null}, icon=${icon || "📦"}, updated_at=NOW()
     WHERE id=${id} RETURNING *
   `;
   if (oldName !== name) {

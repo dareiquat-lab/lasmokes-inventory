@@ -5,6 +5,54 @@ import { Search, Plus, Edit2, Trash2, X, Tag } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import type { CategoryRecord } from "@/types";
 
+function suggestEmoji(name: string): string {
+  const n = name.toLowerCase();
+  const rules: [string[], string][] = [
+    [["cigarette", "cig", "tobacco", "smoke", "marlboro", "newport", "camel", "menthol"], "🚬"],
+    [["cigar", "stogie", "cohiba", "davidoff"], "🍫"],
+    [["wrap", "blunt", "backwood", "dutchmaster"], "📜"],
+    [["paper", "rolling", "zigzag", "zig", "raw", "rizla"], "📄"],
+    [["lighter", "torch", "clipper", "bic", "flame", "ignit"], "🔥"],
+    [["match", "matchbook"], "🔥"],
+    [["battery", "batteries", "18650", "lithium", "alkaline"], "🔋"],
+    [["butane", "propane", "fuel", "gas", "fluid", "refill"], "💨"],
+    [["incense", "stick", "scent", "aroma", "fragrance", "diffuser"], "🕯️"],
+    [["candle", "wax"], "🕯️"],
+    [["medication", "medicine", "drug", "pharmacy", "vitamin", "pill", "capsule", "otc", "health"], "💊"],
+    [["accessory", "accessories", "tool", "supply", "misc", "other", "general"], "⚙️"],
+    [["grinder", "herb grinder"], "⚙️"],
+    [["eye", "vision", "contact", "drop", "optical", "lens"], "👁️"],
+    [["condom", "protection", "contraceptive", "safe", "sexual"], "🛡️"],
+    [["vape", "vaping", "e-cig", "ecig", "pod", "mod", "coil", "juice", "eliquid", "e-liquid", "disposable"], "💨"],
+    [["hookah", "shisha", "narghile", "waterpipe"], "🌬️"],
+    [["pipe", "glass", "bowl", "bong", "dab", "rig"], "🪈"],
+    [["hemp", "cbd", "cannabis", "marijuana", "weed", "herb", "kush", "sativa", "indica", "delta"], "🌿"],
+    [["drink", "beverage", "soda", "water", "tea", "coffee", "energy drink"], "🥤"],
+    [["energy", "boost", "monster", "redbull"], "⚡"],
+    [["beer", "alcohol", "wine", "liquor", "spirit", "whiskey", "vodka", "rum"], "🍺"],
+    [["food", "snack", "chip", "cracker", "pretzel", "popcorn", "nuts"], "🍿"],
+    [["candy", "gummy", "sweet", "chocolate", "lollipop"], "🍬"],
+    [["gum", "chew", "mint", "breath"], "🌿"],
+    [["lotion", "cream", "balm", "salve", "skincare", "skin"], "🧴"],
+    [["rolling tray", "tray", "mat"], "🗂️"],
+    [["scale", "weight", "measure"], "⚖️"],
+    [["bag", "storage", "case", "pouch", "container", "box"], "👜"],
+    [["card", "gift", "voucher", "coupon"], "🎁"],
+    [["phone", "charger", "cable", "electronic", "tech"], "📱"],
+    [["mask", "ppe", "glove", "hygiene", "sanit"], "🧤"],
+    [["pain", "relief", "aspirin", "ibuprofen", "tylenol"], "💊"],
+    [["sexual", "adult", "pleasure"], "🛡️"],
+    [["lighter fluid", "torch fuel"], "🔥"],
+    [["cleaning", "cleaner", "wash", "wipe"], "🧹"],
+    [["nail", "gel", "polish", "beauty", "cosmetic"], "💅"],
+    [["hat", "cap", "shirt", "apparel", "clothing", "merch"], "👕"],
+  ];
+  for (const [keywords, emoji] of rules) {
+    if (keywords.some(k => n.includes(k))) return emoji;
+  }
+  return "📦";
+}
+
 export function CategoriesClient() {
   const [categories, setCategories] = useState<CategoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +63,7 @@ export function CategoriesClient() {
   const [editing, setEditing] = useState<CategoryRecord | null>(null);
   const [formName, setFormName] = useState("");
   const [formDesc, setFormDesc] = useState("");
+  const [formIcon, setFormIcon] = useState("📦");
   const [formError, setFormError] = useState("");
   const [formSaving, setFormSaving] = useState(false);
 
@@ -52,6 +101,7 @@ export function CategoriesClient() {
     setEditing(null);
     setFormName("");
     setFormDesc("");
+    setFormIcon("📦");
     setFormError("");
     setShowForm(true);
   };
@@ -60,8 +110,17 @@ export function CategoriesClient() {
     setEditing(cat);
     setFormName(cat.name);
     setFormDesc(cat.description || "");
+    setFormIcon(cat.icon || "📦");
     setFormError("");
     setShowForm(true);
+  };
+
+  const handleNameChange = (name: string) => {
+    setFormName(name);
+    // Auto-suggest emoji only when adding (not editing) or if icon is still the default
+    if (!editing || formIcon === "📦") {
+      setFormIcon(suggestEmoji(name));
+    }
   };
 
   const handleSave = async () => {
@@ -77,7 +136,7 @@ export function CategoriesClient() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: formName.trim(), description: formDesc.trim() || null }),
+        body: JSON.stringify({ name: formName.trim(), description: formDesc.trim() || null, icon: formIcon }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save");
@@ -220,10 +279,10 @@ export function CategoriesClient() {
                     <td className="table-cell">
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-6 h-6 rounded-md bg-[#ff4757] flex items-center justify-center flex-shrink-0"
-                          style={{ boxShadow: "2px 2px 4px rgba(166,50,60,0.3)" }}
+                          className="w-8 h-8 rounded-lg bg-[#e0e5ec] flex items-center justify-center flex-shrink-0 text-lg"
+                          style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
                         >
-                          <Tag className="w-3 h-3 text-white" />
+                          {cat.icon || "📦"}
                         </div>
                         <span className="font-sans text-sm font-bold text-[#2d3436]">{cat.name}</span>
                       </div>
@@ -269,18 +328,43 @@ export function CategoriesClient() {
       {/* Add / Edit Modal */}
       <Modal isOpen={showForm} onClose={() => { if (!formSaving) { setShowForm(false); setFormError(""); } }} title={editing ? "Edit Category" : "Add Category"}>
         <div className="space-y-4">
-          <div>
-            <label className="label">Category Name *</label>
-            <input
-              type="text"
-              value={formName}
-              onChange={(e) => setFormName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
-              className="input-field"
-              placeholder="e.g. Vapes"
-              autoFocus
-            />
+          <div className="flex gap-3 items-end">
+            <div className="flex-1">
+              <label className="label">Category Name *</label>
+              <input
+                type="text"
+                value={formName}
+                onChange={(e) => handleNameChange(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
+                className="input-field"
+                placeholder="e.g. Vapes"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="label">Icon</label>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-11 h-11 flex items-center justify-center text-2xl rounded-lg bg-[#e0e5ec] select-none"
+                  style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                  title="Auto-suggested icon"
+                >
+                  {formIcon}
+                </div>
+                <input
+                  type="text"
+                  value={formIcon}
+                  onChange={(e) => setFormIcon(e.target.value)}
+                  className="input-field w-16 text-center text-lg"
+                  maxLength={4}
+                  title="Type or paste any emoji"
+                />
+              </div>
+            </div>
           </div>
+          <p className="font-jetbrains text-[9px] text-[#babecc] -mt-2">
+            Icon is auto-suggested from the name — type any emoji to override
+          </p>
           <div>
             <label className="label">Description (Optional)</label>
             <textarea

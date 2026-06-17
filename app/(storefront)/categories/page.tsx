@@ -41,7 +41,7 @@ export default async function CategoriesPage() {
               style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
             >
               <span className="text-3xl group-hover:scale-110 transition-transform duration-200">
-                {CATEGORY_ICONS[cat.name] || "📦"}
+                {(cat as { name: string; icon?: string }).icon || CATEGORY_ICONS[cat.name] || "📦"}
               </span>
               <div className="text-center">
                 <div className="font-sans text-[10px] font-bold uppercase tracking-wider text-[#2d3436] group-hover:text-[#ff4757] transition-colors">

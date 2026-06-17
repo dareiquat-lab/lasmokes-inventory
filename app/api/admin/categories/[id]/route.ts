@@ -7,9 +7,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   try {
     const id = parseInt(params.id);
     if (isNaN(id)) return NextResponse.json({ error: "Invalid category ID" }, { status: 400 });
-    const { name, description } = await request.json();
+    const { name, description, icon } = await request.json();
     if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    const category = await updateCategory(id, name.trim(), description?.trim());
+    const category = await updateCategory(id, name.trim(), description?.trim(), icon?.trim());
     if (!category) return NextResponse.json({ error: "Category not found" }, { status: 404 });
     return NextResponse.json(category);
   } catch (e: unknown) {

@@ -149,7 +149,7 @@ export default async function HomePage() {
                 className="flex flex-col items-center gap-2 p-3 bg-[#e0e5ec] rounded-xl transition-all duration-200 hover:-translate-y-0.5 group"
                 style={{ boxShadow: "4px 4px 10px #babecc, -4px -4px 10px #ffffff" }}
               >
-                <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{CATEGORY_ICONS[cat.name] || "📦"}</span>
+                <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{(cat as { name: string; icon?: string }).icon || CATEGORY_ICONS[cat.name] || "📦"}</span>
                 <div className="font-jetbrains text-[8px] uppercase tracking-wider text-[#4a5568] group-hover:text-[#ff4757] text-center leading-tight transition-colors">
                   {cat.name}
                 </div>
