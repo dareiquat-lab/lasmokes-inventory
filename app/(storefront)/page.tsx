@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { getStorefrontProducts } from "@/lib/db";
+import { getStorefrontProducts, getCategories } from "@/lib/db";
 import { ProductCard } from "@/components/storefront/ProductCard";
-import { CATEGORIES, CATEGORY_ICONS } from "@/types";
+import { CATEGORY_ICONS } from "@/types";
 import { ShoppingCart, Package, Zap } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -9,11 +9,16 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   let featured: Awaited<ReturnType<typeof getStorefrontProducts>>["products"] = [];
   let total = 0;
+  let categories: { name: string }[] = [];
 
   try {
-    const result = await getStorefrontProducts({ limit: 8, page: 1 });
+    const [result, cats] = await Promise.all([
+      getStorefrontProducts({ limit: 8, page: 1 }),
+      getCategories(),
+    ]);
     featured = result.products;
     total = result.total;
+    categories = cats as { name: string }[];
   } catch {
     // DB not connected
   }
@@ -65,7 +70,7 @@ export default async function HomePage() {
               </div>
               <div className="w-px h-8 bg-[#babecc]" />
               <div>
-                <div className="font-jetbrains text-xl font-black text-[#0984e3]">{CATEGORIES.length}</div>
+                <div className="font-jetbrains text-xl font-black text-[#0984e3]">{categories.length}</div>
                 <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[#4a5568]">Categories</div>
               </div>
               <div className="w-px h-8 bg-[#babecc]" />
@@ -137,16 +142,16 @@ export default async function HomePage() {
             </h2>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {CATEGORIES.map(cat => (
+            {categories.map(cat => (
               <Link
-                key={cat}
-                href={`/products?category=${encodeURIComponent(cat)}`}
+                key={cat.name}
+                href={`/products?category=${encodeURIComponent(cat.name)}`}
                 className="flex flex-col items-center gap-2 p-3 bg-[#e0e5ec] rounded-xl transition-all duration-200 hover:-translate-y-0.5 group"
                 style={{ boxShadow: "4px 4px 10px #babecc, -4px -4px 10px #ffffff" }}
               >
-                <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{CATEGORY_ICONS[cat]}</span>
+                <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{CATEGORY_ICONS[cat.name] || "📦"}</span>
                 <div className="font-jetbrains text-[8px] uppercase tracking-wider text-[#4a5568] group-hover:text-[#ff4757] text-center leading-tight transition-colors">
-                  {cat}
+                  {cat.name}
                 </div>
               </Link>
             ))}

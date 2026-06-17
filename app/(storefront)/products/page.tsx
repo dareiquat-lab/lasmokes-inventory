@@ -1,6 +1,5 @@
-import { getStorefrontProducts } from "@/lib/db";
+import { getStorefrontProducts, getCategories } from "@/lib/db";
 import { ProductCard } from "@/components/storefront/ProductCard";
-import { CATEGORIES } from "@/types";
 import { Search } from "lucide-react";
 import Link from "next/link";
 
@@ -18,9 +17,13 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   let data: Awaited<ReturnType<typeof getStorefrontProducts>> = {
     products: [], total: 0, page: 1, limit: 24, totalPages: 0,
   };
+  let categoryNames: string[] = [];
 
   try {
-    data = await getStorefrontProducts({ search, category, page, limit: 24 });
+    [data, categoryNames] = await Promise.all([
+      getStorefrontProducts({ search, category, page, limit: 24 }),
+      getCategories().then(cats => (cats as { name: string }[]).map(c => c.name)),
+    ]);
   } catch {
     // DB not connected
   }
@@ -78,7 +81,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
           >
             All
           </Link>
-          {CATEGORIES.map(cat => (
+          {categoryNames.map(cat => (
             <Link
               key={cat}
               href={buildUrl({ category: cat, page: 1 })}

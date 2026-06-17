@@ -24,7 +24,6 @@ import { CategoryBadge, StockBadge } from "@/components/ui/Badge";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { ConfirmModal, Modal } from "@/components/ui/Modal";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
-import { CATEGORIES } from "@/types";
 import type { Product } from "@/types";
 import { useSearchParams } from "next/navigation";
 
@@ -53,6 +52,14 @@ export function InventoryClient() {
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [bulkAction, setBulkAction] = useState("");
   const [bulkModal, setBulkModal] = useState(false);
+  const [categoryNames, setCategoryNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/categories")
+      .then(r => r.json())
+      .then(d => setCategoryNames((d.categories || []).map((c: { name: string }) => c.name)))
+      .catch(() => {});
+  }, []);
   const [bulkQuantity, setBulkQuantity] = useState("");
   const [bulkCategory, setBulkCategory] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -213,7 +220,7 @@ export function InventoryClient() {
             className="input-field pl-9 pr-8 appearance-none min-w-[160px] cursor-pointer"
           >
             <option value="">All Categories</option>
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            {categoryNames.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
 
@@ -548,7 +555,7 @@ export function InventoryClient() {
                 className="input-field"
               >
                 <option value="">Select category...</option>
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {categoryNames.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
           )}
