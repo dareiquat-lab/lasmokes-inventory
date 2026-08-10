@@ -85,6 +85,17 @@ export async function getProductById(id: number) {
   return result[0] || null;
 }
 
+export async function getProductByBarcode(code: string) {
+  // Try exact barcode match first, then SKU
+  const result = await sql`
+    SELECT * FROM products
+    WHERE barcode = ${code} OR sku = ${code}
+    ORDER BY (barcode = ${code}) DESC
+    LIMIT 1
+  `;
+  return result[0] || null;
+}
+
 export async function getStorefrontProducts(filters: {
   search?: string;
   category?: string;
