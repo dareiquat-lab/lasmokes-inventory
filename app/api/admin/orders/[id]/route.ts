@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateOrderStatus, getOrderById } from "@/lib/db";
+import { updateOrderStatus, getOrderById, deleteOrder } from "@/lib/db";
 import type { OrderStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +45,19 @@ export async function PATCH(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("PATCH /api/admin/orders/[id]:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
+
+export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const id = parseInt(params.id);
+    if (isNaN(id)) return NextResponse.json({ error: "Invalid order ID" }, { status: 400 });
+    await deleteOrder(id);
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("DELETE /api/admin/orders/[id]:", msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

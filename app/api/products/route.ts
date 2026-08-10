@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { product_name, category, sku, quantity, price, image_url, barcode, notes } = body;
+    const { product_name, category, sku, quantity, price, cost, image_url, barcode, notes } = body;
 
     if (!product_name || !category || !sku) {
       return NextResponse.json({ error: "product_name, category, and sku are required" }, { status: 400 });
@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
       sku,
       quantity: parseInt(quantity) || 0,
       price: parseFloat(price) || 0,
+      cost: cost !== undefined ? parseFloat(cost) : 0,
       image_url: image_url || null,
       barcode: barcode || null,
       notes: notes || null,

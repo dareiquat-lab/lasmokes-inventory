@@ -136,13 +136,15 @@ export async function createProduct(data: {
   sku: string;
   quantity: number;
   price: number;
+  cost?: number;
   image_url?: string | null;
   barcode?: string | null;
   notes?: string | null;
 }) {
+  await ensureProductCostColumn();
   const result = await sql`
-    INSERT INTO products (product_name, category, sku, quantity, price, image_url, barcode, notes)
-    VALUES (${data.product_name}, ${data.category}, ${data.sku}, ${data.quantity}, ${data.price}, ${data.image_url || null}, ${data.barcode || null}, ${data.notes || null})
+    INSERT INTO products (product_name, category, sku, quantity, price, cost, image_url, barcode, notes)
+    VALUES (${data.product_name}, ${data.category}, ${data.sku}, ${data.quantity}, ${data.price}, ${data.cost ?? 0}, ${data.image_url || null}, ${data.barcode || null}, ${data.notes || null})
     RETURNING *
   `;
   return result[0];
@@ -154,6 +156,7 @@ export async function updateProduct(id: number, data: Partial<{
   sku: string;
   quantity: number;
   price: number;
+  cost: number;
   image_url: string | null;
   barcode: string | null;
   notes: string | null;
@@ -176,14 +179,36 @@ export async function bulkDeleteProducts(ids: number[]) {
   await sql`DELETE FROM products WHERE id = ANY(${ids})`;
 }
 
+export async function ensureProductCostColumn() {
+  await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS cost NUMERIC(10,2) NOT NULL DEFAULT 0`;
+}
+
 export async function getDashboardStats() {
-  const [totalProducts, totalUnits, lowStock, recentlyUpdated, categoryBreakdown, newOrders] = await Promise.all([
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+
+  await ensureProductCostColumn();
+
+  const [totalProducts, totalUnits, lowStock, recentlyUpdated, categoryBreakdown, totalCategories, newOrders, monthlyProfit] = await Promise.all([
     sql`SELECT COUNT(*) as count FROM products`,
     sql`SELECT COALESCE(SUM(quantity), 0) as total FROM products`,
     sql`SELECT COUNT(*) as count FROM products WHERE quantity <= ${parseInt(process.env.LOW_STOCK_THRESHOLD || "10")}`,
     sql`SELECT * FROM products ORDER BY updated_at DESC LIMIT 5`,
-    sql`SELECT category, COUNT(*) as count FROM products GROUP BY category ORDER BY count DESC`,
+    sql`SELECT c.name as category, c.icon, COUNT(p.id) as count FROM categories c LEFT JOIN products p ON p.category = c.name GROUP BY c.id, c.name, c.icon ORDER BY count DESC, c.name ASC`.catch(() => []),
+    sql`SELECT COUNT(*) as count FROM categories`.catch(() => [{ count: 0 }]),
     sql`SELECT COUNT(*) as count FROM orders WHERE status = 'new'`.catch(() => [{ count: 0 }]),
+    sql`
+      SELECT
+        COALESCE(SUM((oi.price - COALESCE(p.cost, 0)) * oi.quantity), 0) as total_profit,
+        COALESCE(SUM(oi.price * oi.quantity), 0) as total_revenue
+      FROM orders o
+      JOIN order_items oi ON oi.order_id = o.id
+      LEFT JOIN products p ON p.id = oi.product_id
+      WHERE o.status = 'completed'
+        AND o.created_at >= ${monthStart}
+        AND o.created_at < ${nextMonthStart}
+    `.catch(() => [{ total_profit: 0, total_revenue: 0 }]),
   ]);
 
   return {
@@ -193,14 +218,84 @@ export async function getDashboardStats() {
     recentlyUpdated: recentlyUpdated as unknown as import("@/types").Product[],
     categoryBreakdown: (categoryBreakdown as Record<string, unknown>[]).map((r) => ({
       category: r.category as string,
+      icon: (r.icon as string) || "📦",
       count: parseInt(String(r.count)),
     })),
+    totalCategories: parseInt(String(totalCategories[0]?.count ?? 0)),
     newOrdersCount: parseInt(String(newOrders[0]?.count ?? 0)),
+    monthlyProfit: parseFloat(String(monthlyProfit[0]?.total_profit ?? 0)),
+    monthlyRevenue: parseFloat(String(monthlyProfit[0]?.total_revenue ?? 0)),
   };
 }
 
 export async function getAllProductsForExport() {
   return sql`SELECT * FROM products ORDER BY category, product_name`;
+}
+
+export async function getMonthlyReportData() {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+  const threshold = parseInt(process.env.LOW_STOCK_THRESHOLD || "10");
+
+  const [monthlyOrders, statusBreakdown, allProducts, categoryTotals] = await Promise.all([
+    sql`
+      SELECT o.*,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'product_name', oi.product_name,
+              'product_sku',  oi.product_sku,
+              'quantity',     oi.quantity,
+              'price',        oi.price
+            )
+          ) FILTER (WHERE oi.id IS NOT NULL),
+          '[]'
+        ) as items,
+        COALESCE((
+          SELECT SUM(oi2.price * oi2.quantity)
+          FROM order_items oi2
+          WHERE oi2.order_id = o.id
+        ), 0) as order_total
+      FROM orders o
+      LEFT JOIN order_items oi ON oi.order_id = o.id
+      WHERE o.created_at >= ${monthStart} AND o.created_at < ${nextMonthStart}
+      GROUP BY o.id
+      ORDER BY o.created_at DESC
+    `,
+    sql`
+      SELECT status, COUNT(*) as count
+      FROM orders
+      WHERE created_at >= ${monthStart} AND created_at < ${nextMonthStart}
+      GROUP BY status
+      ORDER BY status
+    `,
+    sql`SELECT * FROM products ORDER BY category, product_name`,
+    sql`
+      SELECT category, COUNT(*) as product_count, SUM(quantity) as total_units,
+             SUM(quantity * price) as stock_value
+      FROM products
+      GROUP BY category
+      ORDER BY category
+    `,
+  ]);
+
+  const totalOrderValue = (monthlyOrders as Record<string, unknown>[])
+    .reduce((sum, o) => sum + parseFloat(String(o.order_total || 0)), 0);
+
+  return {
+    month: now.toLocaleString("en-US", { month: "long", year: "numeric" }),
+    generatedAt: now.toLocaleString("en-US", {
+      weekday: "short", month: "short", day: "numeric",
+      year: "numeric", hour: "2-digit", minute: "2-digit",
+    }),
+    monthlyOrders: monthlyOrders as Record<string, unknown>[],
+    statusBreakdown: statusBreakdown as { status: string; count: string }[],
+    totalOrderValue,
+    allProducts: allProducts as Record<string, unknown>[],
+    categoryTotals: categoryTotals as Record<string, unknown>[],
+    lowStockThreshold: threshold,
+  };
 }
 
 export async function generateSKU(category: string, existingSkus: string[]) {
@@ -351,6 +446,89 @@ export async function updateOrderStatus(id: number, status: OrderStatus) {
     WHERE id = ${id} RETURNING *
   `;
   return result[0] || null;
+}
+
+export async function deleteOrder(id: number) {
+  await sql`DELETE FROM orders WHERE id = ${id}`;
+}
+
+export async function getProfitData() {
+  await ensureProductCostColumn();
+  const products = await sql`
+    SELECT
+      id, product_name, category, sku, quantity, price, cost,
+      (price - cost) AS margin_amount,
+      CASE WHEN price > 0
+        THEN ROUND(((price - cost) / price * 100)::numeric, 1)
+        ELSE 0
+      END AS margin_pct,
+      (price - cost) * quantity AS potential_profit,
+      price * quantity AS stock_value,
+      cost * quantity AS cost_basis
+    FROM products
+    ORDER BY potential_profit DESC
+  `;
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+
+  const [monthlyStats, categoryBreakdown] = await Promise.all([
+    sql`
+      SELECT
+        COALESCE(SUM((oi.price - COALESCE(p.cost, 0)) * oi.quantity), 0) AS total_profit,
+        COALESCE(SUM(oi.price * oi.quantity), 0) AS total_revenue,
+        COALESCE(SUM(oi.quantity), 0) AS total_units_sold
+      FROM orders o
+      JOIN order_items oi ON oi.order_id = o.id
+      LEFT JOIN products p ON p.id = oi.product_id
+      WHERE o.status = 'completed'
+        AND o.created_at >= ${monthStart}
+        AND o.created_at < ${nextMonthStart}
+    `,
+    sql`
+      SELECT
+        c.name AS category,
+        c.icon,
+        COUNT(p.id) AS product_count,
+        COALESCE(SUM((p.price - p.cost) * p.quantity), 0) AS potential_profit,
+        COALESCE(SUM(p.price * p.quantity), 0) AS stock_value,
+        CASE WHEN SUM(p.price * p.quantity) > 0
+          THEN ROUND((SUM((p.price - p.cost) * p.quantity) / SUM(p.price * p.quantity) * 100)::numeric, 1)
+          ELSE 0
+        END AS avg_margin_pct
+      FROM categories c
+      LEFT JOIN products p ON p.category = c.name
+      GROUP BY c.id, c.name, c.icon
+      ORDER BY potential_profit DESC
+    `.catch(() => []),
+  ]);
+
+  const productsWithCost = (products as Record<string, unknown>[]).filter(p => parseFloat(String(p.cost)) > 0).length;
+  const totalPotentialProfit = (products as Record<string, unknown>[]).reduce((s, p) => s + parseFloat(String(p.potential_profit || 0)), 0);
+  const totalStockValue = (products as Record<string, unknown>[]).reduce((s, p) => s + parseFloat(String(p.stock_value || 0)), 0);
+  const avgMarginPct = totalStockValue > 0 ? (totalPotentialProfit / totalStockValue) * 100 : 0;
+
+  return {
+    products: products as Record<string, unknown>[],
+    monthlyActualProfit: parseFloat(String(monthlyStats[0]?.total_profit ?? 0)),
+    monthlyRevenue: parseFloat(String(monthlyStats[0]?.total_revenue ?? 0)),
+    monthlyUnitsSold: parseInt(String(monthlyStats[0]?.total_units_sold ?? 0)),
+    totalPotentialProfit,
+    totalStockValue,
+    avgMarginPct,
+    productsWithCost,
+    totalProducts: products.length,
+    categoryBreakdown: (categoryBreakdown as Record<string, unknown>[]).map(r => ({
+      category: String(r.category),
+      icon: String(r.icon || "📦"),
+      productCount: parseInt(String(r.product_count || 0)),
+      potentialProfit: parseFloat(String(r.potential_profit || 0)),
+      stockValue: parseFloat(String(r.stock_value || 0)),
+      avgMarginPct: parseFloat(String(r.avg_margin_pct || 0)),
+    })),
+    month: now.toLocaleString("en-US", { month: "long", year: "numeric" }),
+  };
 }
 
 // ─── Categories ───────────────────────────────────────────────────────────────

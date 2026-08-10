@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   LogOut,
   Tag,
+  TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,6 +22,7 @@ const navLinks = [
   { href: "/admin",               label: "Dashboard",  icon: LayoutDashboard },
   { href: "/admin/inventory",     label: "Inventory",  icon: Package         },
   { href: "/admin/orders",        label: "Orders",     icon: ShoppingCart    },
+  { href: "/admin/profit",        label: "Profit",     icon: TrendingUp      },
   { href: "/admin/categories",    label: "Categories", icon: Tag             },
   { href: "/admin/low-stock",     label: "Low Stock",  icon: AlertTriangle   },
   { href: "/admin/products/new",  label: "Add Item",   icon: PlusCircle      },
@@ -130,8 +132,8 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
               <span className="text-base">🏪</span>
             </div>
             <div>
-              <div className="font-jetbrains text-sm font-black text-[#2d3436] leading-tight tracking-wider uppercase">
-                LA SMOKES
+              <div className="font-jetbrains text-xs font-black text-[#2d3436] leading-tight tracking-wider uppercase">
+                LA SMOKES WHOLESALE
               </div>
               <div className="font-jetbrains text-[8px] text-[#4a5568] leading-tight tracking-widest uppercase">
                 Admin Portal
@@ -191,7 +193,7 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
           <span>Logout</span>
         </button>
         <div className="font-jetbrains text-[9px] text-[#babecc] mt-3 leading-relaxed">
-          <div>v1.0.0 // LASMOKES-INV</div>
+          <div>v1.0.0 // LASMOKES-WHL</div>
         </div>
       </div>
     </>

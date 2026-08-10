@@ -5,6 +5,7 @@ export interface Product {
   sku: string;
   quantity: number;
   price: number;
+  cost?: number;
   image_url: string | null;
   barcode: string | null;
   notes: string | null;
@@ -35,7 +36,11 @@ export interface DashboardStats {
   totalUnits: number;
   lowStockCount: number;
   recentlyUpdated: Product[];
-  categoryBreakdown: { category: string; count: number }[];
+  categoryBreakdown: { category: string; icon: string; count: number }[];
+  totalCategories: number;
+  newOrdersCount: number;
+  monthlyProfit: number;
+  monthlyRevenue: number;
 }
 
 export type OrderStatus = "new" | "contacted" | "ready" | "completed" | "cancelled";

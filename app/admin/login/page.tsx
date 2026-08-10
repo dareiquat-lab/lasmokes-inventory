@@ -63,7 +63,7 @@ function LoginForm() {
             <Lock className="w-7 h-7 text-[#ff4757]" />
           </div>
           <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
-            LA SMOKES
+            LA SMOKES WHOLESALE
           </h1>
           <p className="font-jetbrains text-[9px] text-[#4a5568] uppercase tracking-widest mt-1">
             Admin Portal Access

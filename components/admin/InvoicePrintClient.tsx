@@ -117,7 +117,7 @@ export function InvoicePrintClient({ order }: Props) {
                 letterSpacing: "-0.5px",
               }}
             >
-              LA SMOKES
+              LA SMOKES WHOLESALE
             </div>
             <div
               style={{
@@ -357,7 +357,7 @@ export function InvoicePrintClient({ order }: Props) {
             color: "#9ca3af",
           }}
         >
-          LA Smokes · {new Date().getFullYear()} · Confidential · Internal Document
+          LA Smokes Wholesale · {new Date().getFullYear()} · Confidential · Internal Document
         </div>
       </div>
 

@@ -34,8 +34,9 @@ export function StorefrontNav() {
             >
               <span className="text-sm">🏪</span>
             </div>
-            <div className="font-jetbrains text-sm font-black text-[#2d3436] tracking-wider uppercase hidden sm:block">
-              LA SMOKES
+            <div className="hidden sm:block">
+              <div className="font-jetbrains text-xs font-black text-[#2d3436] tracking-wider uppercase leading-tight">LA SMOKES</div>
+              <div className="font-jetbrains text-[8px] font-bold text-[#4a5568] tracking-widest uppercase leading-tight">WHOLESALE</div>
             </div>
           </Link>
 

@@ -36,19 +36,23 @@ export default async function HomePage() {
           }}
         />
 
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-20">
           <div className="font-jetbrains text-[10px] uppercase tracking-widest text-[#4a5568] mb-4 flex items-center gap-2">
             <span
               className="inline-block w-2 h-2 rounded-full bg-green-500"
               style={{ boxShadow: "0 0 6px rgba(34,197,94,0.8)" }}
             />
-            Official Smoke Shop
+            Official Wholesale Distributor
           </div>
-          <h1 className="font-sans text-4xl md:text-6xl font-black text-[#2d3436] leading-tight tracking-tight mb-3">
+          <h1 className="font-sans text-4xl md:text-6xl font-black text-[#2d3436] leading-tight tracking-tight mb-1">
             <span className="text-[#ff4757]">LA</span> SMOKES
           </h1>
+          <div className="font-sans text-xl md:text-2xl font-black text-[#4a5568] tracking-widest uppercase mb-3">
+            WHOLESALE
+          </div>
           <p className="font-jetbrains text-sm text-[#4a5568] max-w-md leading-relaxed mb-8">
-            Premium smoke shop. Browse our full catalog of cigarettes, cigars, wraps, accessories, and more.
+            Premium wholesale smoke shop. Browse our full catalog of cigarettes, cigars, wraps, accessories, and more.
           </p>
 
           <div className="flex flex-wrap gap-3">
@@ -185,10 +189,10 @@ export default async function HomePage() {
       <footer className="py-6 bg-[#d1d9e6]" style={{ borderTop: "1px solid #babecc" }}>
         <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="font-jetbrains text-xs font-black text-[#2d3436] tracking-wider uppercase">
-            LA SMOKES
+            LA SMOKES WHOLESALE
           </div>
           <div className="font-jetbrains text-[9px] text-[#babecc]">
-            © 2025 LA Smokes. All rights reserved.
+            © 2025 LA Smokes Wholesale. All rights reserved.
           </div>
           <Link href="/admin" className="font-jetbrains text-[9px] text-[#babecc] hover:text-[#4a5568] transition-colors">
             Staff Portal

@@ -18,6 +18,7 @@ const productSchema = z.object({
   sku:          z.string().min(1, "SKU is required").max(50),
   quantity:     z.coerce.number().int().min(0, "Quantity must be 0 or more"),
   price:        z.coerce.number().min(0, "Price must be 0 or more"),
+  cost:         z.coerce.number().min(0, "Cost must be 0 or more").optional(),
   barcode:      z.string().optional(),
   notes:        z.string().optional(),
 });
@@ -62,6 +63,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
       sku:          product?.sku || "",
       quantity:     product?.quantity ?? 0,
       price:        product?.price ?? 0,
+      cost:         product?.cost ?? 0,
       barcode:      product?.barcode || "",
       notes:        product?.notes || "",
     },
@@ -244,6 +246,39 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.price.message}</p>
                   )}
                 </div>
+              </div>
+
+              {/* Cost — admin-only, never shown on storefront */}
+              <div
+                className="rounded-xl p-4 space-y-2"
+                style={{ background: "rgba(255,71,87,0.04)", border: "1px solid rgba(255,71,87,0.15)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <label className="label mb-0">Your Cost (Admin Only)</label>
+                  <span
+                    className="font-jetbrains text-[8px] uppercase tracking-widest px-1.5 py-0.5 rounded font-bold"
+                    style={{ background: "rgba(255,71,87,0.12)", color: "#ff4757" }}
+                  >
+                    Private
+                  </span>
+                </div>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-jetbrains text-[#babecc] text-sm">$</span>
+                  <input
+                    {...register("cost")}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="input-field pl-7"
+                  />
+                </div>
+                <p className="font-jetbrains text-[9px] text-[#babecc]">
+                  Used for margin and profit calculations. Not visible to customers.
+                </p>
+                {errors.cost && (
+                  <p className="font-jetbrains text-[#c0392b] text-xs mt-1">{errors.cost.message}</p>
+                )}
               </div>
 
               <div>

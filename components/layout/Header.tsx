@@ -37,7 +37,7 @@ export function Header() {
           </div>
           <div className="hidden sm:block">
             <div className="font-jetbrains text-[10px] font-black text-[#2d3436] leading-tight tracking-wider uppercase">
-              LA SMOKES
+              LA SMOKES WHOLESALE
             </div>
             <div className="font-jetbrains text-[7px] text-[#4a5568] leading-tight tracking-widest uppercase">
               Admin

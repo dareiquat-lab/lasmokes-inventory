@@ -10,6 +10,8 @@ import {
   BarChart2,
   PlusCircle,
   Download,
+  DollarSign,
+  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
@@ -42,27 +44,30 @@ function StatCard({
   icon: Icon,
   color = "red",
   delay = 0,
+  href,
 }: {
   label: string;
   value: string | number;
   icon: React.ElementType;
-  color?: "red" | "blue" | "purple" | "orange";
+  color?: "red" | "blue" | "purple" | "orange" | "green";
   delay?: number;
+  href?: string;
 }) {
   const colorMap = {
-    red:    { text: "#ff4757", bg: "rgba(255,71,87,0.1)",  iconBg: "rgba(255,71,87,0.12)" },
-    blue:   { text: "#0984e3", bg: "rgba(9,132,227,0.1)",  iconBg: "rgba(9,132,227,0.12)" },
-    purple: { text: "#6c5ce7", bg: "rgba(108,92,231,0.1)", iconBg: "rgba(108,92,231,0.12)" },
-    orange: { text: "#e17055", bg: "rgba(225,112,85,0.1)", iconBg: "rgba(225,112,85,0.12)" },
+    red:    { text: "#ff4757", bg: "rgba(255,71,87,0.1)",   iconBg: "rgba(255,71,87,0.12)"  },
+    blue:   { text: "#0984e3", bg: "rgba(9,132,227,0.1)",   iconBg: "rgba(9,132,227,0.12)"  },
+    purple: { text: "#6c5ce7", bg: "rgba(108,92,231,0.1)",  iconBg: "rgba(108,92,231,0.12)" },
+    orange: { text: "#e17055", bg: "rgba(225,112,85,0.1)",  iconBg: "rgba(225,112,85,0.12)" },
+    green:  { text: "#00b894", bg: "rgba(0,184,148,0.1)",   iconBg: "rgba(0,184,148,0.12)"  },
   };
   const c = colorMap[color];
 
-  return (
+  const card = (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.35, type: "spring", stiffness: 200 }}
-      className="bg-[#e0e5ec] rounded-2xl p-5 relative overflow-hidden"
+      className={`bg-[#e0e5ec] rounded-2xl p-5 relative overflow-hidden${href ? " hover:-translate-y-0.5 transition-transform duration-200" : ""}`}
       style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
     >
       <div className="flex items-start justify-between mb-4">
@@ -75,6 +80,9 @@ function StatCard({
         >
           <Icon className="w-5 h-5" style={{ color: c.text }} />
         </div>
+        {href && (
+          <span className="font-jetbrains text-[8px] uppercase tracking-widest text-[#babecc]">View →</span>
+        )}
       </div>
       <div
         className="font-jetbrains text-2xl font-black mb-0.5"
@@ -85,6 +93,9 @@ function StatCard({
       <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">{label}</div>
     </motion.div>
   );
+
+  if (href) return <Link href={href}>{card}</Link>;
+  return card;
 }
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) => {
@@ -160,7 +171,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
             Dashboard
           </h1>
           <p className="font-jetbrains text-xs text-[#4a5568] mt-1 tracking-wider">
-            LA Smokes Inventory Overview
+            LA Smokes Wholesale — Inventory Overview
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -168,9 +179,9 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
             <PlusCircle className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Add Item</span>
           </Link>
-          <a href="/api/export?format=csv" className="btn-secondary flex items-center gap-1.5">
+          <a href="/admin/report" target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center gap-1.5">
             <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Export</span>
+            <span className="hidden sm:inline">Export PDF</span>
           </a>
         </div>
       </div>
@@ -183,6 +194,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           icon={Package}
           color="red"
           delay={0}
+          href="/admin/inventory"
         />
         <StatCard
           label="Total Units"
@@ -190,6 +202,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           icon={TrendingUp}
           color="blue"
           delay={0.05}
+          href="/admin/inventory"
         />
         <StatCard
           label="Low Stock"
@@ -197,13 +210,35 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           icon={AlertTriangle}
           color={(stats.lowStockCount ?? 0) > 0 ? "orange" : "red"}
           delay={0.1}
+          href="/admin/low-stock"
+        />
+        <StatCard
+          label="New Orders"
+          value={(stats.newOrdersCount ?? 0).toLocaleString()}
+          icon={ShoppingCart}
+          color="purple"
+          delay={0.15}
+          href="/admin/orders"
+        />
+      </div>
+
+      {/* Profit + Categories row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <StatCard
+          label="Monthly Profit"
+          value={`$${(stats.monthlyProfit ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+          icon={DollarSign}
+          color="green"
+          delay={0.2}
+          href="/admin/profit"
         />
         <StatCard
           label="Categories"
-          value={stats.categoryBreakdown?.length ?? 0}
+          value={stats.totalCategories ?? stats.categoryBreakdown?.length ?? 0}
           icon={BarChart2}
           color="purple"
-          delay={0.15}
+          delay={0.22}
+          href="/admin/categories"
         />
       </div>
 
@@ -213,7 +248,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.3 }}
           className="bg-[#e0e5ec] rounded-2xl p-5 lg:col-span-2"
           style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
         >
@@ -251,7 +286,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.35 }}
           className="bg-[#e0e5ec] rounded-2xl p-5"
           style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
         >
@@ -299,7 +334,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
           className="bg-[#e0e5ec] rounded-xl p-4 flex items-center gap-3"
           style={{
             boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
@@ -329,7 +364,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
+        transition={{ delay: 0.45 }}
         className="bg-[#e0e5ec] rounded-2xl p-5"
         style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
       >
@@ -344,7 +379,7 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
               className="flex flex-col items-center gap-2 p-3 bg-[#e0e5ec] rounded-xl transition-all duration-200 hover:-translate-y-0.5 group"
               style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
             >
-              <CategoryIcon category={item.category} size="sm" />
+              <span className="text-xl">{item.icon || "📦"}</span>
               <div className="text-center">
                 <div className="font-jetbrains text-sm font-black text-[#ff4757] group-hover:text-[#ff6b7a]">
                   {item.count}

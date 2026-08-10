@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LA SMOKES — INVENTORY",
-  description: "Internal inventory management system for LA Smokes",
+  title: "LA SMOKES WHOLESALE — INVENTORY",
+  description: "Internal inventory management system for LA Smokes Wholesale",
 };
 
 export default function RootLayout({

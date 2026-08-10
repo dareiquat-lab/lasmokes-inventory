@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail } from "lucide-react";
+import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
 import type { Order, OrderStatus, InvoiceActivity } from "@/types";
 import { EmailInvoiceModal } from "@/components/admin/EmailInvoiceModal";
+import { ConfirmModal } from "@/components/ui/Modal";
 
 interface PaginatedOrders {
   orders: Order[];
@@ -60,10 +61,12 @@ function OrderRow({
   order,
   onStatusChange,
   onEmail,
+  onDelete,
 }: {
   order: Order;
   onStatusChange: (id: number, status: OrderStatus) => void;
   onEmail: (order: Order) => void;
+  onDelete: (order: Order) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [activity, setActivity] = useState<InvoiceActivity[] | null>(null);
@@ -112,6 +115,14 @@ function OrderRow({
       onEmail(order);
     },
     [onEmail, order]
+  );
+
+  const handleDeleteClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onDelete(order);
+    },
+    [onDelete, order]
   );
 
   return (
@@ -167,6 +178,13 @@ function OrderRow({
               className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#ff4757] hover:bg-[#ff475710] transition-all"
             >
               <Mail className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              title="Delete order"
+              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#c0392b] hover:bg-[#c0392b10] transition-all"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
             <button onClick={handleExpand} className="p-1.5">
               {expanded ? (
@@ -264,6 +282,8 @@ export function OrdersClient() {
   const debounceRef = useRef<NodeJS.Timeout>();
   const pendingIds = useRef<Set<number>>(new Set());
   const [emailModalOrder, setEmailModalOrder] = useState<Order | null>(null);
+  const [deleteModalOrder, setDeleteModalOrder] = useState<Order | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -349,6 +369,20 @@ export function OrdersClient() {
       pendingIds.current.delete(orderId);
     }
   }, [data]);
+
+  const handleDeleteOrder = useCallback(async () => {
+    if (!deleteModalOrder) return;
+    setIsDeleting(true);
+    try {
+      await fetch(`/api/admin/orders/${deleteModalOrder.id}`, { method: "DELETE" });
+      setDeleteModalOrder(null);
+      fetchOrders();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [deleteModalOrder, fetchOrders]);
 
   return (
     <div className="space-y-4">
@@ -444,6 +478,7 @@ export function OrdersClient() {
                     order={order}
                     onStatusChange={handleStatusChange}
                     onEmail={setEmailModalOrder}
+                    onDelete={setDeleteModalOrder}
                   />
                 ))
               )}
@@ -486,6 +521,17 @@ export function OrdersClient() {
           onSent={() => setEmailModalOrder(null)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteModalOrder}
+        onClose={() => setDeleteModalOrder(null)}
+        onConfirm={handleDeleteOrder}
+        title="Delete Order"
+        message={`Permanently delete order ${deleteModalOrder?.order_number} for ${deleteModalOrder?.customer_name}? This cannot be undone.`}
+        confirmLabel="Delete"
+        isLoading={isDeleting}
+        isDanger
+      />
     </div>
   );
 }

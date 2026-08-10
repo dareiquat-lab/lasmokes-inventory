@@ -17,7 +17,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   try {
     const body = await request.json();
-    const { product_name, category, sku, quantity, price, image_url, barcode, notes } = body;
+    const { product_name, category, sku, quantity, price, cost, image_url, barcode, notes } = body;
 
     const updateData: Record<string, string | number | null> = {};
     if (product_name !== undefined) updateData.product_name = product_name;
@@ -25,6 +25,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (sku !== undefined) updateData.sku = sku;
     if (quantity !== undefined) updateData.quantity = parseInt(String(quantity));
     if (price !== undefined) updateData.price = parseFloat(String(price));
+    if (cost !== undefined) updateData.cost = parseFloat(String(cost));
     if (image_url !== undefined) updateData.image_url = image_url;
     if (barcode !== undefined) updateData.barcode = barcode;
     if (notes !== undefined) updateData.notes = notes;
