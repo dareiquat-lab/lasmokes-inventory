@@ -360,6 +360,37 @@ export async function createOrder(data: {
   return order;
 }
 
+export async function updateOrder(id: number, data: {
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  notes?: string;
+  items: { product_id: number | null; product_name: string; product_sku: string | null; quantity: number; price: number }[];
+}) {
+  const orderResult = await sql`
+    UPDATE orders
+    SET customer_name = ${data.customer_name},
+        customer_phone = ${data.customer_phone},
+        customer_email = ${data.customer_email},
+        notes = ${data.notes || null},
+        updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *
+  `;
+  if (!orderResult[0]) return null;
+
+  await sql`DELETE FROM order_items WHERE order_id = ${id}`;
+
+  for (const item of data.items) {
+    await sql`
+      INSERT INTO order_items (order_id, product_id, product_name, product_sku, quantity, price)
+      VALUES (${id}, ${item.product_id}, ${item.product_name}, ${item.product_sku}, ${item.quantity}, ${item.price})
+    `;
+  }
+
+  return getOrderById(id);
+}
+
 export async function getOrders(filters: {
   search?: string;
   status?: string;

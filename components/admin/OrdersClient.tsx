@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail, Trash2, Plus, Minus, PlusCircle } from "lucide-react";
+import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail, Trash2, Plus, Minus, PlusCircle, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
 import type { Order, OrderStatus, InvoiceActivity, Product } from "@/types";
@@ -62,11 +62,13 @@ function OrderRow({
   onStatusChange,
   onEmail,
   onDelete,
+  onEdit,
 }: {
   order: Order;
   onStatusChange: (id: number, status: OrderStatus) => void;
   onEmail: (order: Order) => void;
   onDelete: (order: Order) => void;
+  onEdit: (order: Order) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [activity, setActivity] = useState<InvoiceActivity[] | null>(null);
@@ -125,6 +127,14 @@ function OrderRow({
     [onDelete, order]
   );
 
+  const handleEditClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onEdit(order);
+    },
+    [onEdit, order]
+  );
+
   return (
     <>
       <tr
@@ -171,6 +181,13 @@ function OrderRow({
               className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#2d3436] hover:bg-[#babecc30] transition-all"
             >
               <Printer className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleEditClick}
+              title="Edit order"
+              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#0984e3] hover:bg-[#0984e310] transition-all"
+            >
+              <Pencil className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleEmailClick}
@@ -585,6 +602,304 @@ function CreateOrderModal({
   );
 }
 
+// ─── Edit Order Modal ─────────────────────────────────────────────────────────
+
+function EditOrderModal({
+  order,
+  isOpen,
+  onClose,
+  onSaved,
+}: {
+  order: Order | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [notes, setNotes] = useState("");
+  const [items, setItems] = useState<NewItem[]>([]);
+
+  const [productSearch, setProductSearch] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  // Populate fields from order when opened
+  useEffect(() => {
+    if (isOpen && order) {
+      setName(order.customer_name);
+      setPhone(order.customer_phone);
+      setEmail(order.customer_email);
+      setNotes(order.notes || "");
+      setItems(
+        (order.items || []).map(i => ({
+          product_id: i.product_id,
+          product_name: i.product_name,
+          product_sku: i.product_sku,
+          quantity: i.quantity,
+          price: Number(i.price),
+        }))
+      );
+      setProductSearch("");
+      setError("");
+    }
+  }, [isOpen, order]);
+
+  // Fetch products
+  useEffect(() => {
+    if (!isOpen) return;
+    setLoadingProducts(true);
+    fetch("/api/products?limit=500")
+      .then(r => r.json())
+      .then(d => setProducts(d.products || []))
+      .catch(() => {})
+      .finally(() => setLoadingProducts(false));
+  }, [isOpen]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
+        searchRef.current && !searchRef.current.contains(e.target as Node)
+      ) setShowDropdown(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filtered = productSearch.trim()
+    ? products.filter(p =>
+        p.product_name.toLowerCase().includes(productSearch.toLowerCase()) ||
+        p.sku.toLowerCase().includes(productSearch.toLowerCase())
+      ).slice(0, 8)
+    : products.slice(0, 8);
+
+  const addProduct = (p: Product) => {
+    setItems(prev => {
+      const exists = prev.find(i => i.product_id === p.id);
+      if (exists) return prev.map(i => i.product_id === p.id ? { ...i, quantity: i.quantity + 1 } : i);
+      return [...prev, { product_id: p.id, product_name: p.product_name, product_sku: p.sku, quantity: 1, price: Number(p.price) }];
+    });
+    setProductSearch("");
+    setShowDropdown(false);
+  };
+
+  const updateQty = (i: number, qty: number) => {
+    if (qty < 1) return removeItem(i);
+    setItems(prev => prev.map((item, idx) => idx === i ? { ...item, quantity: qty } : item));
+  };
+
+  const updatePrice = (i: number, price: number) => {
+    setItems(prev => prev.map((item, idx) => idx === i ? { ...item, price } : item));
+  };
+
+  const removeItem = (i: number) => setItems(prev => prev.filter((_, idx) => idx !== i));
+
+  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+  const handleSubmit = async () => {
+    if (!order) return;
+    if (!name.trim()) { setError("Customer name is required."); return; }
+    if (!phone.trim()) { setError("Phone is required."); return; }
+    if (!email.trim()) { setError("Email is required."); return; }
+    if (!items.length) { setError("Add at least one item."); return; }
+
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: name.trim(),
+          customer_phone: phone.trim(),
+          customer_email: email.trim(),
+          notes: notes.trim() || undefined,
+          items,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update order");
+      onSaved();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title={`Edit Order ${order?.order_number ?? ""}`} maxWidth="max-w-2xl">
+      <div className="space-y-5">
+        {/* Customer fields */}
+        <div>
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+            Customer
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="label">Name *</label>
+              <input className="input-field" value={name} onChange={e => setName(e.target.value)} placeholder="Full name" />
+            </div>
+            <div>
+              <label className="label">Phone *</label>
+              <input className="input-field" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone number" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label">Email *</label>
+              <input className="input-field" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label">Notes</label>
+              <input className="input-field" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Pickup, delivery, or other notes…" />
+            </div>
+          </div>
+        </div>
+
+        {/* Product search */}
+        <div>
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+            Items
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc] pointer-events-none" />
+            <input
+              ref={searchRef}
+              className="input-field pl-9"
+              value={productSearch}
+              onChange={e => { setProductSearch(e.target.value); setShowDropdown(true); }}
+              onFocus={() => setShowDropdown(true)}
+              placeholder={loadingProducts ? "Loading products…" : "Search products to add…"}
+            />
+            {showDropdown && (
+              <div
+                ref={dropdownRef}
+                className="absolute left-0 right-0 top-full mt-1 bg-[#e0e5ec] rounded-xl overflow-hidden z-20"
+                style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              >
+                {filtered.length === 0 ? (
+                  <div className="px-4 py-3 font-jetbrains text-[10px] text-[#babecc]">No products found</div>
+                ) : (
+                  filtered.map(p => (
+                    <button
+                      key={p.id}
+                      onMouseDown={() => addProduct(p)}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#ff475708] transition-colors"
+                      style={{ borderBottom: "1px solid #f0f2f5" }}
+                    >
+                      <div>
+                        <div className="font-sans text-xs font-bold text-[#2d3436]">{p.product_name}</div>
+                        <div className="font-jetbrains text-[9px] text-[#babecc]">{p.sku} · {p.category}</div>
+                      </div>
+                      <div className="font-jetbrains text-xs font-black text-[#ff4757]">
+                        ${Number(p.price).toFixed(2)}
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Item list */}
+        {items.length > 0 && (
+          <div className="space-y-2">
+            {items.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 py-2" style={{ borderBottom: "1px solid #f0f2f5" }}>
+                <div className="flex-1 min-w-0">
+                  <div className="font-sans text-xs font-bold text-[#2d3436] truncate">{item.product_name}</div>
+                  <div className="font-jetbrains text-[9px] text-[#babecc]">{item.product_sku || "—"}</div>
+                </div>
+                <div className="flex items-center flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => updateQty(i, item.quantity - 1)}
+                    className="w-7 h-8 flex items-center justify-center rounded-l-lg text-[#4a5568] hover:text-[#ff4757]"
+                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <div
+                    className="w-9 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[#2d3436]"
+                    style={{ background: "#e0e5ec", boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
+                  >
+                    {item.quantity}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => updateQty(i, item.quantity + 1)}
+                    className="w-7 h-8 flex items-center justify-center rounded-r-lg text-[#4a5568] hover:text-[#ff4757]"
+                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="relative flex-shrink-0 w-24">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="input-field pl-6 pr-2 text-right"
+                    value={item.price}
+                    onChange={e => updatePrice(i, parseFloat(e.target.value) || 0)}
+                  />
+                </div>
+                <button onClick={() => removeItem(i)} className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1 flex-shrink-0">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+            <div
+              className="flex items-center justify-between px-3 py-2 rounded-xl mt-2"
+              style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+            >
+              <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">Order Total</span>
+              <span className="font-jetbrains text-sm font-black text-[#ff4757]">${total.toFixed(2)}</span>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div
+            className="rounded-lg px-3 py-2 font-jetbrains text-xs text-[#c0392b]"
+            style={{ background: "rgba(192,57,43,0.08)", border: "1px solid rgba(192,57,43,0.2)" }}
+          >
+            {error}
+          </div>
+        )}
+
+        <div className="flex gap-3 justify-end pt-1">
+          <button onClick={onClose} className="btn-secondary">Cancel</button>
+          <button onClick={handleSubmit} disabled={submitting} className="btn-primary flex items-center gap-2 disabled:opacity-40">
+            {submitting ? (
+              <>
+                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving…
+              </>
+            ) : (
+              <>
+                <Pencil className="w-3.5 h-3.5" />
+                Save Changes
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 export function OrdersClient() {
   const [data, setData] = useState<PaginatedOrders | null>(null);
   const [loading, setLoading] = useState(true);
@@ -598,6 +913,7 @@ export function OrdersClient() {
   const [deleteModalOrder, setDeleteModalOrder] = useState<Order | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOrder, setEditModalOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
@@ -800,6 +1116,7 @@ export function OrdersClient() {
                     onStatusChange={handleStatusChange}
                     onEmail={setEmailModalOrder}
                     onDelete={setDeleteModalOrder}
+                    onEdit={setEditModalOrder}
                   />
                 ))
               )}
@@ -838,6 +1155,13 @@ export function OrdersClient() {
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onCreated={() => fetchOrders()}
+      />
+
+      <EditOrderModal
+        order={editModalOrder}
+        isOpen={!!editModalOrder}
+        onClose={() => setEditModalOrder(null)}
+        onSaved={() => fetchOrders()}
       />
 
       {emailModalOrder && (
