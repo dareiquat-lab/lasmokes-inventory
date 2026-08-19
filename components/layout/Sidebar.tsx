@@ -15,6 +15,7 @@ import {
   Tag,
   TrendingUp,
   ScanLine,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,6 +29,7 @@ const navLinks = [
   { href: "/admin/categories",    label: "Categories", icon: Tag             },
   { href: "/admin/low-stock",     label: "Low Stock",  icon: AlertTriangle   },
   { href: "/admin/products/new",  label: "Add Item",   icon: PlusCircle      },
+  { href: "/admin/import",        label: "AI Import",  icon: Sparkles        },
 ];
 
 function NavLink({ href, label, icon: Icon, onClick }: {
