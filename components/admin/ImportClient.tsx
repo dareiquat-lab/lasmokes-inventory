@@ -386,7 +386,7 @@ function OrderCard({
   );
 }
 
-// ─── Invoice Review Table ──────────────────────────────────────────────────────
+// ─── Invoice Review Cards ─────────────────────────────────────────────────────
 
 function InvoiceTable({
   items,
@@ -400,66 +400,69 @@ function InvoiceTable({
   };
 
   return (
-    <div
-      className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
-      style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
-    >
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr style={{ borderBottom: "1px solid #babecc" }}>
-              <th className="table-header">Product Name</th>
-              <th className="table-header">Category</th>
-              <th className="table-header w-28">Qty</th>
-              <th className="table-header w-28">Unit Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, i) => (
-              <tr key={i} style={{ borderBottom: "1px solid #f0f2f5" }}>
-                <td className="table-cell">
-                  <input
-                    className="input-field"
-                    value={item.name}
-                    onChange={(e) => update(i, { name: e.target.value })}
-                  />
-                </td>
-                <td className="table-cell">
-                  <input
-                    className="input-field"
-                    value={item.category}
-                    onChange={(e) => update(i, { category: e.target.value })}
-                  />
-                </td>
-                <td className="table-cell">
-                  <input
-                    type="number"
-                    min="0"
-                    className="input-field"
-                    value={item.quantity}
-                    onChange={(e) => update(i, { quantity: parseInt(e.target.value) || 0 })}
-                  />
-                </td>
-                <td className="table-cell">
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">
-                      $
-                    </span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      className="input-field pl-6"
-                      value={item.unit_cost}
-                      onChange={(e) => update(i, { unit_cost: parseFloat(e.target.value) || 0 })}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="space-y-3">
+      {items.map((item, i) => (
+        <div
+          key={i}
+          className="bg-[#e0e5ec] rounded-2xl p-4 space-y-3"
+          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        >
+          {/* Row number */}
+          <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#babecc]">
+            Item {i + 1}
+          </div>
+
+          {/* Product name — full width */}
+          <div>
+            <label className="label">Product Name</label>
+            <input
+              className="input-field"
+              value={item.name}
+              onChange={(e) => update(i, { name: e.target.value })}
+            />
+          </div>
+
+          {/* Category — full width */}
+          <div>
+            <label className="label">Category</label>
+            <input
+              className="input-field"
+              value={item.category}
+              onChange={(e) => update(i, { category: e.target.value })}
+            />
+          </div>
+
+          {/* Qty + Unit Cost side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Qty</label>
+              <input
+                type="number"
+                min="0"
+                className="input-field"
+                value={item.quantity}
+                onChange={(e) => update(i, { quantity: parseInt(e.target.value) || 0 })}
+              />
+            </div>
+            <div>
+              <label className="label">Unit Cost</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">
+                  $
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="input-field pl-6"
+                  value={item.unit_cost}
+                  onChange={(e) => update(i, { unit_cost: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
