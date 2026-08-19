@@ -274,24 +274,26 @@ function OrderCard({
       )}
 
       {/* Client fields */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div>
-          <label className="label">First Name</label>
-          <input
-            className="input-field"
-            value={order.client.first_name}
-            onChange={(e) => setClient({ first_name: e.target.value })}
-            placeholder="First"
-          />
-        </div>
-        <div>
-          <label className="label">Last Name</label>
-          <input
-            className="input-field"
-            value={order.client.last_name}
-            onChange={(e) => setClient({ last_name: e.target.value })}
-            placeholder="Last"
-          />
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="label">First Name</label>
+            <input
+              className="input-field"
+              value={order.client.first_name}
+              onChange={(e) => setClient({ first_name: e.target.value })}
+              placeholder="First"
+            />
+          </div>
+          <div>
+            <label className="label">Last Name</label>
+            <input
+              className="input-field"
+              value={order.client.last_name}
+              onChange={(e) => setClient({ last_name: e.target.value })}
+              placeholder="Last"
+            />
+          </div>
         </div>
         <div>
           <label className="label">Phone</label>
@@ -317,53 +319,61 @@ function OrderCard({
 
       {/* Items */}
       <div>
-        <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-2">
+        <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
           Items
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {order.items.map((item, i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div
+              key={i}
+              className="space-y-2 pb-3"
+              style={{ borderBottom: "1px solid #e8ecf1" }}
+            >
+              {/* Product name — full width */}
               <input
-                className="input-field flex-1 min-w-0"
+                className="input-field w-full"
                 value={item.product_name}
                 onChange={(e) => setItemName(i, e.target.value)}
+                placeholder="Product name"
               />
-              {/* Qty stepper */}
-              <div className="flex items-center flex-shrink-0">
-                <button
-                  onClick={() => setItemQty(i, item.quantity - 1)}
-                  className="w-7 h-8 flex items-center justify-center rounded-l-lg text-[#4a5568] hover:text-[#ff4757]"
-                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
-                >
-                  <Minus className="w-3 h-3" />
-                </button>
-                <div
-                  className="w-9 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[#2d3436]"
-                  style={{ background: "#e0e5ec", boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
-                >
-                  {item.quantity}
+              {/* Qty + Price on one row */}
+              <div className="flex items-center gap-2">
+                <label className="label mb-0 flex-shrink-0 w-8">Qty</label>
+                <div className="flex items-center flex-shrink-0">
+                  <button
+                    onClick={() => setItemQty(i, item.quantity - 1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-l-lg text-[#4a5568] hover:text-[#ff4757]"
+                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <div
+                    className="w-10 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[#2d3436]"
+                    style={{ background: "#e0e5ec", boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
+                  >
+                    {item.quantity}
+                  </div>
+                  <button
+                    onClick={() => setItemQty(i, item.quantity + 1)}
+                    className="w-8 h-8 flex items-center justify-center rounded-r-lg text-[#4a5568] hover:text-[#ff4757]"
+                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setItemQty(i, item.quantity + 1)}
-                  className="w-7 h-8 flex items-center justify-center rounded-r-lg text-[#4a5568] hover:text-[#ff4757]"
-                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
-                >
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
-              {/* Price */}
-              <div className="relative flex-shrink-0 w-24">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">
-                  $
-                </span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className="input-field pl-6 pr-2 text-right"
-                  value={item.unit_price}
-                  onChange={(e) => setItemPrice(i, parseFloat(e.target.value) || 0)}
-                />
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="input-field pl-6 pr-2 text-right w-full"
+                    value={item.unit_price}
+                    onChange={(e) => setItemPrice(i, parseFloat(e.target.value) || 0)}
+                  />
+                </div>
               </div>
             </div>
           ))}
