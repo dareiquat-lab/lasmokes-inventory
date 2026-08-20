@@ -340,19 +340,22 @@ export async function createOrder(data: {
   business_name?: string | null;
   tobacco_license_number?: string | null;
   sellers_permit_number?: string | null;
+  client_id?: number | null;
   items: { product_id: number; product_name: string; product_sku: string; quantity: number; price: number }[];
 }) {
   await ensureOrderClientColumn();
   const orderNumber = generateOrderNumber();
 
-  const clientId = await upsertClientFromOrder({
-    customer_name: data.customer_name,
-    customer_phone: data.customer_phone,
-    customer_email: data.customer_email,
-    business_name: data.business_name,
-    tobacco_license_number: data.tobacco_license_number,
-    sellers_permit_number: data.sellers_permit_number,
-  }).catch(() => null);
+  const clientId = data.client_id !== undefined
+    ? data.client_id
+    : await upsertClientFromOrder({
+        customer_name: data.customer_name,
+        customer_phone: data.customer_phone,
+        customer_email: data.customer_email,
+        business_name: data.business_name,
+        tobacco_license_number: data.tobacco_license_number,
+        sellers_permit_number: data.sellers_permit_number,
+      }).catch(() => null);
 
   const orderResult = await sql`
     INSERT INTO orders (order_number, customer_name, customer_phone, customer_email, notes, status, client_id)
@@ -381,18 +384,21 @@ export async function updateOrder(id: number, data: {
   business_name?: string | null;
   tobacco_license_number?: string | null;
   sellers_permit_number?: string | null;
+  client_id?: number | null;
   items: { product_id: number | null; product_name: string; product_sku: string | null; quantity: number; price: number }[];
 }) {
   await ensureOrderClientColumn();
 
-  const clientId = await upsertClientFromOrder({
-    customer_name: data.customer_name,
-    customer_phone: data.customer_phone,
-    customer_email: data.customer_email,
-    business_name: data.business_name,
-    tobacco_license_number: data.tobacco_license_number,
-    sellers_permit_number: data.sellers_permit_number,
-  }).catch(() => null);
+  const clientId = data.client_id !== undefined
+    ? data.client_id
+    : await upsertClientFromOrder({
+        customer_name: data.customer_name,
+        customer_phone: data.customer_phone,
+        customer_email: data.customer_email,
+        business_name: data.business_name,
+        tobacco_license_number: data.tobacco_license_number,
+        sellers_permit_number: data.sellers_permit_number,
+      }).catch(() => null);
 
   const orderResult = await sql`
     UPDATE orders

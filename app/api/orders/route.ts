@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { customer_name, customer_phone, customer_email, notes, items,
-            business_name, tobacco_license_number, sellers_permit_number } = body;
+            business_name, tobacco_license_number, sellers_permit_number, client_id } = body;
 
     if (!customer_name?.trim()) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
       business_name: business_name?.trim() || null,
       tobacco_license_number: tobacco_license_number?.trim() || null,
       sellers_permit_number: sellers_permit_number?.trim() || null,
+      client_id: typeof client_id === "number" ? client_id : undefined,
       items,
     });
 

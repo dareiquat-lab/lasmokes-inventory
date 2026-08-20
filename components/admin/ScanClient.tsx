@@ -13,7 +13,8 @@ import {
   Send,
   Package,
 } from "lucide-react";
-import type { Product } from "@/types";
+import type { Product, Client } from "@/types";
+import { ClientPicker } from "@/components/admin/ClientPicker";
 
 interface OrderItem {
   product: Product;
@@ -74,9 +75,13 @@ export function ScanClient() {
   const [lastCode, setLastCode] = useState("");
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [tobaccoLicense, setTobaccoLicense] = useState("");
+  const [sellersPermit, setSellersPermit] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
@@ -195,14 +200,28 @@ export function ScanClient() {
 
   const clearOrder = () => {
     setOrderItems([]);
+    setSelectedClient(null);
     setCustomerName("");
     setCustomerPhone("");
     setCustomerEmail("");
+    setBusinessName("");
+    setTobaccoLicense("");
+    setSellersPermit("");
     setNotes("");
     setSubmitSuccess(null);
     setSubmitError("");
     setScanStatus("idle");
     setScannedProduct(null);
+  };
+
+  const handleClientSelect = (client: Client) => {
+    setSelectedClient(client);
+    if (client.contact_name) setCustomerName(client.contact_name);
+    if (client.phone) setCustomerPhone(client.phone);
+    if (client.email) setCustomerEmail(client.email);
+    if (client.business_name) setBusinessName(client.business_name);
+    if (client.tobacco_license_number) setTobaccoLicense(client.tobacco_license_number);
+    if (client.sellers_permit_number) setSellersPermit(client.sellers_permit_number);
   };
 
   const submitOrder = async () => {
@@ -227,6 +246,10 @@ export function ScanClient() {
           customer_phone: customerPhone.trim(),
           customer_email: customerEmail.trim(),
           notes: notes.trim() || undefined,
+          business_name: businessName.trim() || null,
+          tobacco_license_number: tobaccoLicense.trim() || null,
+          sellers_permit_number: sellersPermit.trim() || null,
+          client_id: selectedClient?.id ?? undefined,
           items: orderItems.map((i) => ({
             product_id: i.product.id,
             product_name: i.product.product_name,
@@ -611,6 +634,12 @@ export function ScanClient() {
             <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
               Customer Info
             </div>
+            <ClientPicker
+              selectedClient={selectedClient}
+              onSelect={handleClientSelect}
+              onClear={() => setSelectedClient(null)}
+              label="Assign to Client"
+            />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="label">Name *</label>

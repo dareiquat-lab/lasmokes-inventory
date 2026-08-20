@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail, Trash2, Plus, Minus, PlusCircle, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
-import type { Order, OrderStatus, InvoiceActivity, Product } from "@/types";
+import type { Order, OrderStatus, InvoiceActivity, Product, Client } from "@/types";
 import { EmailInvoiceModal } from "@/components/admin/EmailInvoiceModal";
 import { ConfirmModal, Modal } from "@/components/ui/Modal";
+import { ClientPicker } from "@/components/admin/ClientPicker";
 
 interface PaginatedOrders {
   orders: Order[];
@@ -319,6 +320,7 @@ export function CreateOrderModal({
   onCreated: () => void;
   prefill?: CreateOrderPrefill;
 }) {
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [name, setName] = useState(prefill?.name ?? "");
   const [phone, setPhone] = useState(prefill?.phone ?? "");
   const [email, setEmail] = useState(prefill?.email ?? "");
@@ -341,6 +343,7 @@ export function CreateOrderModal({
   // Reset when opened/closed
   useEffect(() => {
     if (isOpen) {
+      setSelectedClient(null);
       setName(prefill?.name ?? "");
       setPhone(prefill?.phone ?? "");
       setEmail(prefill?.email ?? "");
@@ -435,6 +438,7 @@ export function CreateOrderModal({
           business_name: businessName.trim() || null,
           tobacco_license_number: tobaccoLicense.trim() || null,
           sellers_permit_number: sellersPermit.trim() || null,
+          client_id: selectedClient?.id ?? undefined,
           items,
         }),
       });
@@ -449,9 +453,27 @@ export function CreateOrderModal({
     }
   };
 
+  const handleClientSelect = (client: Client) => {
+    setSelectedClient(client);
+    if (client.contact_name) setName(client.contact_name);
+    if (client.phone) setPhone(client.phone);
+    if (client.email) setEmail(client.email);
+    if (client.business_name) setBusinessName(client.business_name);
+    if (client.tobacco_license_number) setTobaccoLicense(client.tobacco_license_number);
+    if (client.sellers_permit_number) setSellersPermit(client.sellers_permit_number);
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="New Order" maxWidth="max-w-2xl">
       <div className="space-y-5">
+        {/* Client picker */}
+        <ClientPicker
+          selectedClient={selectedClient}
+          onSelect={handleClientSelect}
+          onClear={() => setSelectedClient(null)}
+          label="Assign to Client"
+        />
+
         {/* Customer fields */}
         <div>
           <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
@@ -659,6 +681,7 @@ function EditOrderModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -681,6 +704,7 @@ function EditOrderModal({
   // Populate fields from order when opened; pre-fill compliance from linked client
   useEffect(() => {
     if (isOpen && order) {
+      setSelectedClient(null);
       setName(order.customer_name);
       setPhone(order.customer_phone);
       setEmail(order.customer_email);
@@ -702,9 +726,11 @@ function EditOrderModal({
         fetch(`/api/admin/clients/${order.client_id}`)
           .then(r => r.json())
           .then(c => {
-            if (c?.business_name) setBusinessName(c.business_name);
-            if (c?.tobacco_license_number) setTobaccoLicense(c.tobacco_license_number);
-            if (c?.sellers_permit_number) setSellersPermit(c.sellers_permit_number);
+            if (!c || c.error) return;
+            setSelectedClient(c as Client);
+            if (c.business_name) setBusinessName(c.business_name);
+            if (c.tobacco_license_number) setTobaccoLicense(c.tobacco_license_number);
+            if (c.sellers_permit_number) setSellersPermit(c.sellers_permit_number);
           })
           .catch(() => {});
       }
@@ -785,6 +811,7 @@ function EditOrderModal({
           business_name: businessName.trim() || null,
           tobacco_license_number: tobaccoLicense.trim() || null,
           sellers_permit_number: sellersPermit.trim() || null,
+          client_id: selectedClient ? selectedClient.id : null,
           items,
         }),
       });
@@ -799,9 +826,27 @@ function EditOrderModal({
     }
   };
 
+  const handleEditClientSelect = (client: Client) => {
+    setSelectedClient(client);
+    if (client.contact_name) setName(client.contact_name);
+    if (client.phone) setPhone(client.phone);
+    if (client.email) setEmail(client.email);
+    if (client.business_name) setBusinessName(client.business_name);
+    if (client.tobacco_license_number) setTobaccoLicense(client.tobacco_license_number);
+    if (client.sellers_permit_number) setSellersPermit(client.sellers_permit_number);
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Edit Order ${order?.order_number ?? ""}`} maxWidth="max-w-2xl">
       <div className="space-y-5">
+        {/* Client picker */}
+        <ClientPicker
+          selectedClient={selectedClient}
+          onSelect={handleEditClientSelect}
+          onClear={() => setSelectedClient(null)}
+          label="Client"
+        />
+
         {/* Customer fields */}
         <div>
           <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
