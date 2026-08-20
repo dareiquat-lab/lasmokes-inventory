@@ -63,6 +63,8 @@ export interface Order {
   customer_email: string;
   notes: string | null;
   status: OrderStatus;
+  client_id: number | null;
+  client_business_name?: string | null;
   created_at: string;
   updated_at: string;
   items?: OrderItem[];
@@ -88,6 +90,17 @@ export interface CategoryRecord {
   updated_at: string;
 }
 
+export const CLIENT_TYPES = [
+  "Store Owner",
+  "Retailer",
+  "Distributor",
+  "Supplier",
+  "Chain Store",
+  "Other",
+] as const;
+
+export type ClientType = typeof CLIENT_TYPES[number];
+
 export interface Client {
   id: number;
   business_name: string;
@@ -100,6 +113,7 @@ export interface Client {
   zip: string | null;
   tobacco_license_number: string | null;
   sellers_permit_number: string | null;
+  client_type: ClientType;
   notes: string | null;
   created_at: string;
   updated_at: string;

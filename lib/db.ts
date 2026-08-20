@@ -339,11 +339,18 @@ export async function createOrder(data: {
   notes?: string;
   items: { product_id: number; product_name: string; product_sku: string; quantity: number; price: number }[];
 }) {
+  await ensureOrderClientColumn();
   const orderNumber = generateOrderNumber();
 
+  const clientId = await upsertClientFromOrder({
+    customer_name: data.customer_name,
+    customer_phone: data.customer_phone,
+    customer_email: data.customer_email,
+  }).catch(() => null);
+
   const orderResult = await sql`
-    INSERT INTO orders (order_number, customer_name, customer_phone, customer_email, notes, status)
-    VALUES (${orderNumber}, ${data.customer_name}, ${data.customer_phone}, ${data.customer_email}, ${data.notes || null}, 'new')
+    INSERT INTO orders (order_number, customer_name, customer_phone, customer_email, notes, status, client_id)
+    VALUES (${orderNumber}, ${data.customer_name}, ${data.customer_phone}, ${data.customer_email}, ${data.notes || null}, 'new', ${clientId})
     RETURNING *
   `;
   const order = orderResult[0] as Order;
@@ -367,12 +374,21 @@ export async function updateOrder(id: number, data: {
   notes?: string;
   items: { product_id: number | null; product_name: string; product_sku: string | null; quantity: number; price: number }[];
 }) {
+  await ensureOrderClientColumn();
+
+  const clientId = await upsertClientFromOrder({
+    customer_name: data.customer_name,
+    customer_phone: data.customer_phone,
+    customer_email: data.customer_email,
+  }).catch(() => null);
+
   const orderResult = await sql`
     UPDATE orders
     SET customer_name = ${data.customer_name},
         customer_phone = ${data.customer_phone},
         customer_email = ${data.customer_email},
         notes = ${data.notes || null},
+        client_id = COALESCE(${clientId}, client_id),
         updated_at = NOW()
     WHERE id = ${id}
     RETURNING *
@@ -421,6 +437,7 @@ export async function getOrders(filters: {
   const countQuery = `SELECT COUNT(*) as total FROM orders o ${whereClause}`;
   const dataQuery = `
     SELECT o.*,
+      c.business_name as client_business_name,
       COALESCE(
         json_agg(
           json_build_object(
@@ -436,8 +453,9 @@ export async function getOrders(filters: {
       ) as items
     FROM orders o
     LEFT JOIN order_items oi ON oi.order_id = o.id
+    LEFT JOIN clients c ON c.id = o.client_id
     ${whereClause}
-    GROUP BY o.id
+    GROUP BY o.id, c.business_name
     ORDER BY o.created_at DESC
     LIMIT $${paramIdx} OFFSET $${paramIdx + 1}
   `;
@@ -461,6 +479,7 @@ export async function getOrders(filters: {
 export async function getOrderByNumber(orderNumber: string) {
   const result = await sql`
     SELECT o.*,
+      c.business_name as client_business_name,
       COALESCE(
         json_agg(
           json_build_object(
@@ -476,8 +495,9 @@ export async function getOrderByNumber(orderNumber: string) {
       ) as items
     FROM orders o
     LEFT JOIN order_items oi ON oi.order_id = o.id
+    LEFT JOIN clients c ON c.id = o.client_id
     WHERE o.order_number = ${orderNumber}
-    GROUP BY o.id
+    GROUP BY o.id, c.business_name
   `;
   return (result[0] as unknown as Order) || null;
 }
@@ -685,20 +705,63 @@ export async function ensureClientsTable() {
       zip TEXT,
       tobacco_license_number TEXT,
       sellers_permit_number TEXT,
+      client_type TEXT NOT NULL DEFAULT 'Store Owner',
       notes TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  await sql`ALTER TABLE clients ADD COLUMN IF NOT EXISTS client_type TEXT NOT NULL DEFAULT 'Store Owner'`;
+}
+
+export async function ensureOrderClientColumn() {
+  await ensureClientsTable();
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS client_id INTEGER REFERENCES clients(id) ON DELETE SET NULL`;
+}
+
+export async function upsertClientFromOrder(data: {
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+}): Promise<number | null> {
+  await ensureClientsTable();
+
+  const name = data.customer_name?.trim();
+  const phone = data.customer_phone?.trim();
+  const email = data.customer_email?.trim();
+
+  if (!name || name === "Unknown Customer") return null;
+
+  const cleanPhone = phone && phone !== "N/A" ? phone : null;
+  const cleanEmail = email && email !== "N/A" ? email : null;
+
+  // Match by phone first
+  if (cleanPhone) {
+    const byPhone = await sql`SELECT id FROM clients WHERE phone = ${cleanPhone} LIMIT 1`;
+    if (byPhone[0]) return byPhone[0].id as number;
+  }
+
+  // Match by business_name (case-insensitive)
+  const byName = await sql`SELECT id FROM clients WHERE LOWER(business_name) = LOWER(${name}) LIMIT 1`;
+  if (byName[0]) return byName[0].id as number;
+
+  // Create new client auto-extracted from order
+  const result = await sql`
+    INSERT INTO clients (business_name, phone, email, client_type)
+    VALUES (${name}, ${cleanPhone}, ${cleanEmail}, 'Store Owner')
+    RETURNING id
+  `;
+  return result[0].id as number;
 }
 
 export async function getClients(filters: {
   search?: string;
   page?: number;
   limit?: number;
+  type?: string;
 }) {
   await ensureClientsTable();
-  const { search = "", page = 1, limit = 25 } = filters;
+  const { search = "", page = 1, limit = 25, type = "" } = filters;
   const offset = (page - 1) * limit;
 
   const conditions: string[] = [];
@@ -712,6 +775,12 @@ export async function getClients(filters: {
     const term = `%${search}%`;
     params.push(term, term, term, term, term);
     paramIdx += 5;
+  }
+
+  if (type) {
+    conditions.push(`client_type = $${paramIdx}`);
+    params.push(type);
+    paramIdx++;
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -750,11 +819,12 @@ export async function createClient(data: {
   zip?: string | null;
   tobacco_license_number?: string | null;
   sellers_permit_number?: string | null;
+  client_type?: string | null;
   notes?: string | null;
 }) {
   await ensureClientsTable();
   const result = await sql`
-    INSERT INTO clients (business_name, contact_name, phone, email, address, city, state, zip, tobacco_license_number, sellers_permit_number, notes)
+    INSERT INTO clients (business_name, contact_name, phone, email, address, city, state, zip, tobacco_license_number, sellers_permit_number, client_type, notes)
     VALUES (
       ${data.business_name},
       ${data.contact_name || null},
@@ -766,6 +836,7 @@ export async function createClient(data: {
       ${data.zip || null},
       ${data.tobacco_license_number || null},
       ${data.sellers_permit_number || null},
+      ${data.client_type || 'Store Owner'},
       ${data.notes || null}
     )
     RETURNING *
@@ -784,6 +855,7 @@ export async function updateClient(id: number, data: {
   zip?: string | null;
   tobacco_license_number?: string | null;
   sellers_permit_number?: string | null;
+  client_type?: string | null;
   notes?: string | null;
 }) {
   await ensureClientsTable();
@@ -799,6 +871,7 @@ export async function updateClient(id: number, data: {
       zip = ${data.zip ?? null},
       tobacco_license_number = ${data.tobacco_license_number ?? null},
       sellers_permit_number = ${data.sellers_permit_number ?? null},
+      client_type = COALESCE(${data.client_type ?? null}, client_type),
       notes = ${data.notes ?? null},
       updated_at = NOW()
     WHERE id = ${id}
@@ -853,6 +926,7 @@ export async function getOrderActivity(order_id: number) {
 export async function getOrderById(id: number) {
   const result = await sql`
     SELECT o.*,
+      c.business_name as client_business_name,
       COALESCE(
         json_agg(
           json_build_object(
@@ -868,8 +942,9 @@ export async function getOrderById(id: number) {
       ) as items
     FROM orders o
     LEFT JOIN order_items oi ON oi.order_id = o.id
+    LEFT JOIN clients c ON c.id = o.client_id
     WHERE o.id=${id}
-    GROUP BY o.id
+    GROUP BY o.id, c.business_name
   `;
   return (result[0] as unknown as import("@/types").Order) || null;
 }

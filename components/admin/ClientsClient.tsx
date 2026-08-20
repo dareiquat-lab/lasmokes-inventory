@@ -22,7 +22,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Client } from "@/types";
+import { CLIENT_TYPES } from "@/types";
+import type { Client, ClientType } from "@/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,6 +38,7 @@ interface ClientForm {
   zip: string;
   tobacco_license_number: string;
   sellers_permit_number: string;
+  client_type: ClientType;
   notes: string;
 }
 
@@ -51,6 +53,7 @@ const emptyForm = (): ClientForm => ({
   zip: "",
   tobacco_license_number: "",
   sellers_permit_number: "",
+  client_type: "Store Owner",
   notes: "",
 });
 
@@ -66,6 +69,7 @@ function clientToForm(c: Client): ClientForm {
     zip: c.zip ?? "",
     tobacco_license_number: c.tobacco_license_number ?? "",
     sellers_permit_number: c.sellers_permit_number ?? "",
+    client_type: c.client_type ?? "Store Owner",
     notes: c.notes ?? "",
   };
 }
@@ -143,6 +147,7 @@ function ClientModal({
           zip: form.zip.trim() || null,
           tobacco_license_number: form.tobacco_license_number.trim() || null,
           sellers_permit_number: form.sellers_permit_number.trim() || null,
+          client_type: form.client_type,
           notes: form.notes.trim() || null,
         }),
       });
@@ -216,6 +221,18 @@ function ClientModal({
                   value={form.contact_name}
                   onChange={(e) => set("contact_name", e.target.value)}
                 />
+              </div>
+              <div>
+                <label className="label">Client Type</label>
+                <select
+                  className="input-field"
+                  value={form.client_type}
+                  onChange={(e) => set("client_type", e.target.value as ClientType)}
+                >
+                  {CLIENT_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -771,11 +788,19 @@ function ClientCard({
           <div className="font-sans text-sm font-black text-[#2d3436] truncate">
             {client.business_name}
           </div>
-          {client.contact_name && (
-            <div className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">
-              {client.contact_name}
-            </div>
-          )}
+          <div className="flex items-center gap-2 mt-0.5">
+            <span
+              className="font-jetbrains text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded"
+              style={{ background: "rgba(255,71,87,0.1)", color: "#ff4757" }}
+            >
+              {client.client_type}
+            </span>
+            {client.contact_name && (
+              <span className="font-jetbrains text-[10px] text-[#4a5568] truncate">
+                {client.contact_name}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex gap-2 flex-shrink-0">
           <button
@@ -838,6 +863,7 @@ export function ClientsClient() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<ClientType | "">("");
   const [page, setPage] = useState(1);
 
   const [editTarget, setEditTarget] = useState<Client | null | "new">(null);
@@ -861,6 +887,7 @@ export function ClientsClient() {
         search: debouncedSearch,
         page: String(page),
         limit: "20",
+        ...(typeFilter ? { type: typeFilter } : {}),
       });
       const res = await fetch(`/api/admin/clients?${params}`, {
         headers: { "Cache-Control": "no-cache" },
@@ -878,7 +905,7 @@ export function ClientsClient() {
 
   useEffect(() => {
     fetchClients();
-  }, [fetchClients]);
+  }, [fetchClients, typeFilter]);
 
   const withTobacco = clients.filter((c) => c.tobacco_license_number).length;
   const withPermit = clients.filter((c) => c.sellers_permit_number).length;
@@ -920,6 +947,37 @@ export function ClientsClient() {
             Add Client
           </button>
         </div>
+      </div>
+
+      {/* Type filter chips */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <button
+          onClick={() => { setTypeFilter(""); setPage(1); }}
+          className={cn(
+            "font-jetbrains text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all",
+            typeFilter === ""
+              ? "text-white bg-[#ff4757]"
+              : "text-[#4a5568]"
+          )}
+          style={typeFilter !== "" ? { boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" } : {}}
+        >
+          All
+        </button>
+        {CLIENT_TYPES.map((t) => (
+          <button
+            key={t}
+            onClick={() => { setTypeFilter(t); setPage(1); }}
+            className={cn(
+              "font-jetbrains text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all",
+              typeFilter === t
+                ? "text-white bg-[#ff4757]"
+                : "text-[#4a5568]"
+            )}
+            style={typeFilter !== t ? { boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" } : {}}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
       {/* Stats */}

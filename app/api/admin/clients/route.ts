@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
       search: searchParams.get("search") || "",
       page: parseInt(searchParams.get("page") || "1"),
       limit: parseInt(searchParams.get("limit") || "25"),
+      type: searchParams.get("type") || "",
     });
     return NextResponse.json(result, {
       headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
