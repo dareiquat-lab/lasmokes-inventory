@@ -70,6 +70,34 @@ Rules:
 - Skip subtotal, tax, and total rows.
 - Return ONLY the JSON object, no markdown, no explanation.`;
 
+const CLIENT_PROMPT = `You are parsing a document containing business client information for a wholesale tobacco distributor.
+The document may be a business card, a tobacco license, a seller's permit, or any other business document.
+
+Extract every distinct business record visible and return ONLY valid JSON with no extra text:
+{
+  "clients": [
+    {
+      "business_name": "string — the business or company name, or null if not found",
+      "contact_name": "string — the individual person's name, or null",
+      "phone": "string — phone number as written, or null",
+      "email": "string — email address, or null",
+      "address": "string — street address line, or null",
+      "city": "string — city, or null",
+      "state": "string — state abbreviation (e.g. CA), or null",
+      "zip": "string — zip/postal code, or null",
+      "tobacco_license_number": "string — any tobacco retailer or distributor license number, or null",
+      "sellers_permit_number": "string — any seller's permit or sales tax permit number, or null"
+    }
+  ]
+}
+
+Rules:
+- Return ONLY the JSON object, no markdown fences, no explanation.
+- If a field is not visible in the document, set it to null.
+- For tobacco_license_number: look for labels like "Tobacco License", "Tobacco Retailer License", "Tobacco Distributor", "License #", "License No.", etc.
+- For sellers_permit_number: look for labels like "Seller's Permit", "Sales Tax Permit", "Permit #", "Resale Certificate", etc.
+- If no label is present but a permit/license number is visible, include it in the most appropriate field.`;
+
 const SUPPORTED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 export async function POST(request: NextRequest) {
@@ -92,8 +120,8 @@ export async function POST(request: NextRequest) {
   const mode = formData.get("mode") as string | null;
 
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
-  if (!mode || !["order", "invoice"].includes(mode)) {
-    return NextResponse.json({ error: "mode must be 'order' or 'invoice'" }, { status: 400 });
+  if (!mode || !["order", "invoice", "client"].includes(mode)) {
+    return NextResponse.json({ error: "mode must be 'order', 'invoice', or 'client'" }, { status: 400 });
   }
 
   const rawType = file.type || "image/jpeg";
@@ -104,7 +132,7 @@ export async function POST(request: NextRequest) {
   const base64 = Buffer.from(bytes).toString("base64");
 
   const client = new Anthropic({ apiKey });
-  const prompt = mode === "order" ? ORDER_PROMPT : INVOICE_PROMPT;
+  const prompt = mode === "order" ? ORDER_PROMPT : mode === "client" ? CLIENT_PROMPT : INVOICE_PROMPT;
 
   try {
     let message;

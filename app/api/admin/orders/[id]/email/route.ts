@@ -33,7 +33,7 @@ function buildEmailHtml(order: OrderWithItems, message?: string): string {
   <div style="max-width:600px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
     <div style="background:#1a1a1a;padding:28px 32px;display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="color:#ff4757;font-size:22px;font-weight:900;letter-spacing:-0.5px">LA SMOKES</div>
+        <div style="color:#ff4757;font-size:22px;font-weight:900;letter-spacing:-0.5px">LA SMOKES WHOLESALE</div>
         <div style="color:#9ca3af;font-size:11px;margin-top:4px;letter-spacing:1px;text-transform:uppercase">Invoice / Order Summary</div>
       </div>
       <div style="background:${statusColors[order.status] || "#374151"};color:#fff;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase">${order.status}</div>
@@ -62,7 +62,7 @@ function buildEmailHtml(order: OrderWithItems, message?: string): string {
           <td style="padding:10px 12px;font-weight:900;text-align:right;font-family:monospace;font-size:15px">$${total.toFixed(2)}</td>
         </tr></tfoot>
       </table>
-      <div style="border-top:1px solid #e5e7eb;padding-top:16px;color:#9ca3af;font-size:11px;text-align:center">LA Smokes · This is an automated invoice summary.</div>
+      <div style="border-top:1px solid #e5e7eb;padding-top:16px;color:#9ca3af;font-size:11px;text-align:center">LA Smokes Wholesale · This is an automated invoice summary.</div>
     </div>
   </div></body></html>`;
 }
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const order = await getOrderById(id);
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
-    const fromEmail = process.env.EMAIL_FROM || "LA Smokes <noreply@lasmokes.com>";
+    const fromEmail = process.env.EMAIL_FROM || "LA Smokes Wholesale <noreply@lasmokes.com>";
     const emailSubject = subject || `Order Invoice - ${order.order_number}`;
     const html = buildEmailHtml(order as OrderWithItems, message);
 

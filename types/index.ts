@@ -88,6 +88,23 @@ export interface CategoryRecord {
   updated_at: string;
 }
 
+export interface Client {
+  id: number;
+  business_name: string;
+  contact_name: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  tobacco_license_number: string | null;
+  sellers_permit_number: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface InvoiceActivity {
   id: number;
   order_id: number;

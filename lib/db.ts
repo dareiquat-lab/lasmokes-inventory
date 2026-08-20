@@ -669,6 +669,149 @@ export async function getCategoryProductCount(id: number) {
   return parseInt(result[0].count);
 }
 
+// ─── Clients ──────────────────────────────────────────────────────────────────
+
+export async function ensureClientsTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS clients (
+      id SERIAL PRIMARY KEY,
+      business_name TEXT NOT NULL,
+      contact_name TEXT,
+      phone TEXT,
+      email TEXT,
+      address TEXT,
+      city TEXT,
+      state TEXT,
+      zip TEXT,
+      tobacco_license_number TEXT,
+      sellers_permit_number TEXT,
+      notes TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+}
+
+export async function getClients(filters: {
+  search?: string;
+  page?: number;
+  limit?: number;
+}) {
+  await ensureClientsTable();
+  const { search = "", page = 1, limit = 25 } = filters;
+  const offset = (page - 1) * limit;
+
+  const conditions: string[] = [];
+  const params: (string | number)[] = [];
+  let paramIdx = 1;
+
+  if (search) {
+    conditions.push(
+      `(business_name ILIKE $${paramIdx} OR contact_name ILIKE $${paramIdx + 1} OR phone ILIKE $${paramIdx + 2} OR tobacco_license_number ILIKE $${paramIdx + 3} OR sellers_permit_number ILIKE $${paramIdx + 4})`
+    );
+    const term = `%${search}%`;
+    params.push(term, term, term, term, term);
+    paramIdx += 5;
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const countQuery = `SELECT COUNT(*) as total FROM clients ${whereClause}`;
+  const dataQuery = `SELECT * FROM clients ${whereClause} ORDER BY business_name ASC LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`;
+  params.push(limit, offset);
+
+  const [countResult, clients] = await Promise.all([
+    sql(countQuery, params.slice(0, paramIdx - 1)),
+    sql(dataQuery, params),
+  ]);
+
+  return {
+    clients,
+    total: parseInt(countResult[0].total),
+    page,
+    limit,
+    totalPages: Math.ceil(parseInt(countResult[0].total) / limit),
+  };
+}
+
+export async function getClientById(id: number) {
+  await ensureClientsTable();
+  const result = await sql`SELECT * FROM clients WHERE id = ${id}`;
+  return result[0] || null;
+}
+
+export async function createClient(data: {
+  business_name: string;
+  contact_name?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip?: string | null;
+  tobacco_license_number?: string | null;
+  sellers_permit_number?: string | null;
+  notes?: string | null;
+}) {
+  await ensureClientsTable();
+  const result = await sql`
+    INSERT INTO clients (business_name, contact_name, phone, email, address, city, state, zip, tobacco_license_number, sellers_permit_number, notes)
+    VALUES (
+      ${data.business_name},
+      ${data.contact_name || null},
+      ${data.phone || null},
+      ${data.email || null},
+      ${data.address || null},
+      ${data.city || null},
+      ${data.state || null},
+      ${data.zip || null},
+      ${data.tobacco_license_number || null},
+      ${data.sellers_permit_number || null},
+      ${data.notes || null}
+    )
+    RETURNING *
+  `;
+  return result[0];
+}
+
+export async function updateClient(id: number, data: {
+  business_name?: string;
+  contact_name?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip?: string | null;
+  tobacco_license_number?: string | null;
+  sellers_permit_number?: string | null;
+  notes?: string | null;
+}) {
+  await ensureClientsTable();
+  const result = await sql`
+    UPDATE clients SET
+      business_name = COALESCE(${data.business_name ?? null}, business_name),
+      contact_name = ${data.contact_name ?? null},
+      phone = ${data.phone ?? null},
+      email = ${data.email ?? null},
+      address = ${data.address ?? null},
+      city = ${data.city ?? null},
+      state = ${data.state ?? null},
+      zip = ${data.zip ?? null},
+      tobacco_license_number = ${data.tobacco_license_number ?? null},
+      sellers_permit_number = ${data.sellers_permit_number ?? null},
+      notes = ${data.notes ?? null},
+      updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *
+  `;
+  return result[0] || null;
+}
+
+export async function deleteClient(id: number) {
+  await ensureClientsTable();
+  await sql`DELETE FROM clients WHERE id = ${id}`;
+}
+
 // ─── Invoice Activity ─────────────────────────────────────────────────────────
 
 export async function ensureInvoiceActivityTable() {

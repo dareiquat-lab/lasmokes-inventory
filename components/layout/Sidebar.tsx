@@ -16,6 +16,7 @@ import {
   TrendingUp,
   ScanLine,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +25,7 @@ const navLinks = [
   { href: "/admin",               label: "Dashboard",  icon: LayoutDashboard },
   { href: "/admin/inventory",     label: "Inventory",  icon: Package         },
   { href: "/admin/orders",        label: "Orders",     icon: ShoppingCart    },
+  { href: "/admin/clients",       label: "Clients",    icon: Users           },
   { href: "/admin/scan",          label: "Scan",       icon: ScanLine        },
   { href: "/admin/profit",        label: "Profit",     icon: TrendingUp      },
   { href: "/admin/categories",    label: "Categories", icon: Tag             },
