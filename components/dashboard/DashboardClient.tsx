@@ -12,6 +12,7 @@ import {
   Download,
   DollarSign,
   ShoppingCart,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
@@ -178,6 +179,10 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           <Link href="/admin/products/new" className="btn-primary flex items-center gap-1.5">
             <PlusCircle className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Add Item</span>
+          </Link>
+          <Link href="/admin/invoices" className="btn-secondary flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Invoices</span>
           </Link>
           <a href="/admin/report" target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center gap-1.5">
             <Download className="w-3.5 h-3.5" />

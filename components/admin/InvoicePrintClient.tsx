@@ -1,20 +1,38 @@
 "use client";
 
 import { ORDER_STATUSES } from "@/types";
-import type { Order, OrderItem } from "@/types";
+import type { Order, OrderItem, Client } from "@/types";
 import { useRouter } from "next/navigation";
 
 type OrderWithItems = Order & { items: Array<Pick<OrderItem, "product_name" | "product_sku" | "quantity" | "price">> };
 
 interface Props {
   order: OrderWithItems;
+  client?: Client | null;
 }
 
-export function InvoicePrintClient({ order }: Props) {
+const label = (text: string) => ({
+  fontSize: 10,
+  fontWeight: 700,
+  textTransform: "uppercase" as const,
+  letterSpacing: 1.5,
+  color: "#9ca3af",
+  marginBottom: 6,
+});
+
+const fieldLabel = { fontSize: 11, color: "#6b7280", marginBottom: 2 } as const;
+const fieldValue = { fontSize: 14, fontWeight: 600, color: "#111827" } as const;
+const fieldValueMono = { ...fieldValue, fontFamily: "monospace" } as const;
+
+export function InvoicePrintClient({ order, client }: Props) {
   const router = useRouter();
   const status = ORDER_STATUSES.find((s) => s.value === order.status);
   const items = order.items || [];
   const total = items.reduce((s, i) => s + Number(i.price) * i.quantity, 0);
+
+  const fullAddress = client
+    ? [client.address, client.city, client.state, client.zip].filter(Boolean).join(", ")
+    : null;
 
   return (
     <div
@@ -109,25 +127,10 @@ export function InvoicePrintClient({ order }: Props) {
           }}
         >
           <div>
-            <div
-              style={{
-                fontSize: 24,
-                fontWeight: 900,
-                color: "#ff4757",
-                letterSpacing: "-0.5px",
-              }}
-            >
+            <div style={{ fontSize: 24, fontWeight: 900, color: "#ff4757", letterSpacing: "-0.5px" }}>
               LA SMOKES WHOLESALE
             </div>
-            <div
-              style={{
-                fontSize: 11,
-                color: "#9ca3af",
-                marginTop: 4,
-                letterSpacing: 2,
-                textTransform: "uppercase",
-              }}
-            >
+            <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4, letterSpacing: 2, textTransform: "uppercase" }}>
               Invoice / Order Summary
             </div>
           </div>
@@ -148,33 +151,25 @@ export function InvoicePrintClient({ order }: Props) {
         </div>
 
         <div style={{ padding: 36 }}>
-          {/* Meta grid */}
+
+          {/* ── Top meta grid ─────────────────────────────── */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               gap: 32,
-              marginBottom: 32,
+              marginBottom: 28,
             }}
           >
+            {/* Order details */}
             <div>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: 1.5,
-                  color: "#9ca3af",
-                  marginBottom: 12,
-                }}
-              >
-                Order Details
-              </div>
+              <div style={label("Order Details")}>Order Details</div>
               {[
                 {
                   label: "Order Number",
                   value: order.order_number,
-                  valueStyle: { color: "#ff4757", fontFamily: "monospace" },
+                  mono: true,
+                  red: true,
                 },
                 {
                   label: "Date",
@@ -185,53 +180,122 @@ export function InvoicePrintClient({ order }: Props) {
                   }),
                 },
                 { label: "Status", value: status?.label || order.status },
-              ].map(({ label, value, valueStyle }) => (
-                <div key={label} style={{ marginBottom: 8 }}>
-                  <div style={{ fontSize: 11, color: "#6b7280" }}>{label}</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, ...(valueStyle || {}) }}>{value}</div>
+              ].map(({ label: l, value, mono, red }) => (
+                <div key={l} style={{ marginBottom: 10 }}>
+                  <div style={fieldLabel}>{l}</div>
+                  <div
+                    style={{
+                      ...( mono ? fieldValueMono : fieldValue),
+                      ...(red ? { color: "#ff4757" } : {}),
+                    }}
+                  >
+                    {value}
+                  </div>
                 </div>
               ))}
             </div>
+
+            {/* Bill To */}
             <div>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: 1.5,
-                  color: "#9ca3af",
-                  marginBottom: 12,
-                }}
-              >
-                Customer
-              </div>
-              {[
-                { label: "Name", value: order.customer_name },
-                { label: "Phone", value: order.customer_phone },
-                { label: "Email", value: order.customer_email },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ marginBottom: 8 }}>
-                  <div style={{ fontSize: 11, color: "#6b7280" }}>{label}</div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>{value}</div>
-                </div>
-              ))}
+              <div style={label("Bill To")}>Bill To</div>
+              {client ? (
+                <>
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={fieldLabel}>Business</div>
+                    <div style={{ ...fieldValue, fontSize: 15 }}>{client.business_name}</div>
+                  </div>
+                  {client.contact_name && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={fieldLabel}>Contact</div>
+                      <div style={fieldValue}>{client.contact_name}</div>
+                    </div>
+                  )}
+                  {(client.phone || order.customer_phone) && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={fieldLabel}>Phone</div>
+                      <div style={fieldValue}>{client.phone || order.customer_phone}</div>
+                    </div>
+                  )}
+                  {(client.email || order.customer_email) && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={fieldLabel}>Email</div>
+                      <div style={fieldValue}>{client.email || order.customer_email}</div>
+                    </div>
+                  )}
+                  {fullAddress && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={fieldLabel}>Address</div>
+                      <div style={fieldValue}>{fullAddress}</div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {[
+                    { label: "Name", value: order.customer_name },
+                    { label: "Phone", value: order.customer_phone },
+                    { label: "Email", value: order.customer_email },
+                  ].map(({ label: l, value }) => (
+                    <div key={l} style={{ marginBottom: 10 }}>
+                      <div style={fieldLabel}>{l}</div>
+                      <div style={fieldValue}>{value}</div>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
 
+          {/* ── Compliance box (license numbers) ────────── */}
+          {client && (client.tobacco_license_number || client.sellers_permit_number) && (
+            <div
+              style={{
+                background: "#fff8f8",
+                border: "1px solid #fecaca",
+                borderLeft: "4px solid #ff4757",
+                borderRadius: 8,
+                padding: "16px 20px",
+                marginBottom: 28,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 20,
+              }}
+            >
+              <div>
+                <div style={{ ...label(""), marginBottom: 4 }}>Tobacco License No.</div>
+                <div
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: 15,
+                    fontWeight: 800,
+                    color: "#111827",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {client.tobacco_license_number || "—"}
+                </div>
+              </div>
+              <div>
+                <div style={{ ...label(""), marginBottom: 4 }}>Sellers Permit No.</div>
+                <div
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: 15,
+                    fontWeight: 800,
+                    color: "#111827",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {client.sellers_permit_number || "—"}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Customer notes ───────────────────────────── */}
           {order.notes && (
             <div style={{ marginBottom: 24 }}>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: 1.5,
-                  color: "#9ca3af",
-                  marginBottom: 8,
-                }}
-              >
-                Customer Notes
-              </div>
+              <div style={label("Customer Notes")}>Customer Notes</div>
               <div
                 style={{
                   background: "#f9fafb",
@@ -247,18 +311,8 @@ export function InvoicePrintClient({ order }: Props) {
             </div>
           )}
 
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: 1.5,
-              color: "#9ca3af",
-              marginBottom: 12,
-            }}
-          >
-            Items Ordered
-          </div>
+          {/* ── Line items ───────────────────────────────── */}
+          <div style={label("Items Ordered")}>Items Ordered</div>
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 28 }}>
             <thead>
               <tr style={{ background: "#f9fafb" }}>
@@ -285,39 +339,17 @@ export function InvoicePrintClient({ order }: Props) {
             <tbody>
               {items.map((item, i) => (
                 <tr key={i} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                  <td
-                    style={{
-                      padding: "10px 14px",
-                      fontFamily: "monospace",
-                      fontSize: 12,
-                      color: "#6b7280",
-                    }}
-                  >
+                  <td style={{ padding: "10px 14px", fontFamily: "monospace", fontSize: 12, color: "#6b7280" }}>
                     {item.product_sku || "—"}
                   </td>
                   <td style={{ padding: "10px 14px", fontSize: 14 }}>{item.product_name}</td>
                   <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 700, fontSize: 14 }}>
                     {item.quantity}
                   </td>
-                  <td
-                    style={{
-                      padding: "10px 14px",
-                      textAlign: "right",
-                      fontFamily: "monospace",
-                      fontSize: 13,
-                    }}
-                  >
+                  <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "monospace", fontSize: 13 }}>
                     ${Number(item.price).toFixed(2)}
                   </td>
-                  <td
-                    style={{
-                      padding: "10px 14px",
-                      textAlign: "right",
-                      fontFamily: "monospace",
-                      fontWeight: 600,
-                      fontSize: 13,
-                    }}
-                  >
+                  <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "monospace", fontWeight: 600, fontSize: 13 }}>
                     ${(Number(item.price) * item.quantity).toFixed(2)}
                   </td>
                 </tr>
@@ -348,6 +380,7 @@ export function InvoicePrintClient({ order }: Props) {
           </table>
         </div>
 
+        {/* Footer */}
         <div
           style={{
             borderTop: "1px solid #e5e7eb",
