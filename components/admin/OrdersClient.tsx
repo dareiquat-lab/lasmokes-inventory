@@ -312,6 +312,9 @@ function CreateOrderModal({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [tobaccoLicense, setTobaccoLicense] = useState("");
+  const [sellersPermit, setSellersPermit] = useState("");
   const [items, setItems] = useState<NewItem[]>([]);
 
   const [productSearch, setProductSearch] = useState("");
@@ -328,6 +331,7 @@ function CreateOrderModal({
   useEffect(() => {
     if (!isOpen) {
       setName(""); setPhone(""); setEmail(""); setNotes("");
+      setBusinessName(""); setTobaccoLicense(""); setSellersPermit("");
       setItems([]); setProductSearch(""); setError("");
     }
   }, [isOpen]);
@@ -412,6 +416,9 @@ function CreateOrderModal({
           customer_phone: phone.trim(),
           customer_email: email.trim(),
           notes: notes.trim() || undefined,
+          business_name: businessName.trim() || null,
+          tobacco_license_number: tobaccoLicense.trim() || null,
+          sellers_permit_number: sellersPermit.trim() || null,
           items,
         }),
       });
@@ -437,7 +444,7 @@ function CreateOrderModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label">Name *</label>
-              <input className="input-field" value={name} onChange={e => setName(e.target.value)} placeholder="Full name" />
+              <input className="input-field" value={name} onChange={e => setName(e.target.value)} placeholder="Contact / owner name" />
             </div>
             <div>
               <label className="label">Phone *</label>
@@ -450,6 +457,27 @@ function CreateOrderModal({
             <div className="sm:col-span-2">
               <label className="label">Notes</label>
               <input className="input-field" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Pickup, delivery, or other notes…" />
+            </div>
+          </div>
+        </div>
+
+        {/* Business / Compliance */}
+        <div>
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
+            Business &amp; Compliance
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="sm:col-span-2">
+              <label className="label">Business Name</label>
+              <input className="input-field" value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Store / company name" />
+            </div>
+            <div>
+              <label className="label">Tobacco License #</label>
+              <input className="input-field font-jetbrains" value={tobaccoLicense} onChange={e => setTobaccoLicense(e.target.value)} placeholder="License number" />
+            </div>
+            <div>
+              <label className="label">Sellers Permit #</label>
+              <input className="input-field font-jetbrains" value={sellersPermit} onChange={e => setSellersPermit(e.target.value)} placeholder="Permit number" />
             </div>
           </div>
         </div>
@@ -619,6 +647,9 @@ function EditOrderModal({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [tobaccoLicense, setTobaccoLicense] = useState("");
+  const [sellersPermit, setSellersPermit] = useState("");
   const [items, setItems] = useState<NewItem[]>([]);
 
   const [productSearch, setProductSearch] = useState("");
@@ -631,13 +662,14 @@ function EditOrderModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Populate fields from order when opened
+  // Populate fields from order when opened; pre-fill compliance from linked client
   useEffect(() => {
     if (isOpen && order) {
       setName(order.customer_name);
       setPhone(order.customer_phone);
       setEmail(order.customer_email);
       setNotes(order.notes || "");
+      setBusinessName(""); setTobaccoLicense(""); setSellersPermit("");
       setItems(
         (order.items || []).map(i => ({
           product_id: i.product_id,
@@ -649,6 +681,17 @@ function EditOrderModal({
       );
       setProductSearch("");
       setError("");
+
+      if (order.client_id) {
+        fetch(`/api/admin/clients/${order.client_id}`)
+          .then(r => r.json())
+          .then(c => {
+            if (c?.business_name) setBusinessName(c.business_name);
+            if (c?.tobacco_license_number) setTobaccoLicense(c.tobacco_license_number);
+            if (c?.sellers_permit_number) setSellersPermit(c.sellers_permit_number);
+          })
+          .catch(() => {});
+      }
     }
   }, [isOpen, order]);
 
@@ -723,6 +766,9 @@ function EditOrderModal({
           customer_phone: phone.trim(),
           customer_email: email.trim(),
           notes: notes.trim() || undefined,
+          business_name: businessName.trim() || null,
+          tobacco_license_number: tobaccoLicense.trim() || null,
+          sellers_permit_number: sellersPermit.trim() || null,
           items,
         }),
       });
@@ -748,7 +794,7 @@ function EditOrderModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label">Name *</label>
-              <input className="input-field" value={name} onChange={e => setName(e.target.value)} placeholder="Full name" />
+              <input className="input-field" value={name} onChange={e => setName(e.target.value)} placeholder="Contact / owner name" />
             </div>
             <div>
               <label className="label">Phone *</label>
@@ -761,6 +807,27 @@ function EditOrderModal({
             <div className="sm:col-span-2">
               <label className="label">Notes</label>
               <input className="input-field" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Pickup, delivery, or other notes…" />
+            </div>
+          </div>
+        </div>
+
+        {/* Business / Compliance */}
+        <div>
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
+            Business &amp; Compliance
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="sm:col-span-2">
+              <label className="label">Business Name</label>
+              <input className="input-field" value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Store / company name" />
+            </div>
+            <div>
+              <label className="label">Tobacco License #</label>
+              <input className="input-field font-jetbrains" value={tobaccoLicense} onChange={e => setTobaccoLicense(e.target.value)} placeholder="License number" />
+            </div>
+            <div>
+              <label className="label">Sellers Permit #</label>
+              <input className="input-field font-jetbrains" value={sellersPermit} onChange={e => setSellersPermit(e.target.value)} placeholder="Permit number" />
             </div>
           </div>
         </div>

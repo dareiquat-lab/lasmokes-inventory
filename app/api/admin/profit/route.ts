@@ -1,11 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getProfitData } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const data = await getProfitData();
+    const { searchParams } = new URL(request.url);
+    const startDate = searchParams.get("startDate") || undefined;
+    const endDate = searchParams.get("endDate") || undefined;
+    const data = await getProfitData({ startDate, endDate });
     return NextResponse.json(data);
   } catch (error) {
     console.error("GET /api/admin/profit error:", error);

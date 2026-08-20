@@ -7,9 +7,11 @@ import {
   DollarSign,
   BarChart2,
   Package,
+  ShoppingCart,
   ChevronUp,
   ChevronDown,
   Minus,
+  Calendar,
 } from "lucide-react";
 
 interface ProfitItem {
@@ -38,16 +40,22 @@ interface CategoryBreakdown {
 
 interface ProfitData {
   products: ProfitItem[];
-  monthlyActualProfit: number;
-  monthlyRevenue: number;
-  monthlyUnitsSold: number;
+  // Selected-range
+  actualProfit: number;
+  totalRevenue: number;
+  unitsSold: number;
+  totalOrders: number;
+  // All-time
+  allTimeProfit: number;
+  allTimeRevenue: number;
+  allTimeOrders: number;
+  // Inventory
   totalPotentialProfit: number;
   totalStockValue: number;
   avgMarginPct: number;
   productsWithCost: number;
   totalProducts: number;
   categoryBreakdown: CategoryBreakdown[];
-  month: string;
 }
 
 type ViewMode = "overview" | "products" | "categories";
@@ -57,16 +65,49 @@ function formatMoney(n: number) {
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function toYMD(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
+
+type Preset = "this_month" | "last_month" | "last_3" | "this_year" | "all_time" | "custom";
+
+const PRESETS: { key: Preset; label: string }[] = [
+  { key: "this_month",  label: "This Month"   },
+  { key: "last_month",  label: "Last Month"   },
+  { key: "last_3",      label: "Last 3 Mo."   },
+  { key: "this_year",   label: "This Year"    },
+  { key: "all_time",    label: "All Time"     },
+  { key: "custom",      label: "Custom"       },
+];
+
+function presetToDates(preset: Preset): { startDate: string; endDate: string } {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+
+  if (preset === "this_month") {
+    return { startDate: toYMD(new Date(y, m, 1)), endDate: toYMD(now) };
+  }
+  if (preset === "last_month") {
+    return { startDate: toYMD(new Date(y, m - 1, 1)), endDate: toYMD(new Date(y, m, 0)) };
+  }
+  if (preset === "last_3") {
+    return { startDate: toYMD(new Date(y, m - 2, 1)), endDate: toYMD(now) };
+  }
+  if (preset === "this_year") {
+    return { startDate: toYMD(new Date(y, 0, 1)), endDate: toYMD(now) };
+  }
+  // all_time / custom — all_time just uses a wide range
+  return { startDate: "2000-01-01", endDate: toYMD(now) };
+}
+
 function MarginBar({ pct }: { pct: number }) {
   const clamped = Math.max(0, Math.min(100, pct));
   const color = pct >= 40 ? "#00b894" : pct >= 20 ? "#fdcb6e" : pct > 0 ? "#e17055" : "var(--text-dim)";
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 bg-[var(--muted)] rounded-full h-1.5 overflow-hidden" style={{ minWidth: 40 }}>
-        <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${clamped}%`, background: color }}
-        />
+        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${clamped}%`, background: color }} />
       </div>
       <span className="font-jetbrains text-[10px] font-bold w-10 text-right" style={{ color }}>
         {pct > 0 ? `${pct.toFixed(1)}%` : "—"}
@@ -89,10 +130,7 @@ function SummaryCard({
       className="bg-[var(--background)] rounded-2xl p-5"
       style={{ boxShadow: "var(--shadow-card)" }}
     >
-      <div
-        className="w-10 h-10 flex items-center justify-center rounded-xl mb-4"
-        style={{ background: `${color}18`, boxShadow: "var(--shadow-sm)" }}
-      >
+      <div className="w-10 h-10 flex items-center justify-center rounded-xl mb-4" style={{ background: `${color}18`, boxShadow: "var(--shadow-sm)" }}>
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
       <div className="font-jetbrains text-2xl font-black mb-0.5" style={{ color }}>{value}</div>
@@ -109,10 +147,23 @@ export function ProfitClient() {
   const [sortKey, setSortKey] = useState<SortKey>("potential_profit");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  const fetchData = useCallback(async () => {
+  const [preset, setPreset] = useState<Preset>("this_month");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState(toYMD(new Date()));
+
+  const activeDates = preset === "custom"
+    ? { startDate: customStart || "2000-01-01", endDate: customEnd || toYMD(new Date()) }
+    : presetToDates(preset);
+
+  const periodLabel = preset === "custom"
+    ? `${activeDates.startDate} → ${activeDates.endDate}`
+    : PRESETS.find(p => p.key === preset)?.label ?? "";
+
+  const fetchData = useCallback(async (dates: { startDate: string; endDate: string }) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/profit");
+      const params = new URLSearchParams({ startDate: dates.startDate, endDate: dates.endDate });
+      const res = await fetch(`/api/admin/profit?${params}`);
       const json = await res.json();
       setData(json);
     } catch {
@@ -122,15 +173,11 @@ export function ProfitClient() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => { fetchData(activeDates); }, [preset, customStart, customEnd]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir(d => d === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortDir("desc");
-    }
+    if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("desc"); }
   };
 
   const sortedProducts = data
@@ -144,9 +191,7 @@ export function ProfitClient() {
 
   const SortIcon = ({ k }: { k: SortKey }) => {
     if (sortKey !== k) return <Minus className="w-3 h-3 text-[var(--text-dim)]" />;
-    return sortDir === "asc"
-      ? <ChevronUp className="w-3 h-3 text-[#ff4757]" />
-      : <ChevronDown className="w-3 h-3 text-[#ff4757]" />;
+    return sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-[#ff4757]" /> : <ChevronDown className="w-3 h-3 text-[#ff4757]" />;
   };
 
   const ThButton = ({ label, k }: { label: string; k: SortKey }) => (
@@ -154,8 +199,7 @@ export function ProfitClient() {
       onClick={() => handleSort(k)}
       className="flex items-center gap-1 font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
     >
-      {label}
-      <SortIcon k={k} />
+      {label}<SortIcon k={k} />
     </button>
   );
 
@@ -163,11 +207,7 @@ export function ProfitClient() {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="bg-[var(--background)] rounded-2xl p-5 animate-pulse"
-            style={{ boxShadow: "var(--shadow-card)" }}
-          >
+          <div key={i} className="bg-[var(--background)] rounded-2xl p-5 animate-pulse" style={{ boxShadow: "var(--shadow-card)" }}>
             <div className="w-10 h-10 bg-[var(--muted)] rounded-xl mb-4" />
             <div className="h-7 bg-[var(--muted)] rounded w-24 mb-1" />
             <div className="h-3 bg-[var(--muted)] rounded w-32" />
@@ -185,40 +225,84 @@ export function ProfitClient() {
     );
   }
 
+  const margin = data.totalRevenue > 0 ? (data.actualProfit / data.totalRevenue) * 100 : 0;
+
   return (
     <div className="space-y-6">
-      {/* Summary cards */}
+
+      {/* ── Date range filter ──────────────────────────────────── */}
+      <div
+        className="bg-[var(--background)] rounded-2xl p-4"
+        style={{ boxShadow: "var(--shadow-card)" }}
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <Calendar className="w-3.5 h-3.5 text-[var(--text-dim)] flex-shrink-0" />
+          {PRESETS.map(p => (
+            <button
+              key={p.key}
+              onClick={() => setPreset(p.key)}
+              className="px-3 py-1.5 font-jetbrains text-[9px] uppercase tracking-widest rounded-lg transition-all duration-150"
+              style={
+                preset === p.key
+                  ? { background: "#ff4757", color: "#fff", boxShadow: "var(--shadow-sm)" }
+                  : { background: "var(--background)", color: "var(--text-muted)", boxShadow: "var(--shadow-sm)" }
+              }
+            >
+              {p.label}
+            </button>
+          ))}
+          {preset === "custom" && (
+            <div className="flex items-center gap-2 ml-1">
+              <input
+                type="date"
+                className="input-field py-1.5 text-xs w-36"
+                value={customStart}
+                onChange={e => setCustomStart(e.target.value)}
+              />
+              <span className="font-jetbrains text-[10px] text-[var(--text-dim)]">to</span>
+              <input
+                type="date"
+                className="input-field py-1.5 text-xs w-36"
+                value={customEnd}
+                onChange={e => setCustomEnd(e.target.value)}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Summary cards ─────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
-          label={`${data.month} Profit`}
-          value={formatMoney(data.monthlyActualProfit)}
-          sub={`on ${formatMoney(data.monthlyRevenue)} revenue`}
+          label={`Revenue — ${periodLabel}`}
+          value={formatMoney(data.totalRevenue)}
+          sub={`${data.totalOrders} completed order${data.totalOrders !== 1 ? "s" : ""}`}
           icon={DollarSign}
-          color="#00b894"
+          color="#0984e3"
           delay={0}
         />
         <SummaryCard
-          label="Potential Inventory Profit"
-          value={formatMoney(data.totalPotentialProfit)}
-          sub={`if all ${data.totalProducts} products sold`}
+          label={`Profit — ${periodLabel}`}
+          value={formatMoney(data.actualProfit)}
+          sub={`${margin.toFixed(1)}% margin · ${data.unitsSold} units`}
           icon={TrendingUp}
-          color="#ff4757"
+          color="#00b894"
           delay={0.05}
         />
         <SummaryCard
-          label="Avg Margin"
-          value={`${data.avgMarginPct.toFixed(1)}%`}
-          sub="across all stocked inventory"
-          icon={BarChart2}
-          color="#6c5ce7"
+          label="All-Time Revenue"
+          value={formatMoney(data.allTimeRevenue)}
+          sub={`${data.allTimeOrders} total completed orders`}
+          icon={ShoppingCart}
+          color="#ff4757"
           delay={0.1}
         />
         <SummaryCard
-          label="Cost Entered"
-          value={`${data.productsWithCost} / ${data.totalProducts}`}
-          sub="products with cost data"
-          icon={Package}
-          color="#0984e3"
+          label="All-Time Profit"
+          value={formatMoney(data.allTimeProfit)}
+          sub={`avg margin ${data.allTimeRevenue > 0 ? ((data.allTimeProfit / data.allTimeRevenue) * 100).toFixed(1) : "0"}%`}
+          icon={BarChart2}
+          color="#6c5ce7"
           delay={0.15}
         />
       </div>
@@ -235,14 +319,14 @@ export function ProfitClient() {
               {data.totalProducts - data.productsWithCost} product{data.totalProducts - data.productsWithCost !== 1 ? "s" : ""} missing cost data
             </p>
             <p className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-0.5">
-              Enter a cost per product in Inventory → Edit Item to improve accuracy. Products with no cost assume $0 cost.
+              Enter a cost per product in Inventory → Edit Item to improve accuracy.
             </p>
           </div>
         </div>
       )}
 
-      {/* View toggle */}
-      <div className="flex gap-1.5">
+      {/* ── View toggle ───────────────────────────────────────── */}
+      <div className="flex gap-1.5 flex-wrap">
         {(["overview", "products", "categories"] as ViewMode[]).map(v => (
           <button
             key={v}
@@ -259,58 +343,51 @@ export function ProfitClient() {
         ))}
       </div>
 
-      {/* OVERVIEW */}
+      {/* ── OVERVIEW ─────────────────────────────────────────── */}
       {view === "overview" && (
-        <motion.div
-          key="overview"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+        <motion.div key="overview" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 lg:grid-cols-2 gap-6"
         >
-          {/* Monthly summary */}
-          <div
-            className="bg-[var(--background)] rounded-2xl p-5 space-y-4"
-            style={{ boxShadow: "var(--shadow-card)" }}
-          >
+          {/* Selected period stats */}
+          <div className="bg-[var(--background)] rounded-2xl p-5 space-y-4" style={{ boxShadow: "var(--shadow-card)" }}>
             <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
-              {data.month} — Completed Orders
+              {periodLabel} — Completed Orders
             </h2>
             <div className="space-y-3">
               {[
-                { label: "Revenue", value: formatMoney(data.monthlyRevenue), color: "#0984e3" },
-                { label: "Profit", value: formatMoney(data.monthlyActualProfit), color: "#00b894" },
-                { label: "Margin", value: data.monthlyRevenue > 0 ? `${((data.monthlyActualProfit / data.monthlyRevenue) * 100).toFixed(1)}%` : "—", color: "#6c5ce7" },
-                { label: "Units Sold", value: data.monthlyUnitsSold.toLocaleString(), color: "#ff4757" },
+                { label: "Total Sales",  value: formatMoney(data.totalRevenue),    color: "#0984e3" },
+                { label: "Profit",       value: formatMoney(data.actualProfit),    color: "#00b894" },
+                { label: "Margin",       value: margin > 0 ? `${margin.toFixed(1)}%` : "—", color: "#6c5ce7" },
+                { label: "Units Sold",   value: data.unitsSold.toLocaleString(),   color: "#ff4757" },
+                { label: "Orders",       value: data.totalOrders.toLocaleString(), color: "#e17055" },
               ].map(({ label, value, color }) => (
-                <div key={label} className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid #e8ecf1" }}>
+                <div key={label} className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                   <span className="font-jetbrains text-[10px] uppercase tracking-widest text-[var(--text-muted)]">{label}</span>
                   <span className="font-jetbrains text-sm font-black" style={{ color }}>{value}</span>
                 </div>
               ))}
             </div>
-            {data.monthlyRevenue === 0 && (
+            {data.totalOrders === 0 && (
               <p className="font-jetbrains text-[10px] text-[var(--text-dim)]">
-                No completed orders this month yet. Profit reflects orders marked as Completed.
+                No completed orders in this period. Profit reflects orders marked as Completed.
               </p>
             )}
           </div>
 
-          {/* Inventory summary */}
-          <div
-            className="bg-[var(--background)] rounded-2xl p-5 space-y-4"
-            style={{ boxShadow: "var(--shadow-card)" }}
-          >
+          {/* Inventory potential */}
+          <div className="bg-[var(--background)] rounded-2xl p-5 space-y-4" style={{ boxShadow: "var(--shadow-card)" }}>
             <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
               Inventory Potential
             </h2>
             <div className="space-y-3">
               {[
-                { label: "Stock Value (retail)", value: formatMoney(data.totalStockValue), color: "#0984e3" },
-                { label: "Stock Cost Basis", value: formatMoney(data.products.reduce((s, p) => s + (parseFloat(String(p.cost_basis)) || 0), 0)), color: "#e17055" },
-                { label: "Potential Profit", value: formatMoney(data.totalPotentialProfit), color: "#00b894" },
-                { label: "Avg Margin", value: `${data.avgMarginPct.toFixed(1)}%`, color: "#6c5ce7" },
+                { label: "Stock Value (retail)",  value: formatMoney(data.totalStockValue),     color: "#0984e3" },
+                { label: "Stock Cost Basis",       value: formatMoney(data.products.reduce((s, p) => s + (parseFloat(String(p.cost_basis)) || 0), 0)), color: "#e17055" },
+                { label: "Potential Profit",       value: formatMoney(data.totalPotentialProfit), color: "#00b894" },
+                { label: "Avg Margin",             value: `${data.avgMarginPct.toFixed(1)}%`,  color: "#6c5ce7" },
+                { label: "Cost Entered",           value: `${data.productsWithCost} / ${data.totalProducts} products`, color: "#fdcb6e" },
               ].map(({ label, value, color }) => (
-                <div key={label} className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid #e8ecf1" }}>
+                <div key={label} className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                   <span className="font-jetbrains text-[10px] uppercase tracking-widest text-[var(--text-muted)]">{label}</span>
                   <span className="font-jetbrains text-sm font-black" style={{ color }}>{value}</span>
                 </div>
@@ -320,12 +397,9 @@ export function ProfitClient() {
         </motion.div>
       )}
 
-      {/* BY PRODUCT */}
+      {/* ── BY PRODUCT ───────────────────────────────────────── */}
       {view === "products" && (
-        <motion.div
-          key="products"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+        <motion.div key="products" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
           className="bg-[var(--background)] rounded-2xl overflow-hidden"
           style={{ boxShadow: "var(--shadow-card)" }}
         >
@@ -344,16 +418,10 @@ export function ProfitClient() {
               </thead>
               <tbody>
                 {sortedProducts.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="hover:bg-[#ff475704] transition-colors"
-                    style={{ borderBottom: "1px solid #f0f2f5" }}
-                  >
+                  <tr key={p.id} className="hover:bg-[#ff475704] transition-colors" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                     <td className="table-cell">
-                      <div>
-                        <div className="font-sans text-xs font-bold text-[var(--text)] leading-tight">{p.product_name}</div>
-                        <div className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-0.5">{p.sku}</div>
-                      </div>
+                      <div className="font-sans text-xs font-bold text-[var(--text)] leading-tight">{p.product_name}</div>
+                      <div className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-0.5">{p.sku}</div>
                     </td>
                     <td className="table-cell hidden md:table-cell">
                       <span className="font-jetbrains text-[10px] text-[var(--text-muted)]">{p.category}</span>
@@ -376,9 +444,7 @@ export function ProfitClient() {
                     </td>
                     <td className="table-cell">
                       <span className="font-jetbrains text-xs font-black" style={{ color: parseFloat(String(p.potential_profit)) > 0 ? "#00b894" : "var(--text-dim)" }}>
-                        {parseFloat(String(p.potential_profit)) > 0
-                          ? formatMoney(parseFloat(String(p.potential_profit)))
-                          : "—"}
+                        {parseFloat(String(p.potential_profit)) > 0 ? formatMoney(parseFloat(String(p.potential_profit))) : "—"}
                       </span>
                     </td>
                   </tr>
@@ -389,12 +455,9 @@ export function ProfitClient() {
         </motion.div>
       )}
 
-      {/* BY CATEGORY */}
+      {/* ── BY CATEGORY ──────────────────────────────────────── */}
       {view === "categories" && (
-        <motion.div
-          key="categories"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+        <motion.div key="categories" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
           className="bg-[var(--background)] rounded-2xl overflow-hidden"
           style={{ boxShadow: "var(--shadow-card)" }}
         >
@@ -413,11 +476,7 @@ export function ProfitClient() {
                 {[...data.categoryBreakdown]
                   .sort((a, b) => b.potentialProfit - a.potentialProfit)
                   .map((cat) => (
-                    <tr
-                      key={cat.category}
-                      className="hover:bg-[#ff475704] transition-colors"
-                      style={{ borderBottom: "1px solid #f0f2f5" }}
-                    >
+                    <tr key={cat.category} className="hover:bg-[#ff475704] transition-colors" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                       <td className="table-cell">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">{cat.icon}</span>

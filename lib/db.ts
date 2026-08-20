@@ -337,6 +337,9 @@ export async function createOrder(data: {
   customer_phone: string;
   customer_email: string;
   notes?: string;
+  business_name?: string | null;
+  tobacco_license_number?: string | null;
+  sellers_permit_number?: string | null;
   items: { product_id: number; product_name: string; product_sku: string; quantity: number; price: number }[];
 }) {
   await ensureOrderClientColumn();
@@ -346,6 +349,9 @@ export async function createOrder(data: {
     customer_name: data.customer_name,
     customer_phone: data.customer_phone,
     customer_email: data.customer_email,
+    business_name: data.business_name,
+    tobacco_license_number: data.tobacco_license_number,
+    sellers_permit_number: data.sellers_permit_number,
   }).catch(() => null);
 
   const orderResult = await sql`
@@ -372,6 +378,9 @@ export async function updateOrder(id: number, data: {
   customer_phone: string;
   customer_email: string;
   notes?: string;
+  business_name?: string | null;
+  tobacco_license_number?: string | null;
+  sellers_permit_number?: string | null;
   items: { product_id: number | null; product_name: string; product_sku: string | null; quantity: number; price: number }[];
 }) {
   await ensureOrderClientColumn();
@@ -380,6 +389,9 @@ export async function updateOrder(id: number, data: {
     customer_name: data.customer_name,
     customer_phone: data.customer_phone,
     customer_email: data.customer_email,
+    business_name: data.business_name,
+    tobacco_license_number: data.tobacco_license_number,
+    sellers_permit_number: data.sellers_permit_number,
   }).catch(() => null);
 
   const orderResult = await sql`
@@ -510,7 +522,7 @@ export async function deleteOrder(id: number) {
   await sql`DELETE FROM orders WHERE id = ${id}`;
 }
 
-export async function getProfitData() {
+export async function getProfitData(filters?: { startDate?: string; endDate?: string }) {
   await ensureProductCostColumn();
   const products = await sql`
     SELECT
@@ -527,22 +539,36 @@ export async function getProfitData() {
     ORDER BY potential_profit DESC
   `;
 
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+  // Date range — defaults to all time
+  const startDate = filters?.startDate || "2000-01-01";
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const endDate = filters?.endDate || tomorrow;
 
-  const [monthlyStats, categoryBreakdown] = await Promise.all([
+  const [salesStats, allTimeStats, categoryBreakdown] = await Promise.all([
+    // Stats for the selected date range
     sql`
       SELECT
         COALESCE(SUM((oi.price - COALESCE(p.cost, 0)) * oi.quantity), 0) AS total_profit,
         COALESCE(SUM(oi.price * oi.quantity), 0) AS total_revenue,
-        COALESCE(SUM(oi.quantity), 0) AS total_units_sold
+        COALESCE(SUM(oi.quantity), 0) AS total_units_sold,
+        COUNT(DISTINCT o.id) AS total_orders
       FROM orders o
       JOIN order_items oi ON oi.order_id = o.id
       LEFT JOIN products p ON p.id = oi.product_id
       WHERE o.status = 'completed'
-        AND o.created_at >= ${monthStart}
-        AND o.created_at < ${nextMonthStart}
+        AND o.created_at::date >= ${startDate}::date
+        AND o.created_at::date <= ${endDate}::date
+    `,
+    // All-time totals (always shown regardless of filter)
+    sql`
+      SELECT
+        COALESCE(SUM((oi.price - COALESCE(p.cost, 0)) * oi.quantity), 0) AS total_profit,
+        COALESCE(SUM(oi.price * oi.quantity), 0) AS total_revenue,
+        COUNT(DISTINCT o.id) AS total_orders
+      FROM orders o
+      JOIN order_items oi ON oi.order_id = o.id
+      LEFT JOIN products p ON p.id = oi.product_id
+      WHERE o.status = 'completed'
     `,
     sql`
       SELECT
@@ -569,9 +595,16 @@ export async function getProfitData() {
 
   return {
     products: products as Record<string, unknown>[],
-    monthlyActualProfit: parseFloat(String(monthlyStats[0]?.total_profit ?? 0)),
-    monthlyRevenue: parseFloat(String(monthlyStats[0]?.total_revenue ?? 0)),
-    monthlyUnitsSold: parseInt(String(monthlyStats[0]?.total_units_sold ?? 0)),
+    // Selected-range stats
+    actualProfit: parseFloat(String(salesStats[0]?.total_profit ?? 0)),
+    totalRevenue: parseFloat(String(salesStats[0]?.total_revenue ?? 0)),
+    unitsSold: parseInt(String(salesStats[0]?.total_units_sold ?? 0)),
+    totalOrders: parseInt(String(salesStats[0]?.total_orders ?? 0)),
+    // All-time stats
+    allTimeProfit: parseFloat(String(allTimeStats[0]?.total_profit ?? 0)),
+    allTimeRevenue: parseFloat(String(allTimeStats[0]?.total_revenue ?? 0)),
+    allTimeOrders: parseInt(String(allTimeStats[0]?.total_orders ?? 0)),
+    // Inventory
     totalPotentialProfit,
     totalStockValue,
     avgMarginPct,
@@ -585,7 +618,10 @@ export async function getProfitData() {
       stockValue: parseFloat(String(r.stock_value || 0)),
       avgMarginPct: parseFloat(String(r.avg_margin_pct || 0)),
     })),
-    month: now.toLocaleString("en-US", { month: "long", year: "numeric" }),
+    // Legacy aliases for dashboard backward compat
+    monthlyActualProfit: parseFloat(String(salesStats[0]?.total_profit ?? 0)),
+    monthlyRevenue: parseFloat(String(salesStats[0]?.total_revenue ?? 0)),
+    monthlyUnitsSold: parseInt(String(salesStats[0]?.total_units_sold ?? 0)),
   };
 }
 
@@ -719,32 +755,53 @@ export async function upsertClientFromOrder(data: {
   customer_name: string;
   customer_phone: string;
   customer_email: string;
+  business_name?: string | null;
+  tobacco_license_number?: string | null;
+  sellers_permit_number?: string | null;
 }): Promise<number | null> {
   await ensureClientsTable();
 
-  const name = data.customer_name?.trim();
+  // business_name overrides customer_name; if both given, customer_name becomes contact_name
+  const businessName = data.business_name?.trim() || data.customer_name?.trim();
+  const contactName = data.business_name?.trim() ? (data.customer_name?.trim() || null) : null;
   const phone = data.customer_phone?.trim();
   const email = data.customer_email?.trim();
+  const tobaccoLicense = data.tobacco_license_number?.trim() || null;
+  const sellersPermit = data.sellers_permit_number?.trim() || null;
 
-  if (!name || name === "Unknown Customer") return null;
+  if (!businessName || businessName === "Unknown Customer") return null;
 
   const cleanPhone = phone && phone !== "N/A" ? phone : null;
   const cleanEmail = email && email !== "N/A" ? email : null;
 
+  // After matching, update license numbers if provided (never overwrite with null)
+  const updateLicenses = async (id: number) => {
+    if (tobaccoLicense || sellersPermit) {
+      await sql`
+        UPDATE clients SET
+          tobacco_license_number = COALESCE(${tobaccoLicense}, tobacco_license_number),
+          sellers_permit_number  = COALESCE(${sellersPermit},  sellers_permit_number),
+          updated_at = NOW()
+        WHERE id = ${id}
+      `;
+    }
+    return id;
+  };
+
   // Match by phone first
   if (cleanPhone) {
     const byPhone = await sql`SELECT id FROM clients WHERE phone = ${cleanPhone} LIMIT 1`;
-    if (byPhone[0]) return byPhone[0].id as number;
+    if (byPhone[0]) return updateLicenses(byPhone[0].id as number);
   }
 
   // Match by business_name (case-insensitive)
-  const byName = await sql`SELECT id FROM clients WHERE LOWER(business_name) = LOWER(${name}) LIMIT 1`;
-  if (byName[0]) return byName[0].id as number;
+  const byName = await sql`SELECT id FROM clients WHERE LOWER(business_name) = LOWER(${businessName}) LIMIT 1`;
+  if (byName[0]) return updateLicenses(byName[0].id as number);
 
-  // Create new client auto-extracted from order
+  // Create new
   const result = await sql`
-    INSERT INTO clients (business_name, phone, email, client_type)
-    VALUES (${name}, ${cleanPhone}, ${cleanEmail}, 'Store Owner')
+    INSERT INTO clients (business_name, contact_name, phone, email, client_type, tobacco_license_number, sellers_permit_number)
+    VALUES (${businessName}, ${contactName}, ${cleanPhone}, ${cleanEmail}, 'Store Owner', ${tobaccoLicense}, ${sellersPermit})
     RETURNING id
   `;
   return result[0].id as number;
