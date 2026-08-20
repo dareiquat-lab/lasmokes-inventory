@@ -12,6 +12,8 @@ import {
   ChevronDown,
   Minus,
   Calendar,
+  RefreshCw,
+  Download,
 } from "lucide-react";
 
 interface ProfitItem {
@@ -101,6 +103,51 @@ function presetToDates(preset: Preset): { startDate: string; endDate: string } {
   return { startDate: "2000-01-01", endDate: toYMD(now) };
 }
 
+function exportCSV(data: ProfitData, periodLabel: string) {
+  const q = (s: string) => `"${String(s).replace(/"/g, '""')}"`;
+  const m = (n: number) => n.toFixed(2);
+
+  const lines: string[] = [
+    q(`LA Smokes Wholesale — Profit Export`),
+    `${q("Period")},${q(periodLabel)}`,
+    `${q("Generated")},${q(new Date().toLocaleString())}`,
+    "",
+    q("PERIOD SUMMARY"),
+    `${q("Total Sales")},${q("$" + m(data.totalRevenue))}`,
+    `${q("Profit")},${q("$" + m(data.actualProfit))}`,
+    `${q("Margin")},${q(data.totalRevenue > 0 ? ((data.actualProfit / data.totalRevenue) * 100).toFixed(1) + "%" : "—")}`,
+    `${q("Orders")},${data.totalOrders}`,
+    `${q("Units Sold")},${data.unitsSold}`,
+    "",
+    q("ALL-TIME TOTALS"),
+    `${q("All-Time Revenue")},${q("$" + m(data.allTimeRevenue))}`,
+    `${q("All-Time Profit")},${q("$" + m(data.allTimeProfit))}`,
+    `${q("All-Time Orders")},${data.allTimeOrders}`,
+    "",
+    q("INVENTORY POTENTIAL"),
+    `${q("Stock Value (retail)")},${q("$" + m(data.totalStockValue))}`,
+    `${q("Potential Profit")},${q("$" + m(data.totalPotentialProfit))}`,
+    `${q("Avg Margin")},${q(data.avgMarginPct.toFixed(1) + "%")}`,
+    "",
+    q("PRODUCTS"),
+    [q("Product"), q("SKU"), q("Category"), q("Cost"), q("Price"), q("Margin %"), q("Pot. Profit"), q("Stock Qty")].join(","),
+    ...data.products.map(p =>
+      [q(p.product_name), q(p.sku), q(p.category),
+        m(parseFloat(String(p.cost))), m(parseFloat(String(p.price))),
+        parseFloat(String(p.margin_pct)).toFixed(1),
+        m(parseFloat(String(p.potential_profit))), p.quantity].join(",")
+    ),
+  ];
+
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `profit-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function MarginBar({ pct }: { pct: number }) {
   const clamped = Math.max(0, Math.min(100, pct));
   const color = pct >= 40 ? "#00b894" : pct >= 20 ? "#fdcb6e" : pct > 0 ? "#e17055" : "var(--text-dim)";
@@ -150,6 +197,7 @@ export function ProfitClient() {
   const [preset, setPreset] = useState<Preset>("this_month");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState(toYMD(new Date()));
+  const [refreshing, setRefreshing] = useState(false);
 
   const activeDates = preset === "custom"
     ? { startDate: customStart || "2000-01-01", endDate: customEnd || toYMD(new Date()) }
@@ -174,6 +222,12 @@ export function ProfitClient() {
   }, []);
 
   useEffect(() => { fetchData(activeDates); }, [preset, customStart, customEnd]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchData(activeDates);
+    setRefreshing(false);
+  };
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc");
@@ -268,6 +322,30 @@ export function ProfitClient() {
               />
             </div>
           )}
+
+          <div className="flex items-center gap-2 ml-auto">
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              title="Recalculate from current completed orders"
+              className="flex items-center gap-1.5 px-3 py-1.5 font-jetbrains text-[9px] uppercase tracking-widest rounded-lg transition-all duration-150"
+              style={{ background: "var(--background)", color: "var(--text-muted)", boxShadow: "var(--shadow-sm)", opacity: refreshing ? 0.6 : 1 }}
+            >
+              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Refreshing…" : "Refresh"}
+            </button>
+            {data && (
+              <button
+                onClick={() => exportCSV(data, periodLabel)}
+                title="Export profit data as CSV"
+                className="flex items-center gap-1.5 px-3 py-1.5 font-jetbrains text-[9px] uppercase tracking-widest rounded-lg transition-all duration-150"
+                style={{ background: "#ff4757", color: "#fff", boxShadow: "var(--shadow-sm)" }}
+              >
+                <Download className="w-3 h-3" />
+                Export
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

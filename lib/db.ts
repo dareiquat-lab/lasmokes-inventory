@@ -519,6 +519,7 @@ export async function updateOrderStatus(id: number, status: OrderStatus) {
 }
 
 export async function deleteOrder(id: number) {
+  await sql`DELETE FROM order_items WHERE order_id = ${id}`;
   await sql`DELETE FROM orders WHERE id = ${id}`;
 }
 
