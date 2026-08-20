@@ -437,7 +437,6 @@ export async function getOrders(filters: {
   const countQuery = `SELECT COUNT(*) as total FROM orders o ${whereClause}`;
   const dataQuery = `
     SELECT o.*,
-      c.business_name as client_business_name,
       COALESCE(
         json_agg(
           json_build_object(
@@ -453,9 +452,8 @@ export async function getOrders(filters: {
       ) as items
     FROM orders o
     LEFT JOIN order_items oi ON oi.order_id = o.id
-    LEFT JOIN clients c ON c.id = o.client_id
     ${whereClause}
-    GROUP BY o.id, c.business_name
+    GROUP BY o.id
     ORDER BY o.created_at DESC
     LIMIT $${paramIdx} OFFSET $${paramIdx + 1}
   `;
@@ -479,7 +477,6 @@ export async function getOrders(filters: {
 export async function getOrderByNumber(orderNumber: string) {
   const result = await sql`
     SELECT o.*,
-      c.business_name as client_business_name,
       COALESCE(
         json_agg(
           json_build_object(
@@ -495,9 +492,8 @@ export async function getOrderByNumber(orderNumber: string) {
       ) as items
     FROM orders o
     LEFT JOIN order_items oi ON oi.order_id = o.id
-    LEFT JOIN clients c ON c.id = o.client_id
     WHERE o.order_number = ${orderNumber}
-    GROUP BY o.id, c.business_name
+    GROUP BY o.id
   `;
   return (result[0] as unknown as Order) || null;
 }
@@ -926,7 +922,6 @@ export async function getOrderActivity(order_id: number) {
 export async function getOrderById(id: number) {
   const result = await sql`
     SELECT o.*,
-      c.business_name as client_business_name,
       COALESCE(
         json_agg(
           json_build_object(
@@ -942,9 +937,8 @@ export async function getOrderById(id: number) {
       ) as items
     FROM orders o
     LEFT JOIN order_items oi ON oi.order_id = o.id
-    LEFT JOIN clients c ON c.id = o.client_id
     WHERE o.id=${id}
-    GROUP BY o.id, c.business_name
+    GROUP BY o.id
   `;
   return (result[0] as unknown as import("@/types").Order) || null;
 }

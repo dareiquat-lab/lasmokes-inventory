@@ -63,8 +63,7 @@ export interface Order {
   customer_email: string;
   notes: string | null;
   status: OrderStatus;
-  client_id: number | null;
-  client_business_name?: string | null;
+  client_id?: number | null;
   created_at: string;
   updated_at: string;
   items?: OrderItem[];

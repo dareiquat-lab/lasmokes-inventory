@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail, Trash2, Plus, Minus, PlusCircle, Pencil, UserCheck } from "lucide-react";
-import Link from "next/link";
+import { Search, Filter, X, ChevronDown, ChevronUp, Printer, Mail, Trash2, Plus, Minus, PlusCircle, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUSES } from "@/types";
 import type { Order, OrderStatus, InvoiceActivity, Product } from "@/types";
@@ -153,16 +152,6 @@ function OrderRow({
           <div>
             <div className="font-sans text-xs text-[#2d3436] font-bold">{order.customer_name}</div>
             <div className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">{order.customer_phone}</div>
-            {order.client_id && (
-              <Link
-                href="/admin/clients"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 mt-1 font-jetbrains text-[8px] uppercase tracking-widest text-[#ff4757] hover:underline"
-              >
-                <UserCheck className="w-2.5 h-2.5" />
-                {order.client_business_name ?? "Client"}
-              </Link>
-            )}
           </div>
         </td>
         <td className="table-cell hidden sm:table-cell">
