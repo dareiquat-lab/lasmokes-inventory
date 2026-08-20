@@ -486,6 +486,32 @@ export async function getOrders(filters: {
   };
 }
 
+export async function getOrdersByClientId(clientId: number, limit = 20) {
+  const result = await sql`
+    SELECT o.*,
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'id', oi.id,
+            'product_id', oi.product_id,
+            'product_name', oi.product_name,
+            'product_sku', oi.product_sku,
+            'quantity', oi.quantity,
+            'price', oi.price
+          )
+        ) FILTER (WHERE oi.id IS NOT NULL),
+        '[]'
+      ) as items
+    FROM orders o
+    LEFT JOIN order_items oi ON oi.order_id = o.id
+    WHERE o.client_id = ${clientId}
+    GROUP BY o.id
+    ORDER BY o.created_at DESC
+    LIMIT ${limit}
+  `;
+  return result as unknown as Order[];
+}
+
 export async function getOrderByNumber(orderNumber: string) {
   const result = await sql`
     SELECT o.*,

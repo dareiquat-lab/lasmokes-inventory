@@ -299,22 +299,33 @@ interface NewItem {
   price: number;
 }
 
-function CreateOrderModal({
+export interface CreateOrderPrefill {
+  name?: string;
+  phone?: string;
+  email?: string;
+  businessName?: string;
+  tobaccoLicense?: string;
+  sellersPermit?: string;
+}
+
+export function CreateOrderModal({
   isOpen,
   onClose,
   onCreated,
+  prefill,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onCreated: () => void;
+  prefill?: CreateOrderPrefill;
 }) {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(prefill?.name ?? "");
+  const [phone, setPhone] = useState(prefill?.phone ?? "");
+  const [email, setEmail] = useState(prefill?.email ?? "");
   const [notes, setNotes] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [tobaccoLicense, setTobaccoLicense] = useState("");
-  const [sellersPermit, setSellersPermit] = useState("");
+  const [businessName, setBusinessName] = useState(prefill?.businessName ?? "");
+  const [tobaccoLicense, setTobaccoLicense] = useState(prefill?.tobaccoLicense ?? "");
+  const [sellersPermit, setSellersPermit] = useState(prefill?.sellersPermit ?? "");
   const [items, setItems] = useState<NewItem[]>([]);
 
   const [productSearch, setProductSearch] = useState("");
@@ -327,14 +338,19 @@ function CreateOrderModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Reset when closed
+  // Reset when opened/closed
   useEffect(() => {
-    if (!isOpen) {
-      setName(""); setPhone(""); setEmail(""); setNotes("");
-      setBusinessName(""); setTobaccoLicense(""); setSellersPermit("");
+    if (isOpen) {
+      setName(prefill?.name ?? "");
+      setPhone(prefill?.phone ?? "");
+      setEmail(prefill?.email ?? "");
+      setNotes("");
+      setBusinessName(prefill?.businessName ?? "");
+      setTobaccoLicense(prefill?.tobaccoLicense ?? "");
+      setSellersPermit(prefill?.sellersPermit ?? "");
       setItems([]); setProductSearch(""); setError("");
     }
-  }, [isOpen]);
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch products for search
   useEffect(() => {

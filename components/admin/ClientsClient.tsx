@@ -20,10 +20,14 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
+  ShoppingCart,
+  ExternalLink,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CLIENT_TYPES } from "@/types";
-import type { Client, ClientType } from "@/types";
+import type { Client, ClientType, Order } from "@/types";
+import { CreateOrderModal } from "@/components/admin/OrdersClient";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -762,14 +766,282 @@ function DeleteConfirm({
   );
 }
 
+// ─── Client Detail Modal ───────────────────────────────────────────────────────
+
+const STATUS_COLORS: Record<string, string> = {
+  new: "#0984e3",
+  contacted: "#6c5ce7",
+  ready: "#fdcb6e",
+  completed: "#00b894",
+  cancelled: "#b2bec3",
+};
+
+function ClientDetailModal({
+  client,
+  onClose,
+  onEdit,
+}: {
+  client: Client;
+  onClose: () => void;
+  onEdit: () => void;
+}) {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
+
+  useEffect(() => {
+    setOrdersLoading(true);
+    fetch(`/api/admin/clients/${client.id}/orders`)
+      .then(r => r.json())
+      .then(d => setOrders(d.orders ?? []))
+      .catch(() => setOrders([]))
+      .finally(() => setOrdersLoading(false));
+  }, [client.id]);
+
+  const fullAddress = [client.address, client.city, client.state, client.zip]
+    .filter(Boolean)
+    .join(", ");
+
+  const totalSpend = orders
+    .filter(o => o.status === "completed")
+    .reduce((sum, o) => sum + (o.items || []).reduce((s, i) => s + Number(i.price) * i.quantity, 0), 0);
+
+  const prefill = {
+    name: client.contact_name ?? client.business_name,
+    phone: client.phone ?? "",
+    email: client.email ?? "",
+    businessName: client.business_name,
+    tobaccoLicense: client.tobacco_license_number ?? "",
+    sellersPermit: client.sellers_permit_number ?? "",
+  };
+
+  return (
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-start justify-center pt-6 pb-6 px-4 overflow-y-auto"
+        style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+        onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      >
+        <div
+          className="w-full max-w-xl bg-[var(--background)] rounded-2xl flex flex-col"
+          style={{ boxShadow: "var(--shadow-lg)" }}
+        >
+          {/* Header */}
+          <div
+            className="flex items-start justify-between px-6 py-5"
+            style={{ borderBottom: "1px solid var(--border-shadow)" }}
+          >
+            <div className="min-w-0 flex-1">
+              <div className="font-sans text-lg font-black text-[var(--text)] truncate">
+                {client.business_name}
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span
+                  className="font-jetbrains text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded"
+                  style={{ background: "rgba(255,71,87,0.1)", color: "#ff4757" }}
+                >
+                  {client.client_type}
+                </span>
+                {client.contact_name && (
+                  <span className="font-jetbrains text-[10px] text-[var(--text-muted)]">
+                    {client.contact_name}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+              <button
+                onClick={onEdit}
+                title="Edit client"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[#0984e3] transition-colors"
+                style={{ boxShadow: "var(--shadow-sm)" }}
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-dim)] hover:text-[#ff4757] transition-colors"
+                style={{ boxShadow: "var(--shadow-sm)" }}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-6 overflow-y-auto">
+            {/* Contact info */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { icon: Phone, label: "Phone", value: client.phone },
+                { icon: Mail, label: "Email", value: client.email },
+                { icon: MapPin, label: "Address", value: fullAddress || null },
+              ].filter(r => r.value).map(({ icon: Icon, label, value }) => (
+                <div key={label} className={label === "Address" ? "col-span-2" : ""}>
+                  <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-dim)] mb-1">{label}</div>
+                  <div className="flex items-start gap-2">
+                    <Icon className="w-3 h-3 text-[var(--text-dim)] mt-0.5 flex-shrink-0" />
+                    <span className="font-jetbrains text-xs text-[var(--text)]">{value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Compliance */}
+            {(client.tobacco_license_number || client.sellers_permit_number) && (
+              <div
+                className="rounded-xl p-4 grid grid-cols-2 gap-4"
+                style={{ background: "rgba(255,71,87,0.04)", border: "1px solid rgba(255,71,87,0.15)" }}
+              >
+                <div>
+                  <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-dim)] mb-1">Tobacco License</div>
+                  <div className="font-jetbrains text-xs font-black text-[var(--text)]">
+                    {client.tobacco_license_number ?? "—"}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-dim)] mb-1">Sellers Permit</div>
+                  <div className="font-jetbrains text-xs font-black text-[var(--text)]">
+                    {client.sellers_permit_number ?? "—"}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Stats row */}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: "Total Orders", value: orders.length },
+                { label: "Completed", value: orders.filter(o => o.status === "completed").length },
+                { label: "Total Spend", value: `$${totalSpend.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+              ].map(({ label, value }) => (
+                <div
+                  key={label}
+                  className="rounded-xl p-3 text-center"
+                  style={{ boxShadow: "var(--shadow-inner-sm)" }}
+                >
+                  <div className="font-sans text-base font-black text-[var(--text)]">{value}</div>
+                  <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-dim)] mt-0.5">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Order history */}
+            <div>
+              <div className="font-jetbrains text-[9px] font-black uppercase tracking-widest text-[var(--text-dim)] mb-3">
+                Order History
+              </div>
+              {ordersLoading ? (
+                <div className="space-y-2">
+                  {[1, 2].map(i => (
+                    <div key={i} className="rounded-xl h-12 animate-pulse" style={{ boxShadow: "var(--shadow-inner-sm)" }} />
+                  ))}
+                </div>
+              ) : orders.length === 0 ? (
+                <div
+                  className="rounded-xl p-6 text-center"
+                  style={{ boxShadow: "var(--shadow-inner-sm)" }}
+                >
+                  <Clock className="w-5 h-5 text-[var(--text-dim)] mx-auto mb-2" />
+                  <div className="font-jetbrains text-[10px] text-[var(--text-dim)] uppercase tracking-widest">
+                    No orders yet
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {orders.map(order => {
+                    const orderTotal = (order.items || []).reduce((s, i) => s + Number(i.price) * i.quantity, 0);
+                    const statusColor = STATUS_COLORS[order.status] ?? "#b2bec3";
+                    return (
+                      <div
+                        key={order.id}
+                        className="flex items-center gap-3 rounded-xl px-4 py-3"
+                        style={{ boxShadow: "var(--shadow-inner-sm)" }}
+                      >
+                        <span className="font-jetbrains text-[10px] font-black text-[#ff4757] w-20 flex-shrink-0">
+                          {order.order_number}
+                        </span>
+                        <span className="font-jetbrains text-[9px] text-[var(--text-dim)] flex-shrink-0 hidden sm:block">
+                          {new Date(order.created_at).toLocaleDateString()}
+                        </span>
+                        <span
+                          className="font-jetbrains text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded text-white flex-shrink-0"
+                          style={{ background: statusColor }}
+                        >
+                          {order.status}
+                        </span>
+                        <span className="font-jetbrains text-[10px] text-[var(--text-muted)] flex-shrink-0 ml-auto">
+                          {(order.items || []).length} item{(order.items || []).length !== 1 ? "s" : ""}
+                        </span>
+                        <span className="font-jetbrains text-xs font-black text-[var(--text)] flex-shrink-0 w-20 text-right">
+                          ${orderTotal.toFixed(2)}
+                        </span>
+                        <a
+                          href={`/admin/orders/${order.id}/invoice`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-shrink-0 text-[var(--text-dim)] hover:text-[#ff4757] transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Notes */}
+            {client.notes && (
+              <div>
+                <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-dim)] mb-1">Notes</div>
+                <p className="font-jetbrains text-xs text-[var(--text-muted)] leading-relaxed">{client.notes}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div
+            className="px-6 py-4"
+            style={{ borderTop: "1px solid var(--border-shadow)" }}
+          >
+            <button
+              onClick={() => setShowCreateOrder(true)}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              <ShoppingCart className="w-3.5 h-3.5" />
+              Create New Order
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <CreateOrderModal
+        isOpen={showCreateOrder}
+        onClose={() => setShowCreateOrder(false)}
+        prefill={prefill}
+        onCreated={() => {
+          setShowCreateOrder(false);
+          // Refresh orders list
+          fetch(`/api/admin/clients/${client.id}/orders`)
+            .then(r => r.json())
+            .then(d => setOrders(d.orders ?? []))
+            .catch(() => {});
+        }}
+      />
+    </>
+  );
+}
+
 // ─── Client Row / Card ─────────────────────────────────────────────────────────
 
 function ClientCard({
   client,
+  onView,
   onEdit,
   onDelete,
 }: {
   client: Client;
+  onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -779,8 +1051,9 @@ function ClientCard({
 
   return (
     <div
-      className="bg-[var(--background)] rounded-2xl p-5"
+      className="bg-[var(--background)] rounded-2xl p-5 cursor-pointer transition-all duration-150 hover:scale-[1.01]"
       style={{ boxShadow: "var(--shadow-card)" }}
+      onClick={onView}
     >
       {/* Top row: name + actions */}
       <div className="flex items-start justify-between gap-3 mb-4">
@@ -804,14 +1077,14 @@ function ClientCard({
         </div>
         <div className="flex gap-2 flex-shrink-0">
           <button
-            onClick={onEdit}
+            onClick={e => { e.stopPropagation(); onEdit(); }}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
             style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <Edit2 className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={onDelete}
+            onClick={e => { e.stopPropagation(); onDelete(); }}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-dim)] hover:text-[#c0392b] transition-colors"
             style={{ boxShadow: "var(--shadow-sm)" }}
           >
@@ -842,10 +1115,10 @@ function ClientCard({
         )}
       </div>
 
-      {/* License badges */}
+      {/* License badges + create order hint */}
       <div
         className="grid grid-cols-2 gap-3 pt-3"
-        style={{ borderTop: "1px solid #d0d4db" }}
+        style={{ borderTop: "1px solid var(--border-shadow)" }}
       >
         <LicenseBadge value={client.tobacco_license_number} label="Tobacco Lic." />
         <LicenseBadge value={client.sellers_permit_number} label="Sellers Permit" />
@@ -866,6 +1139,7 @@ export function ClientsClient() {
   const [typeFilter, setTypeFilter] = useState<ClientType | "">("");
   const [page, setPage] = useState(1);
 
+  const [viewTarget, setViewTarget] = useState<Client | null>(null);
   const [editTarget, setEditTarget] = useState<Client | null | "new">(null);
   const [aiPrefill, setAiPrefill] = useState<Partial<ClientForm> | undefined>(undefined);
   const [showAIImport, setShowAIImport] = useState(false);
@@ -1072,6 +1346,7 @@ export function ClientsClient() {
             <ClientCard
               key={c.id}
               client={c}
+              onView={() => setViewTarget(c)}
               onEdit={() => { setAiPrefill(undefined); setEditTarget(c); }}
               onDelete={() => setDeleteTarget(c)}
             />
@@ -1105,6 +1380,18 @@ export function ClientsClient() {
       )}
 
       {/* Modals */}
+      {viewTarget && (
+        <ClientDetailModal
+          client={viewTarget}
+          onClose={() => setViewTarget(null)}
+          onEdit={() => {
+            setAiPrefill(undefined);
+            setEditTarget(viewTarget);
+            setViewTarget(null);
+          }}
+        />
+      )}
+
       {showAIImport && (
         <AIImportModal
           onClose={() => setShowAIImport(false)}
