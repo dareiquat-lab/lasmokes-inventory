@@ -69,7 +69,7 @@ export function EmailInvoiceModal({ order, isOpen, onClose, onSent }: Props) {
           </div>
         ) : (
           <>
-            <div className="font-jetbrains text-[10px] text-[#4a5568] uppercase tracking-widest">
+            <div className="font-jetbrains text-[10px] text-[var(--text-muted)] uppercase tracking-widest">
               Sending invoice for{" "}
               <span className="text-[#ff4757] font-bold">{order.order_number}</span>
             </div>

@@ -150,20 +150,20 @@ function OrderRow({
         </td>
         <td className="table-cell">
           <div>
-            <div className="font-sans text-xs text-[#2d3436] font-bold">{order.customer_name}</div>
-            <div className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">{order.customer_phone}</div>
+            <div className="font-sans text-xs text-[var(--text)] font-bold">{order.customer_name}</div>
+            <div className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-0.5">{order.customer_phone}</div>
           </div>
         </td>
         <td className="table-cell hidden sm:table-cell">
-          <span className="font-jetbrains text-xs text-[#4a5568]">{order.customer_email}</span>
+          <span className="font-jetbrains text-xs text-[var(--text-muted)]">{order.customer_email}</span>
         </td>
         <td className="table-cell hidden md:table-cell">
-          <span className="font-jetbrains text-xs text-[#4a5568]">
+          <span className="font-jetbrains text-xs text-[var(--text-muted)]">
             {items.length} item{items.length !== 1 ? "s" : ""}
           </span>
         </td>
         <td className="table-cell hidden lg:table-cell">
-          <span className="font-jetbrains text-[10px] text-[#babecc]">
+          <span className="font-jetbrains text-[10px] text-[var(--text-dim)]">
             {new Date(order.created_at).toLocaleDateString()}
           </span>
         </td>
@@ -178,36 +178,36 @@ function OrderRow({
             <button
               onClick={handlePrint}
               title="Print invoice"
-              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#2d3436] hover:bg-[#babecc30] transition-all"
+              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--nm-dark)/20] transition-all"
             >
               <Printer className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleEditClick}
               title="Edit order"
-              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#0984e3] hover:bg-[#0984e310] transition-all"
+              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[#0984e3] hover:bg-[#0984e310] transition-all"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleEmailClick}
               title="Email invoice"
-              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#ff4757] hover:bg-[#ff475710] transition-all"
+              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[#ff4757] hover:bg-[#ff475710] transition-all"
             >
               <Mail className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleDeleteClick}
               title="Delete order"
-              className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#c0392b] hover:bg-[#c0392b10] transition-all"
+              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[#c0392b] hover:bg-[#c0392b10] transition-all"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
             <button onClick={handleExpand} className="p-1.5">
               {expanded ? (
-                <ChevronUp className="w-3.5 h-3.5 text-[#babecc]" />
+                <ChevronUp className="w-3.5 h-3.5 text-[var(--text-dim)]" />
               ) : (
-                <ChevronDown className="w-3.5 h-3.5 text-[#babecc]" />
+                <ChevronDown className="w-3.5 h-3.5 text-[var(--text-dim)]" />
               )}
             </button>
           </div>
@@ -220,36 +220,36 @@ function OrderRow({
             <div className="space-y-2">
               {items.length > 0 ? (
                 <div className="space-y-1.5">
-                  <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-2">
+                  <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-2">
                     Items Ordered
                   </div>
                   {items.map((item, i) => (
                     <div key={i} className="flex items-center gap-4 font-jetbrains text-xs">
-                      <span className="text-[#babecc] w-16">{item.product_sku || "—"}</span>
-                      <span className="text-[#2d3436] flex-1">{item.product_name}</span>
+                      <span className="text-[var(--text-dim)] w-16">{item.product_sku || "—"}</span>
+                      <span className="text-[var(--text)] flex-1">{item.product_name}</span>
                       <span className="text-[#ff4757] font-bold">×{item.quantity}</span>
-                      <span className="text-[#4a5568]">${Number(item.price).toFixed(2)}</span>
+                      <span className="text-[var(--text-muted)]">${Number(item.price).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="font-jetbrains text-xs text-[#babecc]">No items recorded</p>
+                <p className="font-jetbrains text-xs text-[var(--text-dim)]">No items recorded</p>
               )}
               {order.notes && (
-                <div className="mt-2 pt-2" style={{ borderTop: "1px solid #babecc" }}>
-                  <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-1">
+                <div className="mt-2 pt-2" style={{ borderTop: "1px solid var(--border-shadow)" }}>
+                  <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-1">
                     Customer Notes
                   </div>
-                  <p className="font-jetbrains text-xs text-[#4a5568]">{order.notes}</p>
+                  <p className="font-jetbrains text-xs text-[var(--text-muted)]">{order.notes}</p>
                 </div>
               )}
               {/* Activity log */}
-              <div className="mt-2 pt-2" style={{ borderTop: "1px solid #babecc" }}>
-                <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-2">
+              <div className="mt-2 pt-2" style={{ borderTop: "1px solid var(--border-shadow)" }}>
+                <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-2">
                   Invoice Activity
                 </div>
                 {activityLoading ? (
-                  <div className="font-jetbrains text-[10px] text-[#babecc] animate-pulse">Loading...</div>
+                  <div className="font-jetbrains text-[10px] text-[var(--text-dim)] animate-pulse">Loading...</div>
                 ) : activity && activity.length > 0 ? (
                   <div className="space-y-1">
                     {activity.map((a) => (
@@ -269,16 +269,16 @@ function OrderRow({
                           {a.action_type}
                         </span>
                         {a.recipient_email && (
-                          <span className="text-[#4a5568]">{a.recipient_email}</span>
+                          <span className="text-[var(--text-muted)]">{a.recipient_email}</span>
                         )}
-                        <span className="text-[#babecc] ml-auto">
+                        <span className="text-[var(--text-dim)] ml-auto">
                           {new Date(a.performed_at).toLocaleString()}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="font-jetbrains text-[10px] text-[#babecc]">No activity yet</p>
+                  <p className="font-jetbrains text-[10px] text-[var(--text-dim)]">No activity yet</p>
                 )}
               </div>
             </div>
@@ -431,7 +431,7 @@ function CreateOrderModal({
       <div className="space-y-5">
         {/* Customer fields */}
         <div>
-          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
             Customer
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -456,11 +456,11 @@ function CreateOrderModal({
 
         {/* Product search */}
         <div>
-          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
             Items
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc] pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)] pointer-events-none" />
             <input
               ref={searchRef}
               className="input-field pl-9"
@@ -472,11 +472,11 @@ function CreateOrderModal({
             {showDropdown && (
               <div
                 ref={dropdownRef}
-                className="absolute left-0 right-0 top-full mt-1 bg-[#e0e5ec] rounded-xl overflow-hidden z-20"
-                style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+                className="absolute left-0 right-0 top-full mt-1 bg-[var(--background)] rounded-xl overflow-hidden z-20"
+                style={{ boxShadow: "var(--shadow-card)" }}
               >
                 {filtered.length === 0 ? (
-                  <div className="px-4 py-3 font-jetbrains text-[10px] text-[#babecc]">
+                  <div className="px-4 py-3 font-jetbrains text-[10px] text-[var(--text-dim)]">
                     No products found
                   </div>
                 ) : (
@@ -488,8 +488,8 @@ function CreateOrderModal({
                       style={{ borderBottom: "1px solid #f0f2f5" }}
                     >
                       <div>
-                        <div className="font-sans text-xs font-bold text-[#2d3436]">{p.product_name}</div>
-                        <div className="font-jetbrains text-[9px] text-[#babecc]">{p.sku} · {p.category}</div>
+                        <div className="font-sans text-xs font-bold text-[var(--text)]">{p.product_name}</div>
+                        <div className="font-jetbrains text-[9px] text-[var(--text-dim)]">{p.sku} · {p.category}</div>
                       </div>
                       <div className="font-jetbrains text-xs font-black text-[#ff4757]">
                         ${Number(p.price).toFixed(2)}
@@ -512,37 +512,37 @@ function CreateOrderModal({
                 style={{ borderBottom: "1px solid #f0f2f5" }}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="font-sans text-xs font-bold text-[#2d3436] truncate">{item.product_name}</div>
-                  <div className="font-jetbrains text-[9px] text-[#babecc]">{item.product_sku || "—"}</div>
+                  <div className="font-sans text-xs font-bold text-[var(--text)] truncate">{item.product_name}</div>
+                  <div className="font-jetbrains text-[9px] text-[var(--text-dim)]">{item.product_sku || "—"}</div>
                 </div>
                 {/* Qty stepper */}
                 <div className="flex items-center flex-shrink-0">
                   <button
                     type="button"
                     onClick={() => updateQty(i, item.quantity - 1)}
-                    className="w-7 h-8 flex items-center justify-center rounded-l-lg text-[#4a5568] hover:text-[#ff4757]"
-                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                    className="w-7 h-8 flex items-center justify-center rounded-l-lg text-[var(--text-muted)] hover:text-[#ff4757]"
+                    style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
                   >
                     <Minus className="w-3 h-3" />
                   </button>
                   <div
-                    className="w-9 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[#2d3436]"
-                    style={{ background: "#e0e5ec", boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
+                    className="w-9 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[var(--text)]"
+                    style={{ background: "var(--background)", boxShadow: "var(--shadow-inner-sm)" }}
                   >
                     {item.quantity}
                   </div>
                   <button
                     type="button"
                     onClick={() => updateQty(i, item.quantity + 1)}
-                    className="w-7 h-8 flex items-center justify-center rounded-r-lg text-[#4a5568] hover:text-[#ff4757]"
-                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                    className="w-7 h-8 flex items-center justify-center rounded-r-lg text-[var(--text-muted)] hover:text-[#ff4757]"
+                    style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
                 {/* Price */}
                 <div className="relative flex-shrink-0 w-24">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">$</span>
                   <input
                     type="number"
                     min="0"
@@ -554,7 +554,7 @@ function CreateOrderModal({
                 </div>
                 <button
                   onClick={() => removeItem(i)}
-                  className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1 flex-shrink-0"
+                  className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors p-1 flex-shrink-0"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -564,9 +564,9 @@ function CreateOrderModal({
             {/* Total */}
             <div
               className="flex items-center justify-between px-3 py-2 rounded-xl mt-2"
-              style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+              style={{ boxShadow: "var(--shadow-inner-md)" }}
             >
-              <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">Order Total</span>
+              <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">Order Total</span>
               <span className="font-jetbrains text-sm font-black text-[#ff4757]">${total.toFixed(2)}</span>
             </div>
           </div>
@@ -742,7 +742,7 @@ function EditOrderModal({
       <div className="space-y-5">
         {/* Customer fields */}
         <div>
-          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
             Customer
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -767,11 +767,11 @@ function EditOrderModal({
 
         {/* Product search */}
         <div>
-          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
             Items
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc] pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)] pointer-events-none" />
             <input
               ref={searchRef}
               className="input-field pl-9"
@@ -783,11 +783,11 @@ function EditOrderModal({
             {showDropdown && (
               <div
                 ref={dropdownRef}
-                className="absolute left-0 right-0 top-full mt-1 bg-[#e0e5ec] rounded-xl overflow-hidden z-20"
-                style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+                className="absolute left-0 right-0 top-full mt-1 bg-[var(--background)] rounded-xl overflow-hidden z-20"
+                style={{ boxShadow: "var(--shadow-card)" }}
               >
                 {filtered.length === 0 ? (
-                  <div className="px-4 py-3 font-jetbrains text-[10px] text-[#babecc]">No products found</div>
+                  <div className="px-4 py-3 font-jetbrains text-[10px] text-[var(--text-dim)]">No products found</div>
                 ) : (
                   filtered.map(p => (
                     <button
@@ -797,8 +797,8 @@ function EditOrderModal({
                       style={{ borderBottom: "1px solid #f0f2f5" }}
                     >
                       <div>
-                        <div className="font-sans text-xs font-bold text-[#2d3436]">{p.product_name}</div>
-                        <div className="font-jetbrains text-[9px] text-[#babecc]">{p.sku} · {p.category}</div>
+                        <div className="font-sans text-xs font-bold text-[var(--text)]">{p.product_name}</div>
+                        <div className="font-jetbrains text-[9px] text-[var(--text-dim)]">{p.sku} · {p.category}</div>
                       </div>
                       <div className="font-jetbrains text-xs font-black text-[#ff4757]">
                         ${Number(p.price).toFixed(2)}
@@ -817,35 +817,35 @@ function EditOrderModal({
             {items.map((item, i) => (
               <div key={i} className="flex items-center gap-2 py-2" style={{ borderBottom: "1px solid #f0f2f5" }}>
                 <div className="flex-1 min-w-0">
-                  <div className="font-sans text-xs font-bold text-[#2d3436] truncate">{item.product_name}</div>
-                  <div className="font-jetbrains text-[9px] text-[#babecc]">{item.product_sku || "—"}</div>
+                  <div className="font-sans text-xs font-bold text-[var(--text)] truncate">{item.product_name}</div>
+                  <div className="font-jetbrains text-[9px] text-[var(--text-dim)]">{item.product_sku || "—"}</div>
                 </div>
                 <div className="flex items-center flex-shrink-0">
                   <button
                     type="button"
                     onClick={() => updateQty(i, item.quantity - 1)}
-                    className="w-7 h-8 flex items-center justify-center rounded-l-lg text-[#4a5568] hover:text-[#ff4757]"
-                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                    className="w-7 h-8 flex items-center justify-center rounded-l-lg text-[var(--text-muted)] hover:text-[#ff4757]"
+                    style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
                   >
                     <Minus className="w-3 h-3" />
                   </button>
                   <div
-                    className="w-9 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[#2d3436]"
-                    style={{ background: "#e0e5ec", boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
+                    className="w-9 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[var(--text)]"
+                    style={{ background: "var(--background)", boxShadow: "var(--shadow-inner-sm)" }}
                   >
                     {item.quantity}
                   </div>
                   <button
                     type="button"
                     onClick={() => updateQty(i, item.quantity + 1)}
-                    className="w-7 h-8 flex items-center justify-center rounded-r-lg text-[#4a5568] hover:text-[#ff4757]"
-                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                    className="w-7 h-8 flex items-center justify-center rounded-r-lg text-[var(--text-muted)] hover:text-[#ff4757]"
+                    style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
                 <div className="relative flex-shrink-0 w-24">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">$</span>
                   <input
                     type="number"
                     min="0"
@@ -855,16 +855,16 @@ function EditOrderModal({
                     onChange={e => updatePrice(i, parseFloat(e.target.value) || 0)}
                   />
                 </div>
-                <button onClick={() => removeItem(i)} className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1 flex-shrink-0">
+                <button onClick={() => removeItem(i)} className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors p-1 flex-shrink-0">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             ))}
             <div
               className="flex items-center justify-between px-3 py-2 rounded-xl mt-2"
-              style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+              style={{ boxShadow: "var(--shadow-inner-md)" }}
             >
-              <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">Order Total</span>
+              <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">Order Total</span>
               <span className="font-jetbrains text-sm font-black text-[#ff4757]">${total.toFixed(2)}</span>
             </div>
           </div>
@@ -1026,7 +1026,7 @@ export function OrdersClient() {
           New Order
         </button>
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)]" />
           <input
             type="text"
             value={search}
@@ -1035,13 +1035,13 @@ export function OrdersClient() {
             className="input-field pl-9 pr-8"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#babecc] hover:text-[#ff4757]">
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-dim)] hover:text-[#ff4757]">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc] pointer-events-none" />
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)] pointer-events-none" />
           <select
             value={statusFilter}
             onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
@@ -1057,7 +1057,7 @@ export function OrdersClient() {
 
       {/* Stats */}
       {data && (
-        <div className="font-jetbrains text-[10px] text-[#babecc]">
+        <div className="font-jetbrains text-[10px] text-[var(--text-dim)]">
           {data.total.toLocaleString()} order{data.total !== 1 ? "s" : ""}
           {search && ` matching "${search}"`}
           {statusFilter && ` · status: ${statusFilter}`}
@@ -1066,13 +1066,13 @@ export function OrdersClient() {
 
       {/* Table */}
       <div
-        className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        className="bg-[var(--background)] rounded-2xl overflow-hidden"
+        style={{ boxShadow: "var(--shadow-card)" }}
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: "1px solid #babecc" }}>
+              <tr style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                 <th className="table-header">Order #</th>
                 <th className="table-header">Customer</th>
                 <th className="table-header hidden sm:table-cell">Email</th>
@@ -1089,7 +1089,7 @@ export function OrdersClient() {
                   <tr key={i} style={{ borderBottom: "1px solid #f0f2f5" }} className="animate-pulse">
                     {Array.from({ length: 8 }).map((_, j) => (
                       <td key={j} className="table-cell">
-                        <div className="h-4 bg-[#d1d9e6] rounded w-20" />
+                        <div className="h-4 bg-[var(--muted)] rounded w-20" />
                       </td>
                     ))}
                   </tr>
@@ -1099,12 +1099,12 @@ export function OrdersClient() {
                   <td colSpan={8} className="table-cell text-center py-16">
                     <div className="flex flex-col items-center gap-2">
                       <div
-                        className="w-12 h-12 rounded-xl bg-[#e0e5ec] flex items-center justify-center"
-                        style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                        className="w-12 h-12 rounded-xl bg-[var(--background)] flex items-center justify-center"
+                        style={{ boxShadow: "var(--shadow-inner-md)" }}
                       >
-                        <Search className="w-5 h-5 text-[#babecc]" />
+                        <Search className="w-5 h-5 text-[var(--text-dim)]" />
                       </div>
-                      <p className="font-jetbrains text-xs text-[#babecc] uppercase tracking-widest">No orders found</p>
+                      <p className="font-jetbrains text-xs text-[var(--text-dim)] uppercase tracking-widest">No orders found</p>
                     </div>
                   </td>
                 </tr>
@@ -1125,24 +1125,24 @@ export function OrdersClient() {
         </div>
 
         {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid #babecc" }}>
-            <span className="font-jetbrains text-[10px] text-[#babecc]">
+          <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid var(--border-shadow)" }}>
+            <span className="font-jetbrains text-[10px] text-[var(--text-dim)]">
               Page {data.page} of {data.totalPages}
             </span>
             <div className="flex gap-1.5">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1 font-jetbrains text-[9px] text-[#4a5568] hover:text-[#ff4757] disabled:opacity-30 rounded-lg transition-all"
-                style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+                className="px-3 py-1 font-jetbrains text-[9px] text-[var(--text-muted)] hover:text-[#ff4757] disabled:opacity-30 rounded-lg transition-all"
+                style={{ boxShadow: "var(--shadow-sm)" }}
               >
                 Prev
               </button>
               <button
                 onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
                 disabled={page === data.totalPages}
-                className="px-3 py-1 font-jetbrains text-[9px] text-[#4a5568] hover:text-[#ff4757] disabled:opacity-30 rounded-lg transition-all"
-                style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+                className="px-3 py-1 font-jetbrains text-[9px] text-[var(--text-muted)] hover:text-[#ff4757] disabled:opacity-30 rounded-lg transition-all"
+                style={{ boxShadow: "var(--shadow-sm)" }}
               >
                 Next
               </button>

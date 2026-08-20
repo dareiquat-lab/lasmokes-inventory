@@ -67,21 +67,21 @@ function StatCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.35, type: "spring", stiffness: 200 }}
-      className={`bg-[#e0e5ec] rounded-2xl p-5 relative overflow-hidden${href ? " hover:-translate-y-0.5 transition-transform duration-200" : ""}`}
-      style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+      className={`bg-[var(--background)] rounded-2xl p-5 relative overflow-hidden${href ? " hover:-translate-y-0.5 transition-transform duration-200" : ""}`}
+      style={{ boxShadow: "var(--shadow-card)" }}
     >
       <div className="flex items-start justify-between mb-4">
         <div
           className="w-10 h-10 flex items-center justify-center rounded-xl"
           style={{
             background: c.iconBg,
-            boxShadow: "3px 3px 8px #babecc, -3px -3px 8px #ffffff",
+            boxShadow: "var(--shadow-sm)",
           }}
         >
           <Icon className="w-5 h-5" style={{ color: c.text }} />
         </div>
         {href && (
-          <span className="font-jetbrains text-[8px] uppercase tracking-widest text-[#babecc]">View →</span>
+          <span className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-dim)]">View →</span>
         )}
       </div>
       <div
@@ -90,7 +90,7 @@ function StatCard({
       >
         {value}
       </div>
-      <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">{label}</div>
+      <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">{label}</div>
     </motion.div>
   );
 
@@ -102,10 +102,10 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   if (active && payload && payload.length) {
     return (
       <div
-        className="bg-[#e0e5ec] px-3 py-2 text-sm rounded-lg"
-        style={{ boxShadow: "4px 4px 10px #babecc, -4px -4px 10px #ffffff" }}
+        className="bg-[var(--background)] px-3 py-2 text-sm rounded-lg"
+        style={{ boxShadow: "var(--shadow-sm)" }}
       >
-        <p className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-1">{label}</p>
+        <p className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-1">{label}</p>
         <p className="font-jetbrains text-[#ff4757] font-bold">{payload[0].value} items</p>
       </div>
     );
@@ -137,12 +137,12 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="bg-[#e0e5ec] rounded-2xl p-5 animate-pulse"
-            style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            className="bg-[var(--background)] rounded-2xl p-5 animate-pulse"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
-            <div className="w-10 h-10 bg-[#d1d9e6] rounded-xl mb-4" />
-            <div className="h-7 bg-[#d1d9e6] rounded w-16 mb-1" />
-            <div className="h-3 bg-[#d1d9e6] rounded w-24" />
+            <div className="w-10 h-10 bg-[var(--muted)] rounded-xl mb-4" />
+            <div className="h-7 bg-[var(--muted)] rounded w-16 mb-1" />
+            <div className="h-3 bg-[var(--muted)] rounded w-24" />
           </div>
         ))}
       </div>
@@ -152,8 +152,8 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
   if (!stats) {
     return (
       <div
-        className="bg-[#e0e5ec] rounded-2xl p-8 text-center"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff", border: "1px solid rgba(192,57,43,0.2)" }}
+        className="bg-[var(--background)] rounded-2xl p-8 text-center"
+        style={{ boxShadow: "var(--shadow-card)", border: "1px solid rgba(192,57,43,0.2)" }}
       >
         <p className="font-jetbrains text-[#c0392b] text-sm">
           Unable to load dashboard. Check your database connection.
@@ -167,10 +167,10 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
+          <h1 className="font-sans text-2xl font-black text-[var(--text)] tracking-tight">
             Dashboard
           </h1>
-          <p className="font-jetbrains text-xs text-[#4a5568] mt-1 tracking-wider">
+          <p className="font-jetbrains text-xs text-[var(--text-muted)] mt-1 tracking-wider">
             LA Smokes Wholesale — Inventory Overview
           </p>
         </div>
@@ -249,10 +249,10 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#e0e5ec] rounded-2xl p-5 lg:col-span-2"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl p-5 lg:col-span-2"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
-          <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-4">
+          <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-4">
             Products by Category
           </h2>
           <ResponsiveContainer width="100%" height={220}>
@@ -287,18 +287,18 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="bg-[#e0e5ec] rounded-2xl p-5"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl p-5"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+            <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
               Recently Updated
             </h2>
-            <Clock className="w-3.5 h-3.5 text-[#babecc]" />
+            <Clock className="w-3.5 h-3.5 text-[var(--text-dim)]" />
           </div>
           <div className="space-y-3">
             {(stats.recentlyUpdated ?? []).length === 0 ? (
-              <p className="font-jetbrains text-[#babecc] text-xs">No products yet</p>
+              <p className="font-jetbrains text-[var(--text-dim)] text-xs">No products yet</p>
             ) : (
               (stats.recentlyUpdated ?? []).map((product) => (
                 <Link
@@ -308,10 +308,10 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
                 >
                   <CategoryIcon category={product.category} size="sm" />
                   <div className="min-w-0 flex-1">
-                    <p className="font-sans text-xs font-bold text-[#2d3436] truncate group-hover:text-[#ff4757] transition-colors">
+                    <p className="font-sans text-xs font-bold text-[var(--text)] truncate group-hover:text-[#ff4757] transition-colors">
                       {product.product_name}
                     </p>
-                    <p className="font-jetbrains text-[9px] text-[#babecc] mt-0.5">
+                    <p className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-0.5">
                       {formatDateTime(product.updated_at)} · Qty: {product.quantity}
                     </p>
                   </div>
@@ -335,9 +335,9 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-[#e0e5ec] rounded-xl p-4 flex items-center gap-3"
+          className="bg-[var(--background)] rounded-xl p-4 flex items-center gap-3"
           style={{
-            boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+            boxShadow: "var(--shadow-card)",
             border: "1px solid rgba(225,112,85,0.3)",
           }}
         >
@@ -365,10 +365,10 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45 }}
-        className="bg-[#e0e5ec] rounded-2xl p-5"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        className="bg-[var(--background)] rounded-2xl p-5"
+        style={{ boxShadow: "var(--shadow-card)" }}
       >
-        <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-4">
+        <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-4">
           Inventory by Category
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -376,15 +376,15 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
             <Link
               key={item.category}
               href={`/admin/inventory?category=${encodeURIComponent(item.category)}`}
-              className="flex flex-col items-center gap-2 p-3 bg-[#e0e5ec] rounded-xl transition-all duration-200 hover:-translate-y-0.5 group"
-              style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+              className="flex flex-col items-center gap-2 p-3 bg-[var(--background)] rounded-xl transition-all duration-200 hover:-translate-y-0.5 group"
+              style={{ boxShadow: "var(--shadow-sm)" }}
             >
               <span className="text-xl">{item.icon || "📦"}</span>
               <div className="text-center">
                 <div className="font-jetbrains text-sm font-black text-[#ff4757] group-hover:text-[#ff6b7a]">
                   {item.count}
                 </div>
-                <div className="font-jetbrains text-[9px] text-[#4a5568] leading-tight">{item.category}</div>
+                <div className="font-jetbrains text-[9px] text-[var(--text-muted)] leading-tight">{item.category}</div>
               </div>
             </Link>
           ))}

@@ -40,22 +40,22 @@ function QuantityStepper({
       <button
         type="button"
         onClick={() => onChange(Math.max(1, value - 1))}
-        className="w-8 h-8 flex items-center justify-center rounded-l-lg font-bold text-[#4a5568] hover:text-[#ff4757] transition-colors"
-        style={{ boxShadow: "2px 2px 5px #babecc, -2px -2px 5px #ffffff", background: "#e0e5ec" }}
+        className="w-8 h-8 flex items-center justify-center rounded-l-lg font-bold text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
+        style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
       >
         <Minus className="w-3 h-3" />
       </button>
       <div
-        className="w-10 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[#2d3436]"
-        style={{ background: "#e0e5ec", boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
+        className="w-10 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[var(--text)]"
+        style={{ background: "var(--background)", boxShadow: "var(--shadow-inner-sm)" }}
       >
         {value}
       </div>
       <button
         type="button"
         onClick={() => onChange(max ? Math.min(max, value + 1) : value + 1)}
-        className="w-8 h-8 flex items-center justify-center rounded-r-lg font-bold text-[#4a5568] hover:text-[#ff4757] transition-colors"
-        style={{ boxShadow: "2px 2px 5px #babecc, -2px -2px 5px #ffffff", background: "#e0e5ec" }}
+        className="w-8 h-8 flex items-center justify-center rounded-r-lg font-bold text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
+        style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
       >
         <Plus className="w-3 h-3" />
       </button>
@@ -288,8 +288,8 @@ export function ScanClient() {
     <div className="space-y-6">
       {/* Scanner status bar */}
       <div
-        className="bg-[#e0e5ec] rounded-2xl px-5 py-4 flex items-center gap-4"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        className="bg-[var(--background)] rounded-2xl px-5 py-4 flex items-center gap-4"
+        style={{ boxShadow: "var(--shadow-card)" }}
       >
         <div className="relative flex-shrink-0">
           <span
@@ -303,13 +303,13 @@ export function ScanClient() {
           )}
         </div>
         <div className="flex-1">
-          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+          <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
             Scanner Status
           </div>
-          <div className="font-jetbrains text-xs text-[#2d3436] mt-0.5">{sc.label}</div>
+          <div className="font-jetbrains text-xs text-[var(--text)] mt-0.5">{sc.label}</div>
         </div>
-        <Scan className="w-5 h-5 text-[#babecc]" />
-        <div className="font-jetbrains text-[9px] text-[#babecc] hidden sm:block">
+        <Scan className="w-5 h-5 text-[var(--text-dim)]" />
+        <div className="font-jetbrains text-[9px] text-[var(--text-dim)] hidden sm:block">
           Point scanner anywhere on this page and scan
         </div>
       </div>
@@ -321,9 +321,9 @@ export function ScanClient() {
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className="bg-[#e0e5ec] rounded-2xl px-5 py-4 flex items-center gap-3"
+            className="bg-[var(--background)] rounded-2xl px-5 py-4 flex items-center gap-3"
             style={{
-              boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+              boxShadow: "var(--shadow-card)",
               border: "1px solid rgba(0,184,148,0.3)",
             }}
           >
@@ -332,7 +332,7 @@ export function ScanClient() {
               <div className="font-jetbrains text-xs font-black text-[#00b894] uppercase tracking-wider">
                 Order placed — {submitSuccess}
               </div>
-              <div className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">
+              <div className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-0.5">
                 Scan the next order or view it in Orders
               </div>
             </div>
@@ -345,10 +345,10 @@ export function ScanClient() {
         <div className="space-y-4">
           {/* Scan result card */}
           <div
-            className="bg-[#e0e5ec] rounded-2xl p-5 min-h-[200px] flex flex-col"
-            style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            className="bg-[var(--background)] rounded-2xl p-5 min-h-[200px] flex flex-col"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
-            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-4">
+            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-4">
               Last Scan
             </div>
 
@@ -363,11 +363,11 @@ export function ScanClient() {
                 >
                   <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                    style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+                    style={{ boxShadow: "var(--shadow-recessed)" }}
                   >
-                    <Scan className="w-7 h-7 text-[#babecc]" />
+                    <Scan className="w-7 h-7 text-[var(--text-dim)]" />
                   </div>
-                  <p className="font-jetbrains text-[10px] uppercase tracking-widest text-[#babecc]">
+                  <p className="font-jetbrains text-[10px] uppercase tracking-widest text-[var(--text-dim)]">
                     Waiting for scan
                   </p>
                 </motion.div>
@@ -381,8 +381,8 @@ export function ScanClient() {
                   exit={{ opacity: 0 }}
                   className="flex-1 flex flex-col items-center justify-center gap-3 py-6"
                 >
-                  <div className="w-8 h-8 border-2 border-[#babecc] border-t-[#ff4757] rounded-full animate-spin" />
-                  <p className="font-jetbrains text-[10px] uppercase tracking-widest text-[#4a5568]">
+                  <div className="w-8 h-8 border-2 border-[var(--border-shadow)] border-t-[#ff4757] rounded-full animate-spin" />
+                  <p className="font-jetbrains text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
                     Looking up {lastCode}
                   </p>
                 </motion.div>
@@ -398,7 +398,7 @@ export function ScanClient() {
                 >
                   <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                    style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+                    style={{ boxShadow: "var(--shadow-recessed)" }}
                   >
                     <XCircle className="w-7 h-7 text-[#ff4757]" />
                   </div>
@@ -406,10 +406,10 @@ export function ScanClient() {
                     <p className="font-jetbrains text-xs font-black text-[#ff4757] uppercase tracking-wider">
                       No product found
                     </p>
-                    <p className="font-jetbrains text-[9px] text-[#babecc] mt-1">
+                    <p className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-1">
                       Barcode: {lastCode}
                     </p>
-                    <p className="font-jetbrains text-[9px] text-[#babecc]">
+                    <p className="font-jetbrains text-[9px] text-[var(--text-dim)]">
                       Make sure the product has a barcode or SKU set in Inventory
                     </p>
                   </div>
@@ -428,7 +428,7 @@ export function ScanClient() {
                   <div className="flex gap-3 items-start">
                     <div
                       className="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"
-                      style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                      style={{ boxShadow: "var(--shadow-inner-md)" }}
                     >
                       {scannedProduct.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -438,14 +438,14 @@ export function ScanClient() {
                           className="w-full h-full object-cover rounded-xl"
                         />
                       ) : (
-                        <Package className="w-5 h-5 text-[#babecc]" />
+                        <Package className="w-5 h-5 text-[var(--text-dim)]" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-sans text-sm font-black text-[#2d3436] leading-tight">
+                      <div className="font-sans text-sm font-black text-[var(--text)] leading-tight">
                         {scannedProduct.product_name}
                       </div>
-                      <div className="font-jetbrains text-[9px] text-[#babecc] mt-0.5">
+                      <div className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-0.5">
                         {scannedProduct.sku} · {scannedProduct.category}
                       </div>
                       <div className="font-jetbrains text-lg font-black text-[#ff4757] mt-1">
@@ -494,13 +494,13 @@ export function ScanClient() {
 
           {/* Scan hint */}
           <div
-            className="bg-[#e0e5ec] rounded-xl px-4 py-3"
-            style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+            className="bg-[var(--background)] rounded-xl px-4 py-3"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
-            <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#babecc] mb-1">
+            <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-dim)] mb-1">
               How it works
             </div>
-            <ul className="font-jetbrains text-[10px] text-[#4a5568] space-y-0.5">
+            <ul className="font-jetbrains text-[10px] text-[var(--text-muted)] space-y-0.5">
               <li>· USB or Bluetooth scanners work automatically — no setup needed</li>
               <li>· Matches product barcode first, then SKU as fallback</li>
               <li>· Scanning the same item again increases quantity in the order</li>
@@ -510,18 +510,18 @@ export function ScanClient() {
 
         {/* ── Right: Order builder ── */}
         <div
-          className="bg-[#e0e5ec] rounded-2xl p-5 flex flex-col gap-4"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl p-5 flex flex-col gap-4"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div className="flex items-center justify-between">
-            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] flex items-center gap-2">
+            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-2">
               <ShoppingCart className="w-3.5 h-3.5" />
               Current Order
             </div>
             {orderItems.length > 0 && (
               <button
                 onClick={clearOrder}
-                className="font-jetbrains text-[9px] text-[#babecc] hover:text-[#ff4757] transition-colors uppercase tracking-widest"
+                className="font-jetbrains text-[9px] text-[var(--text-dim)] hover:text-[#ff4757] transition-colors uppercase tracking-widest"
               >
                 Clear
               </button>
@@ -541,11 +541,11 @@ export function ScanClient() {
                 >
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                    style={{ boxShadow: "var(--shadow-inner-md)" }}
                   >
-                    <ShoppingCart className="w-4 h-4 text-[#babecc]" />
+                    <ShoppingCart className="w-4 h-4 text-[var(--text-dim)]" />
                   </div>
-                  <p className="font-jetbrains text-[10px] uppercase tracking-widest text-[#babecc]">
+                  <p className="font-jetbrains text-[10px] uppercase tracking-widest text-[var(--text-dim)]">
                     No items yet
                   </p>
                 </motion.div>
@@ -561,10 +561,10 @@ export function ScanClient() {
                       style={{ borderBottom: "1px solid #e8ecf1" }}
                     >
                       <div className="flex-1 min-w-0">
-                        <div className="font-sans text-xs font-bold text-[#2d3436] truncate">
+                        <div className="font-sans text-xs font-bold text-[var(--text)] truncate">
                           {item.product.product_name}
                         </div>
-                        <div className="font-jetbrains text-[9px] text-[#babecc]">
+                        <div className="font-jetbrains text-[9px] text-[var(--text-dim)]">
                           {item.product.sku} · {formatMoney(item.product.price)} ea
                         </div>
                       </div>
@@ -577,7 +577,7 @@ export function ScanClient() {
                       </div>
                       <button
                         onClick={() => removeItem(item.product.id)}
-                        className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1 flex-shrink-0"
+                        className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors p-1 flex-shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -592,9 +592,9 @@ export function ScanClient() {
           {orderItems.length > 0 && (
             <div
               className="flex items-center justify-between py-2 rounded-xl px-3"
-              style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+              style={{ boxShadow: "var(--shadow-inner-md)" }}
             >
-              <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">
+              <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
                 Order Total
               </span>
               <span className="font-jetbrains text-lg font-black text-[#ff4757]">
@@ -604,11 +604,11 @@ export function ScanClient() {
           )}
 
           {/* Divider */}
-          <div style={{ borderTop: "1px solid #babecc" }} />
+          <div style={{ borderTop: "1px solid var(--border-shadow)" }} />
 
           {/* Customer info */}
           <div className="space-y-3">
-            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
               Customer Info
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

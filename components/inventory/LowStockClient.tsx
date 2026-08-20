@@ -62,13 +62,13 @@ export function LowStockClient() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="bg-[#e0e5ec] rounded-xl p-4 animate-pulse flex gap-3"
-            style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+            className="bg-[var(--background)] rounded-xl p-4 animate-pulse flex gap-3"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
-            <div className="w-10 h-10 bg-[#d1d9e6] rounded-lg" />
+            <div className="w-10 h-10 bg-[var(--muted)] rounded-lg" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-[#d1d9e6] rounded w-48" />
-              <div className="h-3 bg-[#d1d9e6] rounded w-24" />
+              <div className="h-4 bg-[var(--muted)] rounded w-48" />
+              <div className="h-3 bg-[var(--muted)] rounded w-24" />
             </div>
           </div>
         ))}
@@ -79,19 +79,19 @@ export function LowStockClient() {
   if (products.length === 0) {
     return (
       <div
-        className="bg-[#e0e5ec] rounded-2xl p-12 text-center"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        className="bg-[var(--background)] rounded-2xl p-12 text-center"
+        style={{ boxShadow: "var(--shadow-card)" }}
       >
         <div
-          className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#e0e5ec] mb-3"
-          style={{ boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff" }}
+          className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--background)] mb-3"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           <TrendingUp className="w-8 h-8 text-green-500" />
         </div>
         <p className="font-sans text-sm font-black text-[#00856f] uppercase tracking-widest mb-1">
           All Stocked Up
         </p>
-        <p className="font-jetbrains text-[#4a5568] text-sm">No products are running low on stock.</p>
+        <p className="font-jetbrains text-[var(--text-muted)] text-sm">No products are running low on stock.</p>
       </div>
     );
   }
@@ -100,9 +100,9 @@ export function LowStockClient() {
     <div className="space-y-4">
       {/* Warning banner */}
       <div
-        className="bg-[#e0e5ec] rounded-xl px-4 py-3 flex items-center gap-2"
+        className="bg-[var(--background)] rounded-xl px-4 py-3 flex items-center gap-2"
         style={{
-          boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff",
+          boxShadow: "var(--shadow-sm)",
           border: "1px solid rgba(225,112,85,0.3)",
         }}
       >
@@ -113,13 +113,13 @@ export function LowStockClient() {
       </div>
 
       <div
-        className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        className="bg-[var(--background)] rounded-2xl overflow-hidden"
+        style={{ boxShadow: "var(--shadow-card)" }}
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: "1px solid #babecc" }}>
+              <tr style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                 <th className="table-header w-10">IMG</th>
                 <th className="table-header">Product</th>
                 <th className="table-header hidden sm:table-cell">Category</th>
@@ -140,7 +140,7 @@ export function LowStockClient() {
                     {product.image_url ? (
                       <div
                         className="w-8 h-8 overflow-hidden rounded-lg"
-                        style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
+                        style={{ boxShadow: "var(--shadow-sm)" }}
                       >
                         <img src={product.image_url} alt={product.product_name} className="w-full h-full object-cover" />
                       </div>
@@ -151,7 +151,7 @@ export function LowStockClient() {
                   <td className="table-cell">
                     <Link
                       href={`/admin/products/${product.id}`}
-                      className="font-sans text-[#2d3436] hover:text-[#ff4757] font-bold transition-colors text-sm"
+                      className="font-sans text-[var(--text)] hover:text-[#ff4757] font-bold transition-colors text-sm"
                     >
                       {product.product_name}
                     </Link>
@@ -160,7 +160,7 @@ export function LowStockClient() {
                     <CategoryBadge category={product.category} />
                   </td>
                   <td className="table-cell hidden md:table-cell">
-                    <span className="font-jetbrains text-xs text-[#4a5568]">{product.sku}</span>
+                    <span className="font-jetbrains text-xs text-[var(--text-muted)]">{product.sku}</span>
                   </td>
                   <td className="table-cell">
                     <div className="flex items-center gap-2">
@@ -179,7 +179,7 @@ export function LowStockClient() {
                       )}
                     </div>
                   </td>
-                  <td className="table-cell hidden lg:table-cell font-jetbrains text-[#4a5568]">
+                  <td className="table-cell hidden lg:table-cell font-jetbrains text-[var(--text-muted)]">
                     {formatCurrency(product.price)}
                   </td>
                   <td className="table-cell">
@@ -193,7 +193,7 @@ export function LowStockClient() {
                       </button>
                       <Link
                         href={`/admin/products/${product.id}`}
-                        className="p-1.5 text-[#babecc] hover:text-[#ff4757] rounded-lg transition-colors hover:bg-[#ff475710]"
+                        className="p-1.5 text-[var(--text-dim)] hover:text-[#ff4757] rounded-lg transition-colors hover:bg-[#ff475710]"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </Link>
@@ -218,7 +218,7 @@ export function LowStockClient() {
               <p className="font-sans text-xs font-black uppercase tracking-wider text-[#ff4757]">
                 {quickEditProduct.product_name}
               </p>
-              <p className="font-jetbrains text-[#4a5568] text-xs mt-0.5">
+              <p className="font-jetbrains text-[var(--text-muted)] text-xs mt-0.5">
                 Current: {quickEditProduct.quantity} units
               </p>
             </div>

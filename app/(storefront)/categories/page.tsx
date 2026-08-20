@@ -22,10 +22,10 @@ export default async function CategoriesPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
       <div className="mb-8">
-        <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
+        <h1 className="font-sans text-2xl font-black text-[var(--text)] tracking-tight">
           Categories
         </h1>
-        <p className="font-jetbrains text-xs text-[#4a5568] mt-1">
+        <p className="font-jetbrains text-xs text-[var(--text-muted)] mt-1">
           Browse by product type
         </p>
       </div>
@@ -37,17 +37,17 @@ export default async function CategoriesPage() {
             <Link
               key={cat.name}
               href={`/products?category=${encodeURIComponent(cat.name)}`}
-              className="group flex flex-col items-center gap-3 p-6 bg-[#e0e5ec] rounded-2xl transition-all duration-200 hover:-translate-y-1"
-              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              className="group flex flex-col items-center gap-3 p-6 bg-[var(--background)] rounded-2xl transition-all duration-200 hover:-translate-y-1"
+              style={{ boxShadow: "var(--shadow-card)" }}
             >
               <span className="text-3xl group-hover:scale-110 transition-transform duration-200">
                 {(cat as { name: string; icon?: string }).icon || CATEGORY_ICONS[cat.name] || "📦"}
               </span>
               <div className="text-center">
-                <div className="font-sans text-[10px] font-bold uppercase tracking-wider text-[#2d3436] group-hover:text-[#ff4757] transition-colors">
+                <div className="font-sans text-[10px] font-bold uppercase tracking-wider text-[var(--text)] group-hover:text-[#ff4757] transition-colors">
                   {cat.name}
                 </div>
-                <div className="font-jetbrains text-[9px] text-[#4a5568] mt-1">
+                <div className="font-jetbrains text-[9px] text-[var(--text-muted)] mt-1">
                   {count} product{count !== 1 ? "s" : ""}
                 </div>
               </div>

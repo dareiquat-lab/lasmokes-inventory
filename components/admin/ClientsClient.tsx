@@ -79,18 +79,18 @@ function clientToForm(c: Client): ClientForm {
 function LicenseBadge({ value, label }: { value: string | null; label: string }) {
   if (!value) {
     return (
-      <span className="font-jetbrains text-[9px] text-[#babecc] uppercase tracking-widest">
+      <span className="font-jetbrains text-[9px] text-[var(--text-dim)] uppercase tracking-widest">
         —
       </span>
     );
   }
   return (
     <div className="inline-flex flex-col gap-0.5">
-      <span className="font-jetbrains text-[8px] text-[#4a5568] uppercase tracking-widest leading-none">
+      <span className="font-jetbrains text-[8px] text-[var(--text-muted)] uppercase tracking-widest leading-none">
         {label}
       </span>
       <span
-        className="font-jetbrains text-[10px] font-black text-[#2d3436] px-2 py-0.5 rounded-md"
+        className="font-jetbrains text-[10px] font-black text-[var(--text)] px-2 py-0.5 rounded-md"
         style={{ background: "rgba(255,71,87,0.08)", border: "1px solid rgba(255,71,87,0.2)" }}
       >
         {value}
@@ -169,26 +169,26 @@ function ClientModal({
       style={{ background: "rgba(45,52,54,0.5)", backdropFilter: "blur(4px)" }}
     >
       <div
-        className="w-full max-w-lg bg-[#e0e5ec] rounded-2xl flex flex-col"
-        style={{ boxShadow: "16px 16px 32px #babecc, -16px -16px 32px #ffffff" }}
+        className="w-full max-w-lg bg-[var(--background)] rounded-2xl flex flex-col"
+        style={{ boxShadow: "var(--shadow-lg)" }}
       >
         {/* Header */}
         <div
           className="flex items-center justify-between px-6 py-4"
-          style={{ borderBottom: "1px solid #babecc" }}
+          style={{ borderBottom: "1px solid var(--border-shadow)" }}
         >
           <div>
-            <div className="font-sans text-base font-black text-[#2d3436]">
+            <div className="font-sans text-base font-black text-[var(--text)]">
               {client ? "Edit Client" : "Add Client"}
             </div>
-            <div className="font-jetbrains text-[9px] text-[#4a5568] uppercase tracking-widest mt-0.5">
+            <div className="font-jetbrains text-[9px] text-[var(--text-muted)] uppercase tracking-widest mt-0.5">
               {client ? `ID #${client.id}` : "New business record"}
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#babecc] hover:text-[#ff4757] transition-colors"
-            style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-dim)] hover:text-[#ff4757] transition-colors"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <X className="w-4 h-4" />
           </button>
@@ -198,7 +198,7 @@ function ClientModal({
         <div className="p-6 space-y-5 overflow-y-auto">
           {/* Business info */}
           <div>
-            <div className="font-jetbrains text-[9px] font-black uppercase tracking-widest text-[#babecc] mb-3">
+            <div className="font-jetbrains text-[9px] font-black uppercase tracking-widest text-[var(--text-dim)] mb-3">
               Business Info
             </div>
             <div className="space-y-3">
@@ -259,7 +259,7 @@ function ClientModal({
 
           {/* Address */}
           <div>
-            <div className="font-jetbrains text-[9px] font-black uppercase tracking-widest text-[#babecc] mb-3">
+            <div className="font-jetbrains text-[9px] font-black uppercase tracking-widest text-[var(--text-dim)] mb-3">
               Address
             </div>
             <div className="space-y-3">
@@ -307,7 +307,7 @@ function ClientModal({
 
           {/* Compliance */}
           <div>
-            <div className="font-jetbrains text-[9px] font-black uppercase tracking-widest text-[#babecc] mb-3">
+            <div className="font-jetbrains text-[9px] font-black uppercase tracking-widest text-[var(--text-dim)] mb-3">
               Compliance Numbers
             </div>
             <div className="space-y-3">
@@ -357,7 +357,7 @@ function ClientModal({
         {/* Footer */}
         <div
           className="flex gap-3 px-6 py-4"
-          style={{ borderTop: "1px solid #babecc" }}
+          style={{ borderTop: "1px solid var(--border-shadow)" }}
         >
           <button onClick={onClose} className="btn-secondary flex-1">
             Cancel
@@ -476,27 +476,27 @@ function AIImportModal({
       style={{ background: "rgba(45,52,54,0.5)", backdropFilter: "blur(4px)" }}
     >
       <div
-        className="w-full max-w-md bg-[#e0e5ec] rounded-2xl flex flex-col"
-        style={{ boxShadow: "16px 16px 32px #babecc, -16px -16px 32px #ffffff", maxHeight: "90vh" }}
+        className="w-full max-w-md bg-[var(--background)] rounded-2xl flex flex-col"
+        style={{ boxShadow: "var(--shadow-lg)", maxHeight: "90vh" }}
       >
         {/* Header */}
         <div
           className="flex items-center justify-between px-6 py-4 flex-shrink-0"
-          style={{ borderBottom: "1px solid #babecc" }}
+          style={{ borderBottom: "1px solid var(--border-shadow)" }}
         >
           <div>
-            <div className="font-sans text-base font-black text-[#2d3436] flex items-center gap-2">
+            <div className="font-sans text-base font-black text-[var(--text)] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#ff4757]" />
               AI Client Import
             </div>
-            <div className="font-jetbrains text-[9px] text-[#4a5568] uppercase tracking-widest mt-0.5">
+            <div className="font-jetbrains text-[9px] text-[var(--text-muted)] uppercase tracking-widest mt-0.5">
               Upload a business card, license, or permit
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#babecc] hover:text-[#ff4757] transition-colors"
-            style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-dim)] hover:text-[#ff4757] transition-colors"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <X className="w-4 h-4" />
           </button>
@@ -534,19 +534,19 @@ function AIImportModal({
                   htmlFor="ai-client-file"
                   onClick={() => fileInputRef.current?.click()}
                   className="flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer py-10 px-6"
-                  style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+                  style={{ boxShadow: "var(--shadow-recessed)" }}
                 >
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                    style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+                    style={{ boxShadow: "var(--shadow-sm)" }}
                   >
-                    <Upload className="w-6 h-6 text-[#babecc]" />
+                    <Upload className="w-6 h-6 text-[var(--text-dim)]" />
                   </div>
                   <div className="text-center">
-                    <div className="font-jetbrains text-xs font-black text-[#2d3436] uppercase tracking-wider">
+                    <div className="font-jetbrains text-xs font-black text-[var(--text)] uppercase tracking-wider">
                       Tap to upload
                     </div>
-                    <div className="font-jetbrains text-[10px] text-[#babecc] mt-1">
+                    <div className="font-jetbrains text-[10px] text-[var(--text-dim)] mt-1">
                       Business card, license, or permit — image or PDF
                     </div>
                   </div>
@@ -554,7 +554,7 @@ function AIImportModal({
               ) : (
                 <div
                   className="rounded-2xl p-4 flex items-center gap-4"
-                  style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                  style={{ boxShadow: "var(--shadow-inner-md)" }}
                 >
                   {previewFile ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -564,22 +564,22 @@ function AIImportModal({
                       className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-lg bg-[#e0e5ec] flex items-center justify-center flex-shrink-0"
-                      style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}>
-                      <FileText className="w-7 h-7 text-[#4a5568]" />
+                    <div className="w-16 h-16 rounded-lg bg-[var(--background)] flex items-center justify-center flex-shrink-0"
+                      style={{ boxShadow: "var(--shadow-sm)" }}>
+                      <FileText className="w-7 h-7 text-[var(--text-muted)]" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="font-jetbrains text-xs font-black text-[#2d3436] truncate">
+                    <div className="font-jetbrains text-xs font-black text-[var(--text)] truncate">
                       {file.name}
                     </div>
-                    <div className="font-jetbrains text-[9px] text-[#4a5568] mt-0.5">
+                    <div className="font-jetbrains text-[9px] text-[var(--text-muted)] mt-0.5">
                       {(file.size / 1024).toFixed(1)} KB
                     </div>
                   </div>
                   <button
                     onClick={() => setFile(null)}
-                    className="text-[#babecc] hover:text-[#ff4757] transition-colors"
+                    className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -618,7 +618,7 @@ function AIImportModal({
           {/* Review extracted data */}
           {extracted && (
             <>
-              <div className="font-jetbrains text-[10px] text-[#4a5568] uppercase tracking-widest">
+              <div className="font-jetbrains text-[10px] text-[var(--text-muted)] uppercase tracking-widest">
                 {extracted.length > 1
                   ? `${extracted.length} records found — select one:`
                   : "Review extracted data:"}
@@ -634,9 +634,9 @@ function AIImportModal({
                         "flex-1 rounded-lg px-3 py-1.5 font-jetbrains text-[10px] font-black uppercase tracking-wider transition-all",
                         selectedIdx === i
                           ? "bg-[#ff4757] text-white"
-                          : "text-[#4a5568]"
+                          : "text-[var(--text-muted)]"
                       )}
-                      style={selectedIdx !== i ? { boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" } : {}}
+                      style={selectedIdx !== i ? { boxShadow: "var(--shadow-sm)" } : {}}
                     >
                       Record {i + 1}
                     </button>
@@ -649,7 +649,7 @@ function AIImportModal({
                 return (
                   <div
                     className="rounded-2xl p-4 space-y-2"
-                    style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                    style={{ boxShadow: "var(--shadow-inner-md)" }}
                   >
                     {[
                       ["Business", c.business_name],
@@ -662,10 +662,10 @@ function AIImportModal({
                     ].map(([label, val]) =>
                       val ? (
                         <div key={label} className="flex gap-3">
-                          <span className="font-jetbrains text-[9px] text-[#babecc] uppercase tracking-widest w-24 flex-shrink-0 pt-0.5">
+                          <span className="font-jetbrains text-[9px] text-[var(--text-dim)] uppercase tracking-widest w-24 flex-shrink-0 pt-0.5">
                             {label}
                           </span>
-                          <span className="font-jetbrains text-xs font-black text-[#2d3436]">
+                          <span className="font-jetbrains text-xs font-black text-[var(--text)]">
                             {val}
                           </span>
                         </div>
@@ -724,8 +724,8 @@ function DeleteConfirm({
       style={{ background: "rgba(45,52,54,0.5)", backdropFilter: "blur(4px)" }}
     >
       <div
-        className="w-full max-w-sm bg-[#e0e5ec] rounded-2xl p-6 space-y-5"
-        style={{ boxShadow: "16px 16px 32px #babecc, -16px -16px 32px #ffffff" }}
+        className="w-full max-w-sm bg-[var(--background)] rounded-2xl p-6 space-y-5"
+        style={{ boxShadow: "var(--shadow-lg)" }}
       >
         <div className="flex items-start gap-4">
           <div
@@ -735,10 +735,10 @@ function DeleteConfirm({
             <Trash2 className="w-5 h-5 text-[#c0392b]" />
           </div>
           <div>
-            <div className="font-sans text-base font-black text-[#2d3436]">
+            <div className="font-sans text-base font-black text-[var(--text)]">
               Delete Client
             </div>
-            <div className="font-jetbrains text-xs text-[#4a5568] mt-1 leading-relaxed">
+            <div className="font-jetbrains text-xs text-[var(--text-muted)] mt-1 leading-relaxed">
               Remove <strong>{client.business_name}</strong> from the database? This cannot be undone.
             </div>
           </div>
@@ -779,13 +779,13 @@ function ClientCard({
 
   return (
     <div
-      className="bg-[#e0e5ec] rounded-2xl p-5"
-      style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+      className="bg-[var(--background)] rounded-2xl p-5"
+      style={{ boxShadow: "var(--shadow-card)" }}
     >
       {/* Top row: name + actions */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0">
-          <div className="font-sans text-sm font-black text-[#2d3436] truncate">
+          <div className="font-sans text-sm font-black text-[var(--text)] truncate">
             {client.business_name}
           </div>
           <div className="flex items-center gap-2 mt-0.5">
@@ -796,7 +796,7 @@ function ClientCard({
               {client.client_type}
             </span>
             {client.contact_name && (
-              <span className="font-jetbrains text-[10px] text-[#4a5568] truncate">
+              <span className="font-jetbrains text-[10px] text-[var(--text-muted)] truncate">
                 {client.contact_name}
               </span>
             )}
@@ -805,15 +805,15 @@ function ClientCard({
         <div className="flex gap-2 flex-shrink-0">
           <button
             onClick={onEdit}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#4a5568] hover:text-[#ff4757] transition-colors"
-            style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <Edit2 className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onDelete}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#babecc] hover:text-[#c0392b] transition-colors"
-            style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-dim)] hover:text-[#c0392b] transition-colors"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -823,20 +823,20 @@ function ClientCard({
       {/* Contact info */}
       <div className="space-y-1.5 mb-4">
         {client.phone && (
-          <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[#4a5568]">
-            <Phone className="w-3 h-3 text-[#babecc] flex-shrink-0" />
+          <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[var(--text-muted)]">
+            <Phone className="w-3 h-3 text-[var(--text-dim)] flex-shrink-0" />
             {client.phone}
           </div>
         )}
         {client.email && (
-          <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[#4a5568]">
-            <Mail className="w-3 h-3 text-[#babecc] flex-shrink-0" />
+          <div className="flex items-center gap-2 font-jetbrains text-[10px] text-[var(--text-muted)]">
+            <Mail className="w-3 h-3 text-[var(--text-dim)] flex-shrink-0" />
             <span className="truncate">{client.email}</span>
           </div>
         )}
         {fullAddress && (
-          <div className="flex items-start gap-2 font-jetbrains text-[10px] text-[#4a5568]">
-            <MapPin className="w-3 h-3 text-[#babecc] flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 font-jetbrains text-[10px] text-[var(--text-muted)]">
+            <MapPin className="w-3 h-3 text-[var(--text-dim)] flex-shrink-0 mt-0.5" />
             <span>{fullAddress}</span>
           </div>
         )}
@@ -922,7 +922,7 @@ export function ClientsClient() {
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         {/* Search */}
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)]" />
           <input
             className="input-field pl-9 w-full"
             placeholder="Search by name, phone, license…"
@@ -957,9 +957,9 @@ export function ClientsClient() {
             "font-jetbrains text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all",
             typeFilter === ""
               ? "text-white bg-[#ff4757]"
-              : "text-[#4a5568]"
+              : "text-[var(--text-muted)]"
           )}
-          style={typeFilter !== "" ? { boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" } : {}}
+          style={typeFilter !== "" ? { boxShadow: "var(--shadow-sm)" } : {}}
         >
           All
         </button>
@@ -971,9 +971,9 @@ export function ClientsClient() {
               "font-jetbrains text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all",
               typeFilter === t
                 ? "text-white bg-[#ff4757]"
-                : "text-[#4a5568]"
+                : "text-[var(--text-muted)]"
             )}
-            style={typeFilter !== t ? { boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" } : {}}
+            style={typeFilter !== t ? { boxShadow: "var(--shadow-sm)" } : {}}
           >
             {t}
           </button>
@@ -999,23 +999,23 @@ export function ClientsClient() {
         ].map(({ icon: Icon, label, value, color }) => (
           <div
             key={label}
-            className="bg-[#e0e5ec] rounded-2xl p-4"
-            style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            className="bg-[var(--background)] rounded-2xl p-4"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
             <div className="flex items-center gap-3">
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                style={{ boxShadow: "var(--shadow-inner-md)" }}
               >
                 <Icon className="w-4 h-4" style={{ color }} />
               </div>
               <div className="min-w-0">
-                <div className="font-jetbrains text-[8px] text-[#babecc] uppercase tracking-widest leading-tight">
+                <div className="font-jetbrains text-[8px] text-[var(--text-dim)] uppercase tracking-widest leading-tight">
                   {label}
                 </div>
-                <div className="font-sans text-lg font-black text-[#2d3436] leading-tight mt-0.5">
+                <div className="font-sans text-lg font-black text-[var(--text)] leading-tight mt-0.5">
                   {loading ? (
-                    <span className="inline-block w-8 h-4 rounded bg-[#babecc] opacity-40 animate-pulse" />
+                    <span className="inline-block w-8 h-4 rounded bg-[var(--border-shadow)] opacity-40 animate-pulse" />
                   ) : (
                     value
                   )}
@@ -1032,27 +1032,27 @@ export function ClientsClient() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="bg-[#e0e5ec] rounded-2xl p-5 h-48 animate-pulse"
-              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              className="bg-[var(--background)] rounded-2xl p-5 h-48 animate-pulse"
+              style={{ boxShadow: "var(--shadow-card)" }}
             />
           ))}
         </div>
       ) : clients.length === 0 ? (
         <div
-          className="bg-[#e0e5ec] rounded-2xl p-12 flex flex-col items-center gap-4"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl p-12 flex flex-col items-center gap-4"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+            style={{ boxShadow: "var(--shadow-recessed)" }}
           >
-            <Users className="w-7 h-7 text-[#babecc]" />
+            <Users className="w-7 h-7 text-[var(--text-dim)]" />
           </div>
           <div className="text-center">
-            <div className="font-sans text-base font-black text-[#2d3436]">
+            <div className="font-sans text-base font-black text-[var(--text)]">
               {debouncedSearch ? "No clients match your search" : "No clients yet"}
             </div>
-            <div className="font-jetbrains text-[10px] text-[#babecc] mt-1 uppercase tracking-widest">
+            <div className="font-jetbrains text-[10px] text-[var(--text-dim)] mt-1 uppercase tracking-widest">
               {debouncedSearch ? "Try a different search term" : "Add your first client to get started"}
             </div>
           </div>
@@ -1085,19 +1085,19 @@ export function ClientsClient() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[#4a5568] disabled:opacity-30 transition-all"
-            style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] disabled:opacity-30 transition-all"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="font-jetbrains text-xs text-[#4a5568]">
+          <span className="font-jetbrains text-xs text-[var(--text-muted)]">
             Page {page} of {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-[#4a5568] disabled:opacity-30 transition-all"
-            style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] disabled:opacity-30 transition-all"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <ChevronRight className="w-4 h-4" />
           </button>

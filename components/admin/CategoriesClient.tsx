@@ -198,7 +198,7 @@ export function CategoriesClient() {
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)]" />
           <input
             type="text"
             value={search}
@@ -209,7 +209,7 @@ export function CategoriesClient() {
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#babecc] hover:text-[#ff4757]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-dim)] hover:text-[#ff4757]"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -222,20 +222,20 @@ export function CategoriesClient() {
       </div>
 
       {/* Stats */}
-      <div className="font-jetbrains text-[10px] text-[#babecc]">
+      <div className="font-jetbrains text-[10px] text-[var(--text-dim)]">
         {categories.length} categor{categories.length !== 1 ? "ies" : "y"}
         {search && ` · ${filtered.length} matching`}
       </div>
 
       {/* Table card */}
       <div
-        className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        className="bg-[var(--background)] rounded-2xl overflow-hidden"
+        style={{ boxShadow: "var(--shadow-card)" }}
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: "1px solid #babecc" }}>
+              <tr style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                 <th className="table-header">Name</th>
                 <th className="table-header hidden sm:table-cell">Description</th>
                 <th className="table-header hidden md:table-cell">Created</th>
@@ -248,7 +248,7 @@ export function CategoriesClient() {
                   <tr key={i} style={{ borderBottom: "1px solid #f0f2f5" }} className="animate-pulse">
                     {Array.from({ length: 4 }).map((_, j) => (
                       <td key={j} className="table-cell">
-                        <div className="h-4 bg-[#d1d9e6] rounded w-24" />
+                        <div className="h-4 bg-[var(--muted)] rounded w-24" />
                       </td>
                     ))}
                   </tr>
@@ -258,12 +258,12 @@ export function CategoriesClient() {
                   <td colSpan={4} className="table-cell text-center py-16">
                     <div className="flex flex-col items-center gap-2">
                       <div
-                        className="w-12 h-12 rounded-xl bg-[#e0e5ec] flex items-center justify-center"
-                        style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                        className="w-12 h-12 rounded-xl bg-[var(--background)] flex items-center justify-center"
+                        style={{ boxShadow: "var(--shadow-inner-md)" }}
                       >
-                        <Tag className="w-5 h-5 text-[#babecc]" />
+                        <Tag className="w-5 h-5 text-[var(--text-dim)]" />
                       </div>
-                      <p className="font-jetbrains text-xs text-[#babecc] uppercase tracking-widest">
+                      <p className="font-jetbrains text-xs text-[var(--text-dim)] uppercase tracking-widest">
                         {search ? "No categories match your search" : "No categories yet"}
                       </p>
                     </div>
@@ -279,23 +279,23 @@ export function CategoriesClient() {
                     <td className="table-cell">
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-8 h-8 rounded-lg bg-[#e0e5ec] flex items-center justify-center flex-shrink-0 text-lg"
-                          style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+                          className="w-8 h-8 rounded-lg bg-[var(--background)] flex items-center justify-center flex-shrink-0 text-lg"
+                          style={{ boxShadow: "var(--shadow-sm)" }}
                         >
                           {cat.icon || "📦"}
                         </div>
-                        <span className="font-sans text-sm font-bold text-[#2d3436]">{cat.name}</span>
+                        <span className="font-sans text-sm font-bold text-[var(--text)]">{cat.name}</span>
                       </div>
                     </td>
                     <td className="table-cell hidden sm:table-cell">
-                      <span className="font-jetbrains text-xs text-[#4a5568]">
+                      <span className="font-jetbrains text-xs text-[var(--text-muted)]">
                         {cat.description || (
-                          <span className="text-[#babecc] italic">No description</span>
+                          <span className="text-[var(--text-dim)] italic">No description</span>
                         )}
                       </span>
                     </td>
                     <td className="table-cell hidden md:table-cell">
-                      <span className="font-jetbrains text-[10px] text-[#babecc]">
+                      <span className="font-jetbrains text-[10px] text-[var(--text-dim)]">
                         {new Date(cat.created_at).toLocaleDateString()}
                       </span>
                     </td>
@@ -303,14 +303,14 @@ export function CategoriesClient() {
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => openEdit(cat)}
-                          className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#0984e3] hover:bg-[#0984e310] transition-all"
+                          className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[#0984e3] hover:bg-[#0984e310] transition-all"
                           title="Edit category"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => openDelete(cat)}
-                          className="p-1.5 rounded-lg text-[#4a5568] hover:text-[#c0392b] hover:bg-[#c0392b10] transition-all"
+                          className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[#c0392b] hover:bg-[#c0392b10] transition-all"
                           title="Delete category"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -345,8 +345,8 @@ export function CategoriesClient() {
               <label className="label">Icon</label>
               <div className="flex items-center gap-2">
                 <div
-                  className="w-11 h-11 flex items-center justify-center text-2xl rounded-lg bg-[#e0e5ec] select-none"
-                  style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                  className="w-11 h-11 flex items-center justify-center text-2xl rounded-lg bg-[var(--background)] select-none"
+                  style={{ boxShadow: "var(--shadow-inner-md)" }}
                   title="Auto-suggested icon"
                 >
                   {formIcon}
@@ -362,7 +362,7 @@ export function CategoriesClient() {
               </div>
             </div>
           </div>
-          <p className="font-jetbrains text-[9px] text-[#babecc] -mt-2">
+          <p className="font-jetbrains text-[9px] text-[var(--text-dim)] -mt-2">
             Icon is auto-suggested from the name — type any emoji to override
           </p>
           <div>
@@ -430,9 +430,9 @@ export function CategoriesClient() {
       >
         <div className="space-y-4">
           {!deleteHasProducts ? (
-            <p className="font-jetbrains text-[#4a5568] text-sm">
+            <p className="font-jetbrains text-[var(--text-muted)] text-sm">
               Are you sure you want to delete{" "}
-              <span className="font-bold text-[#2d3436]">&ldquo;{deleteTarget?.name}&rdquo;</span>?
+              <span className="font-bold text-[var(--text)]">&ldquo;{deleteTarget?.name}&rdquo;</span>?
               This action cannot be undone.
             </p>
           ) : (

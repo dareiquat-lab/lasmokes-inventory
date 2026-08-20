@@ -85,17 +85,17 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
         {/* Back */}
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] hover:text-[#ff4757] transition-colors"
+          className="flex items-center gap-1.5 font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Cart
         </button>
 
         <div>
-          <h3 className="font-sans text-xs font-bold text-[#2d3436] uppercase tracking-wider mb-1">
+          <h3 className="font-sans text-xs font-bold text-[var(--text)] uppercase tracking-wider mb-1">
             Contact Details
           </h3>
-          <p className="font-jetbrains text-[9px] text-[#babecc] leading-relaxed">
+          <p className="font-jetbrains text-[9px] text-[var(--text-dim)] leading-relaxed">
             No payment required. We will contact you to confirm your order.
           </p>
         </div>
@@ -150,20 +150,20 @@ export function OrderForm({ onBack, onSuccess }: OrderFormProps) {
 
           {/* Order summary */}
           <div
-            className="bg-[#e0e5ec] rounded-xl p-3 space-y-1.5"
-            style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+            className="bg-[var(--background)] rounded-xl p-3 space-y-1.5"
+            style={{ boxShadow: "var(--shadow-recessed)" }}
           >
-            <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] mb-2">
+            <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] mb-2">
               Order Summary
             </div>
             {items.map(item => (
               <div key={item.id} className="flex justify-between font-jetbrains text-[10px]">
-                <span className="text-[#4a5568] truncate">{item.product_name} ×{item.quantity}</span>
+                <span className="text-[var(--text-muted)] truncate">{item.product_name} ×{item.quantity}</span>
                 <span className="text-[#ff4757] ml-2 flex-shrink-0 font-bold">${(Number(item.price) * item.quantity).toFixed(2)}</span>
               </div>
             ))}
-            <div className="flex justify-between font-jetbrains text-xs font-bold pt-1.5" style={{ borderTop: "1px solid #babecc" }}>
-              <span className="text-[#2d3436]">Total</span>
+            <div className="flex justify-between font-jetbrains text-xs font-bold pt-1.5" style={{ borderTop: "1px solid var(--border-shadow)" }}>
+              <span className="text-[var(--text)]">Total</span>
               <span className="text-[#ff4757]">${subtotal.toFixed(2)}</span>
             </div>
           </div>

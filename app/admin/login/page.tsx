@@ -43,7 +43,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#e0e5ec] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--background)] flex items-center justify-center p-4">
       {/* Subtle grid */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.03]"
@@ -57,23 +57,23 @@ function LoginForm() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 bg-[#e0e5ec] rounded-2xl mb-4"
-            style={{ boxShadow: "6px 6px 14px #babecc, -6px -6px 14px #ffffff" }}
+            className="inline-flex items-center justify-center w-16 h-16 bg-[var(--background)] rounded-2xl mb-4"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
             <Lock className="w-7 h-7 text-[#ff4757]" />
           </div>
-          <h1 className="font-sans text-2xl font-black text-[#2d3436] tracking-tight">
+          <h1 className="font-sans text-2xl font-black text-[var(--text)] tracking-tight">
             LA SMOKES WHOLESALE
           </h1>
-          <p className="font-jetbrains text-[9px] text-[#4a5568] uppercase tracking-widest mt-1">
+          <p className="font-jetbrains text-[9px] text-[var(--text-muted)] uppercase tracking-widest mt-1">
             Admin Portal Access
           </p>
         </div>
 
         {/* Login card */}
         <div
-          className="bg-[#e0e5ec] rounded-2xl p-6 relative overflow-hidden"
-          style={{ boxShadow: "12px 12px 24px #babecc, -12px -12px 24px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl p-6 relative overflow-hidden"
+          style={{ boxShadow: "var(--shadow-floating)" }}
         >
           {/* Corner vents decoration */}
           <div className="absolute top-3 right-4 flex gap-1">
@@ -82,19 +82,19 @@ function LoginForm() {
                 key={i}
                 className="w-1 h-5 rounded-full"
                 style={{
-                  background: "#d1d9e6",
-                  boxShadow: "inset 1px 1px 2px #babecc, inset -1px -1px 1px #ffffff",
+                  background: "var(--muted)",
+                  boxShadow: "var(--shadow-inner-sm)",
                 }}
               />
             ))}
           </div>
 
-          <div className="flex items-center gap-2 mb-5 pb-3" style={{ borderBottom: "1px solid #babecc" }}>
+          <div className="flex items-center gap-2 mb-5 pb-3" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
             <div
               className="w-2 h-2 rounded-full bg-green-500 animate-pulse"
               style={{ boxShadow: "0 0 6px rgba(34,197,94,0.8)" }}
             />
-            <span className="font-jetbrains text-[10px] text-[#4a5568] uppercase tracking-widest">
+            <span className="font-jetbrains text-[10px] text-[var(--text-muted)] uppercase tracking-widest">
               Authentication Required
             </span>
           </div>
@@ -144,7 +144,7 @@ function LoginForm() {
 
         {/* Back to store */}
         <p className="text-center mt-4">
-          <a href="/" className="font-jetbrains text-[10px] text-[#babecc] hover:text-[#ff4757] transition-colors">
+          <a href="/" className="font-jetbrains text-[10px] text-[var(--text-dim)] hover:text-[#ff4757] transition-colors">
             ← Back to storefront
           </a>
         </p>
@@ -156,9 +156,9 @@ function LoginForm() {
 export default function AdminLoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#e0e5ec] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
         <div
-          className="w-8 h-8 rounded-full border-2 border-[#babecc] border-t-[#ff4757] animate-spin"
+          className="w-8 h-8 rounded-full border-2 border-[var(--border-shadow)] border-t-[#ff4757] animate-spin"
         />
       </div>
     }>

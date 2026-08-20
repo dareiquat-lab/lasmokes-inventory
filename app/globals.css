@@ -2,23 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Industrial Skeuomorphism Design Tokens ─────────────────── */
+/* ─── Design Tokens ──────────────────────────────────────────── */
 :root {
+  /* Surface */
   --background:     #e0e5ec;
   --foreground:     #f0f2f5;
   --muted:          #d1d9e6;
+
+  /* Typography */
   --text:           #2d3436;
   --text-muted:     #4a5568;
+  --text-dim:       #babecc;
+
+  /* Accent */
   --accent:         #ff4757;
   --accent-fg:      #ffffff;
+
+  /* Neumorphic shadow colours */
+  --nm-dark:        #babecc;
+  --nm-light:       #ffffff;
   --border-shadow:  #babecc;
   --border-light:   #ffffff;
   --border-dark:    #a3b1c6;
 
-  --shadow-card:     8px 8px 16px #babecc, -8px -8px 16px #ffffff;
-  --shadow-floating: 12px 12px 24px #babecc, -12px -12px 24px #ffffff, inset 1px 1px 0 rgba(255,255,255,0.5);
-  --shadow-pressed:  inset 6px 6px 12px #babecc, inset -6px -6px 12px #ffffff;
-  --shadow-recessed: inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff;
+  /* Shadows — all reference CSS vars so dark mode is automatic */
+  --shadow-card:     8px 8px 16px var(--nm-dark), -8px -8px 16px var(--nm-light);
+  --shadow-floating: 12px 12px 24px var(--nm-dark), -12px -12px 24px var(--nm-light), inset 1px 1px 0 rgba(255,255,255,0.5);
+  --shadow-pressed:  inset 6px 6px 12px var(--nm-dark), inset -6px -6px 12px var(--nm-light);
+  --shadow-recessed: inset 4px 4px 8px var(--nm-dark), inset -4px -4px 8px var(--nm-light);
+  --shadow-sm:       4px 4px 8px var(--nm-dark), -4px -4px 8px var(--nm-light);
+  --shadow-lg:       16px 16px 32px var(--nm-dark), -16px -16px 32px var(--nm-light);
+  --shadow-inner-sm: inset 2px 2px 4px var(--nm-dark), inset -2px -2px 4px var(--nm-light);
+  --shadow-inner-md: inset 3px 3px 6px var(--nm-dark), inset -3px -3px 6px var(--nm-light);
+  --shadow-header:   0 2px 8px var(--nm-dark), 0 -1px 0 var(--nm-light);
+  --shadow-sidebar:      4px 0 12px var(--nm-dark);
+  --shadow-sidebar-left: -8px 0 24px var(--nm-dark);
+}
+
+/* ─── Dark Mode ──────────────────────────────────────────────── */
+.dark {
+  --background:    #1e2228;
+  --foreground:    #252b35;
+  --muted:         #191d23;
+
+  --text:          #e2e8f0;
+  --text-muted:    #8896a8;
+  --text-dim:      #4a5870;
+
+  --accent:        #ff4757;
+  --accent-fg:     #ffffff;
+
+  --nm-dark:       #141720;
+  --nm-light:      #282f3c;
+  --border-shadow: #141720;
+  --border-light:  #282f3c;
+  --border-dark:   #0d1016;
+
+  --shadow-floating: 12px 12px 24px var(--nm-dark), -12px -12px 24px var(--nm-light), inset 1px 1px 0 rgba(255,255,255,0.04);
 }
 
 /* ─── Base ──────────────────────────────────────────────────── */
@@ -33,6 +73,7 @@
     font-family: var(--font-dm-sans), "DM Sans", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   /* Scrollbar */
@@ -54,9 +95,9 @@
 /* ─── Component Classes ──────────────────────────────────────── */
 @layer components {
 
-  /* Card — neumorphic panel bolted to chassis */
+  /* Card — neumorphic panel */
   .card {
-    @apply bg-[#e0e5ec] relative;
+    background: var(--background);
     border-radius: 16px;
     box-shadow: var(--shadow-card);
   }
@@ -67,7 +108,7 @@
     box-shadow: var(--shadow-floating);
   }
 
-  /* Primary button — safety red, tactile press */
+  /* Primary button */
   .btn-primary {
     @apply relative font-bold px-4 py-2.5 text-xs uppercase tracking-widest
            transition-all duration-150 cursor-pointer rounded-lg;
@@ -91,14 +132,14 @@
     box-shadow: none;
   }
 
-  /* Secondary button — chassis material */
+  /* Secondary button */
   .btn-secondary {
     @apply relative font-bold px-4 py-2.5 text-xs uppercase tracking-widest
            transition-all duration-150 cursor-pointer rounded-lg;
     background: var(--background);
     color: var(--text-muted);
     box-shadow: var(--shadow-card);
-    border: 1px solid rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
   }
   .btn-secondary:hover {
     color: var(--accent);
@@ -136,7 +177,7 @@
     cursor: not-allowed;
   }
 
-  /* Input field — recessed well machined into chassis */
+  /* Input field */
   .input-field {
     @apply w-full px-4 py-3 text-sm transition-all duration-150
            focus:outline-none rounded-lg;
@@ -147,7 +188,7 @@
     font-family: var(--font-jetbrains), "JetBrains Mono", monospace;
   }
   .input-field::placeholder {
-    color: var(--border-shadow);
+    color: var(--text-dim);
     opacity: 1;
   }
   .input-field:focus {
@@ -164,22 +205,22 @@
     color: var(--text);
   }
 
-  /* Label — stamped uppercase */
+  /* Label */
   .label {
     @apply block text-[10px] font-bold uppercase tracking-widest mb-1.5;
     color: var(--text-muted);
     font-family: var(--font-jetbrains), monospace;
   }
 
-  /* Badge base */
+  /* Badge */
   .badge {
     @apply inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold
            uppercase tracking-wider rounded-md;
-    box-shadow: 2px 2px 4px #babecc, -1px -1px 2px #ffffff;
+    box-shadow: var(--shadow-sm);
     background: var(--background);
   }
 
-  /* Table header */
+  /* Table */
   .table-header {
     @apply text-[10px] font-bold uppercase tracking-widest text-left py-3 px-4;
     color: var(--text-muted);
@@ -187,13 +228,12 @@
     background: var(--muted);
   }
 
-  /* Table cell */
   .table-cell {
     @apply py-3 px-4 text-sm;
     color: var(--text);
   }
 
-  /* Sidebar link */
+  /* Sidebar links */
   .sidebar-link {
     @apply flex items-center gap-3 px-3 py-2.5 text-xs font-bold
            uppercase tracking-widest transition-all duration-150 rounded-lg;
@@ -228,18 +268,22 @@
   .shadow-pressed  { box-shadow: var(--shadow-pressed); }
   .shadow-recessed { box-shadow: var(--shadow-recessed); }
 
-  /* Keep clip-chamfer as no-ops so existing classes don't break layout */
   .clip-chamfer-sm { border-radius: 8px; }
   .clip-chamfer-md { border-radius: 16px; }
   .clip-chamfer-lg { border-radius: 20px; }
 
-  /* Legacy neon border classes → subtle borders */
-  .border-neon-green  { border-color: #ff475730; }
+  .border-neon-green   { border-color: #ff475730; }
   .border-neon-magenta { border-color: #6c5ce730; }
-  .border-neon-cyan   { border-color: #0984e330; }
+  .border-neon-cyan    { border-color: #0984e330; }
 
-  /* Legacy shadow classes → neumorphic */
   .shadow-neon-green   { box-shadow: var(--shadow-card); }
   .shadow-neon-magenta { box-shadow: var(--shadow-card); }
   .shadow-neon-cyan    { box-shadow: var(--shadow-card); }
+}
+
+/* Recharts — axis/tick labels inherit theme text color in dark mode */
+.dark .recharts-cartesian-axis-tick-value,
+.dark .recharts-legend-item-text {
+  fill: var(--text-muted) !important;
+  color: var(--text-muted) !important;
 }

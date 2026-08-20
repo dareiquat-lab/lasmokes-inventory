@@ -59,10 +59,10 @@ function formatMoney(n: number) {
 
 function MarginBar({ pct }: { pct: number }) {
   const clamped = Math.max(0, Math.min(100, pct));
-  const color = pct >= 40 ? "#00b894" : pct >= 20 ? "#fdcb6e" : pct > 0 ? "#e17055" : "#babecc";
+  const color = pct >= 40 ? "#00b894" : pct >= 20 ? "#fdcb6e" : pct > 0 ? "#e17055" : "var(--text-dim)";
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 bg-[#d1d9e6] rounded-full h-1.5 overflow-hidden" style={{ minWidth: 40 }}>
+      <div className="flex-1 bg-[var(--muted)] rounded-full h-1.5 overflow-hidden" style={{ minWidth: 40 }}>
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${clamped}%`, background: color }}
@@ -86,18 +86,18 @@ function SummaryCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.35, type: "spring", stiffness: 200 }}
-      className="bg-[#e0e5ec] rounded-2xl p-5"
-      style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+      className="bg-[var(--background)] rounded-2xl p-5"
+      style={{ boxShadow: "var(--shadow-card)" }}
     >
       <div
         className="w-10 h-10 flex items-center justify-center rounded-xl mb-4"
-        style={{ background: `${color}18`, boxShadow: "3px 3px 8px #babecc, -3px -3px 8px #ffffff" }}
+        style={{ background: `${color}18`, boxShadow: "var(--shadow-sm)" }}
       >
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
       <div className="font-jetbrains text-2xl font-black mb-0.5" style={{ color }}>{value}</div>
-      <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">{label}</div>
-      {sub && <div className="font-jetbrains text-[9px] text-[#babecc] mt-1">{sub}</div>}
+      <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">{label}</div>
+      {sub && <div className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-1">{sub}</div>}
     </motion.div>
   );
 }
@@ -143,7 +143,7 @@ export function ProfitClient() {
     : [];
 
   const SortIcon = ({ k }: { k: SortKey }) => {
-    if (sortKey !== k) return <Minus className="w-3 h-3 text-[#babecc]" />;
+    if (sortKey !== k) return <Minus className="w-3 h-3 text-[var(--text-dim)]" />;
     return sortDir === "asc"
       ? <ChevronUp className="w-3 h-3 text-[#ff4757]" />
       : <ChevronDown className="w-3 h-3 text-[#ff4757]" />;
@@ -152,7 +152,7 @@ export function ProfitClient() {
   const ThButton = ({ label, k }: { label: string; k: SortKey }) => (
     <button
       onClick={() => handleSort(k)}
-      className="flex items-center gap-1 font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] hover:text-[#ff4757] transition-colors"
+      className="flex items-center gap-1 font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
     >
       {label}
       <SortIcon k={k} />
@@ -165,12 +165,12 @@ export function ProfitClient() {
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="bg-[#e0e5ec] rounded-2xl p-5 animate-pulse"
-            style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            className="bg-[var(--background)] rounded-2xl p-5 animate-pulse"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
-            <div className="w-10 h-10 bg-[#d1d9e6] rounded-xl mb-4" />
-            <div className="h-7 bg-[#d1d9e6] rounded w-24 mb-1" />
-            <div className="h-3 bg-[#d1d9e6] rounded w-32" />
+            <div className="w-10 h-10 bg-[var(--muted)] rounded-xl mb-4" />
+            <div className="h-7 bg-[var(--muted)] rounded w-24 mb-1" />
+            <div className="h-3 bg-[var(--muted)] rounded w-32" />
           </div>
         ))}
       </div>
@@ -179,7 +179,7 @@ export function ProfitClient() {
 
   if (!data) {
     return (
-      <div className="bg-[#e0e5ec] rounded-2xl p-8 text-center" style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}>
+      <div className="bg-[var(--background)] rounded-2xl p-8 text-center" style={{ boxShadow: "var(--shadow-card)" }}>
         <p className="font-jetbrains text-[#c0392b] text-sm">Unable to load profit data.</p>
       </div>
     );
@@ -226,15 +226,15 @@ export function ProfitClient() {
       {/* Missing cost notice */}
       {data.productsWithCost < data.totalProducts && (
         <div
-          className="bg-[#e0e5ec] rounded-xl p-4 flex items-start gap-3"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff", border: "1px solid rgba(9,132,227,0.25)" }}
+          className="bg-[var(--background)] rounded-xl p-4 flex items-start gap-3"
+          style={{ boxShadow: "var(--shadow-card)", border: "1px solid rgba(9,132,227,0.25)" }}
         >
           <Package className="w-4 h-4 text-[#0984e3] flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-jetbrains text-[10px] font-black uppercase tracking-wider text-[#0984e3]">
               {data.totalProducts - data.productsWithCost} product{data.totalProducts - data.productsWithCost !== 1 ? "s" : ""} missing cost data
             </p>
-            <p className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">
+            <p className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-0.5">
               Enter a cost per product in Inventory → Edit Item to improve accuracy. Products with no cost assume $0 cost.
             </p>
           </div>
@@ -250,8 +250,8 @@ export function ProfitClient() {
             className="px-4 py-2 font-jetbrains text-[9px] uppercase tracking-widest rounded-xl transition-all duration-200"
             style={
               view === v
-                ? { background: "#ff4757", color: "#fff", boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }
-                : { background: "#e0e5ec", color: "#4a5568", boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }
+                ? { background: "#ff4757", color: "#fff", boxShadow: "var(--shadow-sm)" }
+                : { background: "var(--background)", color: "var(--text-muted)", boxShadow: "var(--shadow-sm)" }
             }
           >
             {v === "overview" ? "Overview" : v === "products" ? "By Product" : "By Category"}
@@ -269,10 +269,10 @@ export function ProfitClient() {
         >
           {/* Monthly summary */}
           <div
-            className="bg-[#e0e5ec] rounded-2xl p-5 space-y-4"
-            style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            className="bg-[var(--background)] rounded-2xl p-5 space-y-4"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
-            <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+            <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
               {data.month} — Completed Orders
             </h2>
             <div className="space-y-3">
@@ -283,13 +283,13 @@ export function ProfitClient() {
                 { label: "Units Sold", value: data.monthlyUnitsSold.toLocaleString(), color: "#ff4757" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid #e8ecf1" }}>
-                  <span className="font-jetbrains text-[10px] uppercase tracking-widest text-[#4a5568]">{label}</span>
+                  <span className="font-jetbrains text-[10px] uppercase tracking-widest text-[var(--text-muted)]">{label}</span>
                   <span className="font-jetbrains text-sm font-black" style={{ color }}>{value}</span>
                 </div>
               ))}
             </div>
             {data.monthlyRevenue === 0 && (
-              <p className="font-jetbrains text-[10px] text-[#babecc]">
+              <p className="font-jetbrains text-[10px] text-[var(--text-dim)]">
                 No completed orders this month yet. Profit reflects orders marked as Completed.
               </p>
             )}
@@ -297,10 +297,10 @@ export function ProfitClient() {
 
           {/* Inventory summary */}
           <div
-            className="bg-[#e0e5ec] rounded-2xl p-5 space-y-4"
-            style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+            className="bg-[var(--background)] rounded-2xl p-5 space-y-4"
+            style={{ boxShadow: "var(--shadow-card)" }}
           >
-            <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+            <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
               Inventory Potential
             </h2>
             <div className="space-y-3">
@@ -311,7 +311,7 @@ export function ProfitClient() {
                 { label: "Avg Margin", value: `${data.avgMarginPct.toFixed(1)}%`, color: "#6c5ce7" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid #e8ecf1" }}>
-                  <span className="font-jetbrains text-[10px] uppercase tracking-widest text-[#4a5568]">{label}</span>
+                  <span className="font-jetbrains text-[10px] uppercase tracking-widest text-[var(--text-muted)]">{label}</span>
                   <span className="font-jetbrains text-sm font-black" style={{ color }}>{value}</span>
                 </div>
               ))}
@@ -326,13 +326,13 @@ export function ProfitClient() {
           key="products"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl overflow-hidden"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: "1px solid #babecc" }}>
+                <tr style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                   <th className="table-header"><ThButton label="Product" k="product_name" /></th>
                   <th className="table-header hidden md:table-cell"><ThButton label="Category" k="category" /></th>
                   <th className="table-header"><ThButton label="Cost" k="cost" /></th>
@@ -351,16 +351,16 @@ export function ProfitClient() {
                   >
                     <td className="table-cell">
                       <div>
-                        <div className="font-sans text-xs font-bold text-[#2d3436] leading-tight">{p.product_name}</div>
-                        <div className="font-jetbrains text-[9px] text-[#babecc] mt-0.5">{p.sku}</div>
+                        <div className="font-sans text-xs font-bold text-[var(--text)] leading-tight">{p.product_name}</div>
+                        <div className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-0.5">{p.sku}</div>
                       </div>
                     </td>
                     <td className="table-cell hidden md:table-cell">
-                      <span className="font-jetbrains text-[10px] text-[#4a5568]">{p.category}</span>
+                      <span className="font-jetbrains text-[10px] text-[var(--text-muted)]">{p.category}</span>
                     </td>
                     <td className="table-cell">
                       <span className="font-jetbrains text-xs text-[#e17055] font-bold">
-                        {parseFloat(String(p.cost)) > 0 ? formatMoney(parseFloat(String(p.cost))) : <span className="text-[#babecc]">—</span>}
+                        {parseFloat(String(p.cost)) > 0 ? formatMoney(parseFloat(String(p.cost))) : <span className="text-[var(--text-dim)]">—</span>}
                       </span>
                     </td>
                     <td className="table-cell">
@@ -372,10 +372,10 @@ export function ProfitClient() {
                       <MarginBar pct={parseFloat(String(p.margin_pct))} />
                     </td>
                     <td className="table-cell hidden sm:table-cell">
-                      <span className="font-jetbrains text-xs text-[#4a5568]">{p.quantity}</span>
+                      <span className="font-jetbrains text-xs text-[var(--text-muted)]">{p.quantity}</span>
                     </td>
                     <td className="table-cell">
-                      <span className="font-jetbrains text-xs font-black" style={{ color: parseFloat(String(p.potential_profit)) > 0 ? "#00b894" : "#babecc" }}>
+                      <span className="font-jetbrains text-xs font-black" style={{ color: parseFloat(String(p.potential_profit)) > 0 ? "#00b894" : "var(--text-dim)" }}>
                         {parseFloat(String(p.potential_profit)) > 0
                           ? formatMoney(parseFloat(String(p.potential_profit)))
                           : "—"}
@@ -395,13 +395,13 @@ export function ProfitClient() {
           key="categories"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl overflow-hidden"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: "1px solid #babecc" }}>
+                <tr style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                   <th className="table-header">Category</th>
                   <th className="table-header hidden sm:table-cell">Products</th>
                   <th className="table-header">Stock Value</th>
@@ -421,11 +421,11 @@ export function ProfitClient() {
                       <td className="table-cell">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">{cat.icon}</span>
-                          <span className="font-sans text-xs font-bold text-[#2d3436]">{cat.category}</span>
+                          <span className="font-sans text-xs font-bold text-[var(--text)]">{cat.category}</span>
                         </div>
                       </td>
                       <td className="table-cell hidden sm:table-cell">
-                        <span className="font-jetbrains text-xs text-[#4a5568]">{cat.productCount}</span>
+                        <span className="font-jetbrains text-xs text-[var(--text-muted)]">{cat.productCount}</span>
                       </td>
                       <td className="table-cell">
                         <span className="font-jetbrains text-xs text-[#0984e3] font-bold">
@@ -436,7 +436,7 @@ export function ProfitClient() {
                         <MarginBar pct={cat.avgMarginPct} />
                       </td>
                       <td className="table-cell">
-                        <span className="font-jetbrains text-xs font-black" style={{ color: cat.potentialProfit > 0 ? "#00b894" : "#babecc" }}>
+                        <span className="font-jetbrains text-xs font-black" style={{ color: cat.potentialProfit > 0 ? "#00b894" : "var(--text-dim)" }}>
                           {cat.potentialProfit > 0 ? formatMoney(cat.potentialProfit) : "—"}
                         </span>
                       </td>

@@ -39,24 +39,24 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-md" 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-[#2d3436]/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: "spring", damping: 30, stiffness: 400 }}
-            className={`relative w-full ${maxWidth} bg-[#e0e5ec] rounded-2xl`}
-            style={{ boxShadow: "12px 12px 24px #babecc, -12px -12px 24px #ffffff" }}
+            className={`relative w-full ${maxWidth} bg-[var(--background)] rounded-2xl`}
+            style={{ boxShadow: "var(--shadow-floating)" }}
           >
             {title && (
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#babecc]">
-                <h2 className="font-jetbrains text-sm font-black uppercase tracking-wider text-[#2d3436]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-shadow)]">
+                <h2 className="font-jetbrains text-sm font-black uppercase tracking-wider text-[var(--text)]">
                   {title}
                 </h2>
                 <button
                   onClick={onClose}
-                  className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1 rounded-lg hover:bg-[#ff475710]"
+                  className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors p-1 rounded-lg hover:bg-[#ff475710]"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -93,7 +93,7 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
-      <p className="font-jetbrains text-[#4a5568] text-sm mb-5">{message}</p>
+      <p className="font-jetbrains text-[var(--text-muted)] text-sm mb-5">{message}</p>
       <div className="flex gap-3 justify-end">
         <button onClick={onClose} className="btn-secondary">
           Cancel

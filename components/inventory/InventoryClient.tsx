@@ -172,7 +172,7 @@ export function InventoryClient() {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortBy !== field) return <ChevronUp className="w-3 h-3 text-[#babecc]" />;
+    if (sortBy !== field) return <ChevronUp className="w-3 h-3 text-[var(--text-dim)]" />;
     return sortOrder === "asc"
       ? <ChevronUp className="w-3 h-3 text-[#ff4757]" />
       : <ChevronDown className="w-3 h-3 text-[#ff4757]" />;
@@ -181,7 +181,7 @@ export function InventoryClient() {
   const SortHeader = ({ field, label }: { field: SortField; label: string }) => (
     <button
       onClick={() => handleSort(field)}
-      className="flex items-center gap-1 font-jetbrains text-[9px] font-bold uppercase tracking-widest text-[#4a5568] hover:text-[#ff4757] transition-colors"
+      className="flex items-center gap-1 font-jetbrains text-[9px] font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[#ff4757] transition-colors"
     >
       {label}
       <SortIcon field={field} />
@@ -196,7 +196,7 @@ export function InventoryClient() {
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)]" />
           <input
             type="text"
             value={search}
@@ -205,7 +205,7 @@ export function InventoryClient() {
             className="input-field pl-9 pr-8"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#babecc] hover:text-[#ff4757]">
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-dim)] hover:text-[#ff4757]">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -213,7 +213,7 @@ export function InventoryClient() {
 
         {/* Category filter */}
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#babecc] pointer-events-none" />
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-dim)] pointer-events-none" />
           <select
             value={category}
             onChange={e => { setCategory(e.target.value); setPage(1); }}
@@ -239,7 +239,7 @@ export function InventoryClient() {
 
       {/* Stats bar */}
       {data && (
-        <div className="flex items-center justify-between font-jetbrains text-[10px] text-[#babecc]">
+        <div className="flex items-center justify-between font-jetbrains text-[10px] text-[var(--text-dim)]">
           <span>
             {data.total.toLocaleString()} record{data.total !== 1 ? "s" : ""}
             {search && ` matching "${search}"`}
@@ -251,26 +251,26 @@ export function InventoryClient() {
               <div className="flex gap-1.5">
                 <button
                   onClick={() => { setBulkAction("update_quantity"); setBulkModal(true); }}
-                  className="font-jetbrains text-[9px] text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] px-2 py-1 rounded-lg transition-all"
-                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
+                  className="font-jetbrains text-[9px] text-[var(--text-muted)] hover:text-[#ff4757] bg-[var(--background)] px-2 py-1 rounded-lg transition-all"
+                  style={{ boxShadow: "var(--shadow-sm)" }}
                 >
                   Update Qty
                 </button>
                 <button
                   onClick={() => { setBulkAction("update_category"); setBulkModal(true); }}
-                  className="font-jetbrains text-[9px] text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] px-2 py-1 rounded-lg transition-all"
-                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
+                  className="font-jetbrains text-[9px] text-[var(--text-muted)] hover:text-[#ff4757] bg-[var(--background)] px-2 py-1 rounded-lg transition-all"
+                  style={{ boxShadow: "var(--shadow-sm)" }}
                 >
                   Set Category
                 </button>
                 <button
                   onClick={() => { setBulkAction("delete"); setBulkModal(true); }}
-                  className="font-jetbrains text-[9px] text-[#c0392b] bg-[#e0e5ec] px-2 py-1 rounded-lg transition-all"
-                  style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
+                  className="font-jetbrains text-[9px] text-[#c0392b] bg-[var(--background)] px-2 py-1 rounded-lg transition-all"
+                  style={{ boxShadow: "var(--shadow-sm)" }}
                 >
                   Delete
                 </button>
-                <button onClick={() => setSelectedIds(new Set())} className="text-[#babecc] hover:text-[#c0392b]">
+                <button onClick={() => setSelectedIds(new Set())} className="text-[var(--text-dim)] hover:text-[#c0392b]">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -281,15 +281,15 @@ export function InventoryClient() {
 
       {/* Table */}
       <div
-        className="bg-[#e0e5ec] rounded-2xl overflow-hidden"
-        style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+        className="bg-[var(--background)] rounded-2xl overflow-hidden"
+        style={{ boxShadow: "var(--shadow-card)" }}
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: "1px solid #babecc" }}>
+              <tr style={{ borderBottom: "1px solid var(--border-shadow)" }}>
                 <th className="table-header w-10">
-                  <button onClick={toggleSelectAll} className="text-[#babecc] hover:text-[#ff4757] transition-colors">
+                  <button onClick={toggleSelectAll} className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors">
                     {allSelected
                       ? <CheckSquare className="w-4 h-4 text-[#ff4757]" />
                       : <Square className="w-4 h-4" />
@@ -310,15 +310,15 @@ export function InventoryClient() {
               {loading ? (
                 Array.from({ length: 8 }).map((_, i) => (
                   <tr key={i} style={{ borderBottom: "1px solid #f0f2f5" }} className="animate-pulse">
-                    <td className="table-cell"><div className="w-4 h-4 bg-[#d1d9e6] rounded" /></td>
-                    <td className="table-cell"><div className="w-8 h-8 bg-[#d1d9e6] rounded-lg" /></td>
-                    <td className="table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-40" /></td>
-                    <td className="table-cell hidden sm:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-20" /></td>
-                    <td className="table-cell hidden md:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-16" /></td>
-                    <td className="table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-8" /></td>
-                    <td className="table-cell hidden lg:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-12" /></td>
-                    <td className="table-cell hidden xl:table-cell"><div className="h-4 bg-[#d1d9e6] rounded w-20" /></td>
-                    <td className="table-cell"><div className="h-6 bg-[#d1d9e6] rounded w-12" /></td>
+                    <td className="table-cell"><div className="w-4 h-4 bg-[var(--muted)] rounded" /></td>
+                    <td className="table-cell"><div className="w-8 h-8 bg-[var(--muted)] rounded-lg" /></td>
+                    <td className="table-cell"><div className="h-4 bg-[var(--muted)] rounded w-40" /></td>
+                    <td className="table-cell hidden sm:table-cell"><div className="h-4 bg-[var(--muted)] rounded w-20" /></td>
+                    <td className="table-cell hidden md:table-cell"><div className="h-4 bg-[var(--muted)] rounded w-16" /></td>
+                    <td className="table-cell"><div className="h-4 bg-[var(--muted)] rounded w-8" /></td>
+                    <td className="table-cell hidden lg:table-cell"><div className="h-4 bg-[var(--muted)] rounded w-12" /></td>
+                    <td className="table-cell hidden xl:table-cell"><div className="h-4 bg-[var(--muted)] rounded w-20" /></td>
+                    <td className="table-cell"><div className="h-6 bg-[var(--muted)] rounded w-12" /></td>
                   </tr>
                 ))
               ) : data?.products.length === 0 ? (
@@ -326,12 +326,12 @@ export function InventoryClient() {
                   <td colSpan={9} className="table-cell text-center py-16">
                     <div className="flex flex-col items-center gap-2">
                       <div
-                        className="w-12 h-12 rounded-xl bg-[#e0e5ec] flex items-center justify-center"
-                        style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+                        className="w-12 h-12 rounded-xl bg-[var(--background)] flex items-center justify-center"
+                        style={{ boxShadow: "var(--shadow-inner-md)" }}
                       >
-                        <Search className="w-5 h-5 text-[#babecc]" />
+                        <Search className="w-5 h-5 text-[var(--text-dim)]" />
                       </div>
-                      <p className="font-jetbrains text-xs text-[#babecc] uppercase tracking-widest">No records found</p>
+                      <p className="font-jetbrains text-xs text-[var(--text-dim)] uppercase tracking-widest">No records found</p>
                       {(search || category) && (
                         <button
                           onClick={() => { setSearch(""); setCategory(""); }}
@@ -356,7 +356,7 @@ export function InventoryClient() {
                       style={{ borderBottom: "1px solid #f0f2f5" }}
                     >
                       <td className="table-cell">
-                        <button onClick={() => toggleSelect(product.id)} className="text-[#babecc] hover:text-[#ff4757] transition-colors">
+                        <button onClick={() => toggleSelect(product.id)} className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors">
                           {selectedIds.has(product.id)
                             ? <CheckSquare className="w-4 h-4 text-[#ff4757]" />
                             : <Square className="w-4 h-4" />
@@ -367,7 +367,7 @@ export function InventoryClient() {
                         {product.image_url ? (
                           <div
                             className="w-8 h-8 overflow-hidden flex-shrink-0 rounded-lg"
-                            style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
+                            style={{ boxShadow: "var(--shadow-sm)" }}
                           >
                             <img
                               src={product.image_url}
@@ -383,7 +383,7 @@ export function InventoryClient() {
                         <div>
                           <Link
                             href={`/admin/products/${product.id}`}
-                            className="font-sans text-[#2d3436] hover:text-[#ff4757] font-bold transition-colors text-sm line-clamp-1"
+                            className="font-sans text-[var(--text)] hover:text-[#ff4757] font-bold transition-colors text-sm line-clamp-1"
                           >
                             {product.product_name}
                           </Link>
@@ -397,11 +397,11 @@ export function InventoryClient() {
                       </td>
                       <td className="table-cell hidden md:table-cell">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-jetbrains text-xs text-[#4a5568]">{product.sku}</span>
+                          <span className="font-jetbrains text-xs text-[var(--text-muted)]">{product.sku}</span>
                           {product.barcode && (
                             <button
                               onClick={() => setBarcodeModal(product)}
-                              className="text-[#babecc] hover:text-[#0984e3] transition-colors"
+                              className="text-[var(--text-dim)] hover:text-[#0984e3] transition-colors"
                               title="View barcode"
                             >
                               <Barcode className="w-3.5 h-3.5" />
@@ -421,24 +421,24 @@ export function InventoryClient() {
                           <StockBadge quantity={product.quantity} />
                         </div>
                       </td>
-                      <td className="table-cell hidden lg:table-cell font-jetbrains text-[#4a5568]">
+                      <td className="table-cell hidden lg:table-cell font-jetbrains text-[var(--text-muted)]">
                         {formatCurrency(product.price)}
                       </td>
-                      <td className="table-cell hidden xl:table-cell font-jetbrains text-[#babecc] text-xs">
+                      <td className="table-cell hidden xl:table-cell font-jetbrains text-[var(--text-dim)] text-xs">
                         {formatDate(product.updated_at)}
                       </td>
                       <td className="table-cell">
                         <div className="flex items-center gap-1">
                           <Link
                             href={`/admin/products/${product.id}`}
-                            className="p-1.5 text-[#babecc] hover:text-[#ff4757] rounded-lg transition-colors hover:bg-[#ff475710]"
+                            className="p-1.5 text-[var(--text-dim)] hover:text-[#ff4757] rounded-lg transition-colors hover:bg-[#ff475710]"
                             title="Edit"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Link>
                           <button
                             onClick={() => setDeleteTarget(product)}
-                            className="p-1.5 text-[#babecc] hover:text-[#c0392b] rounded-lg transition-colors hover:bg-[#c0392b10]"
+                            className="p-1.5 text-[var(--text-dim)] hover:text-[#c0392b] rounded-lg transition-colors hover:bg-[#c0392b10]"
                             title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -455,15 +455,15 @@ export function InventoryClient() {
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid #babecc" }}>
-            <span className="font-jetbrains text-[10px] text-[#babecc]">
+          <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid var(--border-shadow)" }}>
+            <span className="font-jetbrains text-[10px] text-[var(--text-dim)]">
               Page {data.page} of {data.totalPages} · {data.total} total
             </span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="p-1.5 text-[#babecc] hover:text-[#ff4757] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors hover:bg-[#ff475710]"
+                className="p-1.5 text-[var(--text-dim)] hover:text-[#ff4757] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors hover:bg-[#ff475710]"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -481,7 +481,7 @@ export function InventoryClient() {
                       "w-7 h-7 font-jetbrains text-[9px] rounded-lg transition-all",
                       page === p
                         ? "bg-[#ff4757] text-white font-black"
-                        : "text-[#4a5568] hover:text-[#ff4757]"
+                        : "text-[var(--text-muted)] hover:text-[#ff4757]"
                     )}
                     style={page === p
                       ? { boxShadow: "3px 3px 6px rgba(166,50,60,0.3), -2px -2px 4px rgba(255,100,110,0.2)" }
@@ -496,7 +496,7 @@ export function InventoryClient() {
               <button
                 onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
                 disabled={page === data.totalPages}
-                className="p-1.5 text-[#babecc] hover:text-[#ff4757] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors hover:bg-[#ff475710]"
+                className="p-1.5 text-[var(--text-dim)] hover:text-[#ff4757] disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-colors hover:bg-[#ff475710]"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -528,7 +528,7 @@ export function InventoryClient() {
         }
       >
         <div className="space-y-4">
-          <p className="font-jetbrains text-[#4a5568] text-sm">
+          <p className="font-jetbrains text-[var(--text-muted)] text-sm">
             Affects {selectedIds.size} selected product{selectedIds.size !== 1 ? "s" : ""}.
           </p>
 
@@ -593,12 +593,12 @@ export function InventoryClient() {
               {barcodeModal.product_name}
             </p>
             <div
-              className="bg-[#e0e5ec] p-4 inline-block rounded-xl"
-              style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+              className="bg-[var(--background)] p-4 inline-block rounded-xl"
+              style={{ boxShadow: "var(--shadow-recessed)" }}
             >
-              <p className="font-mono text-[#2d3436] text-xl font-bold tracking-widest">{barcodeModal.barcode}</p>
+              <p className="font-mono text-[var(--text)] text-xl font-bold tracking-widest">{barcodeModal.barcode}</p>
             </div>
-            <p className="font-jetbrains text-[#babecc] text-xs">ID: {barcodeModal.barcode}</p>
+            <p className="font-jetbrains text-[var(--text-dim)] text-xs">ID: {barcodeModal.barcode}</p>
           </div>
         )}
       </Modal>

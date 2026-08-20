@@ -25,12 +25,12 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
     <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-6">
-        <Link href="/products" className="flex items-center gap-1.5 font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] hover:text-[#ff4757] transition-colors">
+        <Link href="/products" className="flex items-center gap-1.5 font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] hover:text-[#ff4757] transition-colors">
           <ArrowLeft className="w-3 h-3" />
           Products
         </Link>
-        <span className="text-[#babecc] font-jetbrains text-[9px]">/</span>
-        <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#babecc]">
+        <span className="text-[var(--text-dim)] font-jetbrains text-[9px]">/</span>
+        <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-dim)]">
           {product.category}
         </span>
       </div>
@@ -38,8 +38,8 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Image */}
         <div
-          className="aspect-square bg-[#d1d9e6] rounded-2xl overflow-hidden"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="aspect-square bg-[var(--muted)] rounded-2xl overflow-hidden"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           {product.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -55,25 +55,25 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
         <div className="space-y-4">
           {/* Category */}
           <div>
-            <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">
+            <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
               {product.category}
             </span>
           </div>
 
           {/* Name */}
-          <h1 className="font-sans text-xl font-black text-[#2d3436] tracking-tight leading-tight">
+          <h1 className="font-sans text-xl font-black text-[var(--text)] tracking-tight leading-tight">
             {product.product_name}
           </h1>
 
           {/* SKU */}
-          <div className="font-jetbrains text-[10px] text-[#babecc]">
-            SKU: <span className="text-[#4a5568]">{product.sku}</span>
+          <div className="font-jetbrains text-[10px] text-[var(--text-dim)]">
+            SKU: <span className="text-[var(--text-muted)]">{product.sku}</span>
           </div>
 
           {/* Price */}
           <div
-            className="inline-block bg-[#e0e5ec] px-4 py-2 rounded-xl"
-            style={{ boxShadow: "4px 4px 10px #babecc, -4px -4px 10px #ffffff" }}
+            className="inline-block bg-[var(--background)] px-4 py-2 rounded-xl"
+            style={{ boxShadow: "var(--shadow-sm)" }}
           >
             <span className="font-jetbrains text-2xl font-black text-[#ff4757]">
               ${Number(product.price).toFixed(2)}
@@ -102,11 +102,11 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
           {/* Notes */}
           {product.notes && (
             <div
-              className="bg-[#e0e5ec] rounded-xl p-3"
-              style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+              className="bg-[var(--background)] rounded-xl p-3"
+              style={{ boxShadow: "var(--shadow-recessed)" }}
             >
-              <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[#4a5568] mb-1">Notes</div>
-              <p className="font-jetbrains text-xs text-[#4a5568] leading-relaxed">{product.notes}</p>
+              <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-muted)] mb-1">Notes</div>
+              <p className="font-jetbrains text-xs text-[var(--text-muted)] leading-relaxed">{product.notes}</p>
             </div>
           )}
 
@@ -115,14 +115,14 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
 
           {/* How ordering works */}
           <div
-            className="bg-[#e0e5ec] rounded-xl p-4 space-y-1.5"
-            style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+            className="bg-[var(--background)] rounded-xl p-4 space-y-1.5"
+            style={{ boxShadow: "var(--shadow-recessed)" }}
           >
-            <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[#4a5568] mb-2">How it works</div>
+            <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-muted)] mb-2">How it works</div>
             {["Add to cart", "Submit your request with name + phone", "We contact you to confirm"].map((step, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="font-jetbrains text-[8px] text-[#ff4757] font-bold w-4">{i + 1}.</span>
-                <span className="font-jetbrains text-[10px] text-[#4a5568]">{step}</span>
+                <span className="font-jetbrains text-[10px] text-[var(--text-muted)]">{step}</span>
               </div>
             ))}
           </div>
@@ -130,8 +130,8 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       </div>
 
       {/* Back link */}
-      <div className="mt-8 pt-6" style={{ borderTop: "1px solid #babecc" }}>
-        <Link href="/products" className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568] hover:text-[#ff4757] transition-colors flex items-center gap-1.5">
+      <div className="mt-8 pt-6" style={{ borderTop: "1px solid var(--border-shadow)" }}>
+        <Link href="/products" className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)] hover:text-[#ff4757] transition-colors flex items-center gap-1.5">
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to all products
         </Link>

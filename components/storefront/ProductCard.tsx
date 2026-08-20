@@ -42,20 +42,20 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`} className="group block">
       <div
         className={cn(
-          "bg-[#e0e5ec] rounded-2xl transition-all duration-300",
+          "bg-[var(--background)] rounded-2xl transition-all duration-300",
           outOfStock
             ? "opacity-65"
             : "hover:-translate-y-1"
         )}
         style={{
           boxShadow: outOfStock
-            ? "4px 4px 10px #babecc, -4px -4px 10px #ffffff"
-            : "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+            ? "var(--shadow-sm)"
+            : "var(--shadow-card)",
         }}
       >
         {/* Image */}
-        <div className="aspect-square overflow-hidden bg-[#d1d9e6] rounded-t-2xl relative"
-          style={{ borderBottom: "1px solid #babecc" }}
+        <div className="aspect-square overflow-hidden bg-[var(--muted)] rounded-t-2xl relative"
+          style={{ borderBottom: "1px solid var(--border-shadow)" }}
         >
           {product.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -72,9 +72,9 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Out of stock overlay */}
           {outOfStock && (
-            <div className="absolute inset-0 bg-[#e0e5ec]/70 flex items-center justify-center">
-              <span className="font-jetbrains text-[10px] font-black text-[#c0392b] uppercase tracking-widest px-3 py-1.5 bg-[#e0e5ec] rounded-lg"
-                style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+            <div className="absolute inset-0 bg-[var(--background)/70] flex items-center justify-center">
+              <span className="font-jetbrains text-[10px] font-black text-[#c0392b] uppercase tracking-widest px-3 py-1.5 bg-[var(--background)] rounded-lg"
+                style={{ boxShadow: "var(--shadow-inner-md)" }}
               >
                 Out of Stock
               </span>
@@ -84,8 +84,8 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Low stock indicator */}
           {!outOfStock && product.quantity <= 10 && (
             <div className="absolute top-2 right-2">
-              <span className="font-jetbrains text-[8px] font-black text-[#c0602a] uppercase tracking-wider px-1.5 py-0.5 bg-[#e0e5ec] rounded-md"
-                style={{ boxShadow: "2px 2px 4px #babecc, -1px -1px 2px #ffffff" }}
+              <span className="font-jetbrains text-[8px] font-black text-[#c0602a] uppercase tracking-wider px-1.5 py-0.5 bg-[var(--background)] rounded-md"
+                style={{ boxShadow: "var(--shadow-sm)" }}
               >
                 Low Stock
               </span>
@@ -95,10 +95,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* Content */}
         <div className="p-3 space-y-2">
-          <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[#4a5568]">
+          <div className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-muted)]">
             {product.category}
           </div>
-          <h3 className="font-sans text-xs font-bold text-[#2d3436] line-clamp-2 leading-tight group-hover:text-[#ff4757] transition-colors">
+          <h3 className="font-sans text-xs font-bold text-[var(--text)] line-clamp-2 leading-tight group-hover:text-[#ff4757] transition-colors">
             {product.product_name}
           </h3>
 
@@ -112,7 +112,7 @@ export function ProductCard({ product }: ProductCardProps) {
               className={cn(
                 "flex items-center gap-1 font-jetbrains text-[8px] uppercase tracking-wider px-2 py-1.5 rounded-lg transition-all",
                 outOfStock
-                  ? "text-[#babecc] cursor-not-allowed opacity-40"
+                  ? "text-[var(--text-dim)] cursor-not-allowed opacity-40"
                   : "text-white bg-[#ff4757] active:translate-y-px"
               )}
               style={!outOfStock ? {

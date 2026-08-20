@@ -151,12 +151,12 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
           {/* Main form */}
           <div className="lg:col-span-2 space-y-5">
             <div
-              className="bg-[#e0e5ec] rounded-2xl p-5 space-y-5"
-              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              className="bg-[var(--background)] rounded-2xl p-5 space-y-5"
+              style={{ boxShadow: "var(--shadow-card)" }}
             >
               {/* Section heading */}
-              <div className="pb-3" style={{ borderBottom: "1px solid #babecc" }}>
-                <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+              <div className="pb-3" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
+                <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
                   Product Information
                 </h2>
               </div>
@@ -232,7 +232,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                 <div>
                   <label className="label">Price *</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-jetbrains text-[#babecc] text-sm">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-jetbrains text-[var(--text-dim)] text-sm">$</span>
                     <input
                       {...register("price")}
                       type="number"
@@ -263,7 +263,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   </span>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-jetbrains text-[#babecc] text-sm">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-jetbrains text-[var(--text-dim)] text-sm">$</span>
                   <input
                     {...register("cost")}
                     type="number"
@@ -273,7 +273,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                     className="input-field pl-7"
                   />
                 </div>
-                <p className="font-jetbrains text-[9px] text-[#babecc]">
+                <p className="font-jetbrains text-[9px] text-[var(--text-dim)]">
                   Used for margin and profit calculations. Not visible to customers.
                 </p>
                 {errors.cost && (
@@ -289,7 +289,7 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
                   placeholder="e.g. 012345678901"
                   className="input-field"
                 />
-                <p className="font-jetbrains text-[9px] text-[#babecc] mt-1">
+                <p className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-1">
                   For barcode scanner support
                 </p>
               </div>
@@ -310,8 +310,8 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
           <div className="space-y-5">
             {/* Image upload */}
             <div
-              className="bg-[#e0e5ec] rounded-2xl p-5"
-              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              className="bg-[var(--background)] rounded-2xl p-5"
+              style={{ boxShadow: "var(--shadow-card)" }}
             >
               <ImageUpload
                 currentImageUrl={imageUrl}
@@ -322,10 +322,10 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
 
             {/* Actions */}
             <div
-              className="bg-[#e0e5ec] rounded-2xl p-5 space-y-3"
-              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              className="bg-[var(--background)] rounded-2xl p-5 space-y-3"
+              style={{ boxShadow: "var(--shadow-card)" }}
             >
-              <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+              <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
                 Actions
               </h2>
 
@@ -379,24 +379,24 @@ export function ProductFormWrapper({ product }: ProductFormWrapperProps) {
             {/* Product meta */}
             {isEditing && product && (
               <div
-                className="bg-[#e0e5ec] rounded-2xl p-5 space-y-2"
-                style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+                className="bg-[var(--background)] rounded-2xl p-5 space-y-2"
+                style={{ boxShadow: "var(--shadow-card)" }}
               >
-                <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+                <h2 className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
                   Record Info
                 </h2>
                 <div className="font-jetbrains text-xs space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-[#babecc]">ID</span>
+                    <span className="text-[var(--text-dim)]">ID</span>
                     <span className="text-[#0984e3] font-bold">#{product.id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#babecc]">Created</span>
-                    <span className="text-[#4a5568]">{new Date(product.created_at).toLocaleDateString()}</span>
+                    <span className="text-[var(--text-dim)]">Created</span>
+                    <span className="text-[var(--text-muted)]">{new Date(product.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#babecc]">Updated</span>
-                    <span className="text-[#4a5568]">{new Date(product.updated_at).toLocaleDateString()}</span>
+                    <span className="text-[var(--text-dim)]">Updated</span>
+                    <span className="text-[var(--text-muted)]">{new Date(product.updated_at).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>

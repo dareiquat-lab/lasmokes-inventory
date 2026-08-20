@@ -71,10 +71,10 @@ export function Sidebar() {
       {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-[#e0e5ec] rounded-lg p-2"
-        style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+        className="md:hidden fixed top-4 left-4 z-50 bg-[var(--background)] rounded-lg p-2"
+        style={{ boxShadow: "var(--shadow-sm)" }}
       >
-        <Menu className="w-5 h-5 text-[#4a5568]" />
+        <Menu className="w-5 h-5 text-[var(--text-muted)]" />
       </button>
 
       {/* Mobile overlay */}
@@ -85,7 +85,7 @@ export function Sidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setMobileOpen(false)}
-            className="md:hidden fixed inset-0 bg-[#2d3436]/40 z-40 backdrop-blur-sm"
+            className="md:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
           />
         )}
       </AnimatePresence>
@@ -98,8 +98,8 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="md:hidden fixed left-0 top-0 bottom-0 w-64 bg-[#e0e5ec] z-50 flex flex-col"
-            style={{ boxShadow: "8px 0 24px #babecc" }}
+            className="md:hidden fixed left-0 top-0 bottom-0 w-64 bg-[var(--background)] z-50 flex flex-col"
+            style={{ boxShadow: "var(--shadow-sidebar)" }}
           >
             <SidebarContent onClose={() => setMobileOpen(false)} showClose />
           </motion.div>
@@ -108,8 +108,8 @@ export function Sidebar() {
 
       {/* Desktop sidebar */}
       <div
-        className="hidden md:flex w-56 bg-[#e0e5ec] flex-col flex-shrink-0"
-        style={{ boxShadow: "4px 0 12px #babecc" }}
+        className="hidden md:flex w-56 bg-[var(--background)] flex-col flex-shrink-0"
+        style={{ boxShadow: "var(--shadow-sidebar)" }}
       >
         <SidebarContent />
       </div>
@@ -128,7 +128,7 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
   return (
     <>
       {/* Logo */}
-      <div className="px-4 py-5 relative" style={{ borderBottom: "1px solid #babecc" }}>
+      <div className="px-4 py-5 relative" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
@@ -138,16 +138,16 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
               <span className="text-base">🏪</span>
             </div>
             <div>
-              <div className="font-jetbrains text-xs font-black text-[#2d3436] leading-tight tracking-wider uppercase">
+              <div className="font-jetbrains text-xs font-black text-[var(--text)] leading-tight tracking-wider uppercase">
                 LA SMOKES WHOLESALE
               </div>
-              <div className="font-jetbrains text-[8px] text-[#4a5568] leading-tight tracking-widest uppercase">
+              <div className="font-jetbrains text-[8px] text-[var(--text-muted)] leading-tight tracking-widest uppercase">
                 Admin Portal
               </div>
             </div>
           </div>
           {showClose && (
-            <button onClick={onClose} className="text-[#babecc] hover:text-[#ff4757] transition-colors p-1">
+            <button onClick={onClose} className="text-[var(--text-dim)] hover:text-[#ff4757] transition-colors p-1">
               <X className="w-5 h-5" />
             </button>
           )}
@@ -155,19 +155,19 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
       </div>
 
       {/* System status */}
-      <div className="px-4 py-2" style={{ borderBottom: "1px solid #babecc" }}>
+      <div className="px-4 py-2" style={{ borderBottom: "1px solid var(--border-shadow)" }}>
         <div className="flex items-center gap-1.5">
           <span
             className="w-2 h-2 rounded-full bg-green-500 animate-pulse"
             style={{ boxShadow: "0 0 5px rgba(34,197,94,0.8)" }}
           />
-          <span className="font-jetbrains text-[8px] text-[#4a5568] uppercase tracking-widest">System Online</span>
+          <span className="font-jetbrains text-[8px] text-[var(--text-muted)] uppercase tracking-widest">System Online</span>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        <div className="font-jetbrains text-[8px] text-[#babecc] uppercase tracking-widest px-3 py-2">
+        <div className="font-jetbrains text-[8px] text-[var(--text-dim)] uppercase tracking-widest px-3 py-2">
           Navigation
         </div>
         {navLinks.map((link) => (
@@ -175,7 +175,7 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
         ))}
 
         {/* Storefront link */}
-        <div className="font-jetbrains text-[8px] text-[#babecc] uppercase tracking-widest px-3 py-2 mt-3">
+        <div className="font-jetbrains text-[8px] text-[var(--text-dim)] uppercase tracking-widest px-3 py-2 mt-3">
           Storefront
         </div>
         <Link
@@ -190,7 +190,7 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
       </nav>
 
       {/* Logout */}
-      <div className="p-3" style={{ borderTop: "1px solid #babecc" }}>
+      <div className="p-3" style={{ borderTop: "1px solid var(--border-shadow)" }}>
         <button
           onClick={handleLogout}
           className="sidebar-link sidebar-link-inactive w-full text-left text-[#c0392b] hover:text-[#c0392b] hover:bg-[#c0392b10]"
@@ -198,7 +198,7 @@ function SidebarContent({ onClose, showClose }: { onClose?: () => void; showClos
           <LogOut className="w-4 h-4 flex-shrink-0" />
           <span>Logout</span>
         </button>
-        <div className="font-jetbrains text-[9px] text-[#babecc] mt-3 leading-relaxed">
+        <div className="font-jetbrains text-[9px] text-[var(--text-dim)] mt-3 leading-relaxed">
           <div>v1.0.0 // LASMOKES-WHL</div>
         </div>
       </div>

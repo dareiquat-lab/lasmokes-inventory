@@ -96,34 +96,34 @@ function ModeCard({
       className={cn(
         "flex-1 text-left rounded-2xl p-5 transition-all duration-150 border-2",
         selected
-          ? "border-[#ff4757] bg-[#e0e5ec]"
-          : "border-transparent bg-[#e0e5ec]"
+          ? "border-[#ff4757] bg-[var(--background)]"
+          : "border-transparent bg-[var(--background)]"
       )}
       style={{
         boxShadow: selected
-          ? "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff, 0 0 0 2px #ff4757"
-          : "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+          ? "var(--shadow-inner-md), 0 0 0 2px #ff4757"
+          : "var(--shadow-card)",
       }}
     >
       <div className="flex items-start gap-3">
         <div
           className={cn(
             "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
-            selected ? "bg-[#ff4757]" : "bg-[#e0e5ec]"
+            selected ? "bg-[#ff4757]" : "bg-[var(--background)]"
           )}
           style={
             selected
               ? {}
-              : { boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }
+              : { boxShadow: "var(--shadow-inner-md)" }
           }
         >
-          <Icon className={cn("w-5 h-5", selected ? "text-white" : "text-[#babecc]")} />
+          <Icon className={cn("w-5 h-5", selected ? "text-white" : "text-[var(--text-dim)]")} />
         </div>
         <div>
-          <div className="font-jetbrains text-xs font-black uppercase tracking-wider text-[#2d3436]">
+          <div className="font-jetbrains text-xs font-black uppercase tracking-wider text-[var(--text)]">
             {title}
           </div>
-          <div className="font-jetbrains text-[10px] text-[#4a5568] mt-1 leading-relaxed">
+          <div className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-1 leading-relaxed">
             {description}
           </div>
         </div>
@@ -150,17 +150,17 @@ function Thumbnail({
 
   return (
     <div
-      className="relative rounded-xl overflow-hidden flex items-center justify-center bg-[#e0e5ec]"
+      className="relative rounded-xl overflow-hidden flex items-center justify-center bg-[var(--background)]"
       style={{
         width: 80,
         height: 80,
-        boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff",
+        boxShadow: "var(--shadow-inner-md)",
       }}
     >
       {isPdf ? (
         <div className="flex flex-col items-center gap-1">
-          <FileText className="w-6 h-6 text-[#4a5568]" />
-          <span className="font-jetbrains text-[8px] text-[#4a5568]">PDF</span>
+          <FileText className="w-6 h-6 text-[var(--text-muted)]" />
+          <span className="font-jetbrains text-[8px] text-[var(--text-muted)]">PDF</span>
         </div>
       ) : url ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -219,18 +219,18 @@ function OrderCard({
 
   return (
     <div
-      className="bg-[#e0e5ec] rounded-2xl p-5 space-y-4"
-      style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+      className="bg-[var(--background)] rounded-2xl p-5 space-y-4"
+      style={{ boxShadow: "var(--shadow-card)" }}
     >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568]">
+        <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
           Order {index + 1}
         </div>
         {total > 1 && (
           <button
             onClick={onRemove}
-            className="font-jetbrains text-[9px] text-[#babecc] hover:text-[#c0392b] transition-colors uppercase tracking-widest"
+            className="font-jetbrains text-[9px] text-[var(--text-dim)] hover:text-[#c0392b] transition-colors uppercase tracking-widest"
           >
             Remove this order
           </button>
@@ -254,7 +254,7 @@ function OrderCard({
           </div>
           <button
             onClick={() => onChange({ ...order, warnDismissed: true })}
-            className="text-[#babecc] hover:text-[#636e72]"
+            className="text-[var(--text-dim)] hover:text-[#636e72]"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -319,7 +319,7 @@ function OrderCard({
 
       {/* Items */}
       <div>
-        <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+        <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
           Items
         </div>
         <div className="space-y-3">
@@ -342,27 +342,27 @@ function OrderCard({
                 <div className="flex items-center flex-shrink-0">
                   <button
                     onClick={() => setItemQty(i, item.quantity - 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-l-lg text-[#4a5568] hover:text-[#ff4757]"
-                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                    className="w-8 h-8 flex items-center justify-center rounded-l-lg text-[var(--text-muted)] hover:text-[#ff4757]"
+                    style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
                   >
                     <Minus className="w-3 h-3" />
                   </button>
                   <div
-                    className="w-10 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[#2d3436]"
-                    style={{ background: "#e0e5ec", boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
+                    className="w-10 h-8 flex items-center justify-center font-jetbrains text-sm font-black text-[var(--text)]"
+                    style={{ background: "var(--background)", boxShadow: "var(--shadow-inner-sm)" }}
                   >
                     {item.quantity}
                   </div>
                   <button
                     onClick={() => setItemQty(i, item.quantity + 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-r-lg text-[#4a5568] hover:text-[#ff4757]"
-                    style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff", background: "#e0e5ec" }}
+                    className="w-8 h-8 flex items-center justify-center rounded-r-lg text-[var(--text-muted)] hover:text-[#ff4757]"
+                    style={{ boxShadow: "var(--shadow-sm)", background: "var(--background)" }}
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">
                     $
                   </span>
                   <input
@@ -383,9 +383,9 @@ function OrderCard({
       {/* Running total */}
       <div
         className="flex items-center justify-between px-3 py-2 rounded-xl"
-        style={{ boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff" }}
+        style={{ boxShadow: "var(--shadow-inner-md)" }}
       >
-        <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">
+        <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
           Order Total
         </span>
         <span className="font-jetbrains text-sm font-black text-[#ff4757]">
@@ -414,11 +414,11 @@ function InvoiceTable({
       {items.map((item, i) => (
         <div
           key={i}
-          className="bg-[#e0e5ec] rounded-2xl p-4 space-y-3"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl p-4 space-y-3"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           {/* Row number */}
-          <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[#babecc]">
+          <div className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-dim)]">
             Item {i + 1}
           </div>
 
@@ -457,7 +457,7 @@ function InvoiceTable({
             <div>
               <label className="label">Unit Cost</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[#babecc]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">
                   $
                 </span>
                 <input
@@ -764,7 +764,7 @@ export function ImportClient() {
             <div className="font-jetbrains text-[10px] font-black uppercase tracking-wider text-[#ff4757]">
               ANTHROPIC_API_KEY not configured
             </div>
-            <div className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">
+            <div className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-0.5">
               Add ANTHROPIC_API_KEY to your .env.local file to enable AI parsing.
             </div>
           </div>
@@ -776,7 +776,7 @@ export function ImportClient() {
         <>
           {/* Mode selector */}
           <div>
-            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
               Import Mode
             </div>
             <div className="flex gap-4">
@@ -799,7 +799,7 @@ export function ImportClient() {
 
           {/* Drop zone */}
           <div>
-            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[#4a5568] mb-3">
+            <div className="font-jetbrains text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-3">
               Upload Files
             </div>
 
@@ -819,19 +819,19 @@ export function ImportClient() {
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
                 className="flex flex-col items-center justify-center gap-3 rounded-2xl cursor-pointer transition-all duration-150 py-12 px-6"
-                style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+                style={{ boxShadow: "var(--shadow-recessed)" }}
               >
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                  style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+                  style={{ boxShadow: "var(--shadow-sm)" }}
                 >
-                  <Upload className="w-6 h-6 text-[#babecc]" />
+                  <Upload className="w-6 h-6 text-[var(--text-dim)]" />
                 </div>
                 <div className="text-center">
-                  <div className="font-jetbrains text-xs font-black text-[#2d3436] uppercase tracking-wider">
+                  <div className="font-jetbrains text-xs font-black text-[var(--text)] uppercase tracking-wider">
                     Tap to select files
                   </div>
-                  <div className="font-jetbrains text-[10px] text-[#babecc] mt-1">
+                  <div className="font-jetbrains text-[10px] text-[var(--text-dim)] mt-1">
                     or drag and drop — {mode === "invoice" ? "images or PDFs" : "images"}
                   </div>
                 </div>
@@ -846,11 +846,11 @@ export function ImportClient() {
                   {/* Add more tile */}
                   <label
                     htmlFor="file-upload-input"
-                    className="cursor-pointer rounded-xl flex flex-col items-center justify-center gap-1 text-[#babecc] hover:text-[#4a5568] transition-colors"
+                    className="cursor-pointer rounded-xl flex flex-col items-center justify-center gap-1 text-[var(--text-dim)] hover:text-[var(--text-muted)] transition-colors"
                     style={{
                       width: 80,
                       height: 80,
-                      boxShadow: "inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff",
+                      boxShadow: "var(--shadow-inner-md)",
                     }}
                   >
                     <Plus className="w-5 h-5" />
@@ -858,7 +858,7 @@ export function ImportClient() {
                   </label>
                 </div>
 
-                <div className="font-jetbrains text-[10px] text-[#babecc]">
+                <div className="font-jetbrains text-[10px] text-[var(--text-dim)]">
                   {files.length} file{files.length !== 1 ? "s" : ""} selected
                 </div>
               </div>
@@ -900,10 +900,10 @@ export function ImportClient() {
         <>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-sans text-lg font-black text-[#2d3436]">
+              <div className="font-sans text-lg font-black text-[var(--text)]">
                 {reviewOrders.length} order{reviewOrders.length !== 1 ? "s" : ""} extracted
               </div>
-              <div className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">
+              <div className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-0.5">
                 Review and edit before saving
               </div>
             </div>
@@ -918,11 +918,11 @@ export function ImportClient() {
 
           {reviewOrders.length === 0 ? (
             <div
-              className="bg-[#e0e5ec] rounded-2xl p-8 flex flex-col items-center gap-3"
-              style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+              className="bg-[var(--background)] rounded-2xl p-8 flex flex-col items-center gap-3"
+              style={{ boxShadow: "var(--shadow-card)" }}
             >
-              <FileImage className="w-8 h-8 text-[#babecc]" />
-              <p className="font-jetbrains text-xs text-[#babecc] uppercase tracking-widest">
+              <FileImage className="w-8 h-8 text-[var(--text-dim)]" />
+              <p className="font-jetbrains text-xs text-[var(--text-dim)] uppercase tracking-widest">
                 No orders found in these screenshots
               </p>
             </div>
@@ -980,10 +980,10 @@ export function ImportClient() {
         <>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-sans text-lg font-black text-[#2d3436]">
+              <div className="font-sans text-lg font-black text-[var(--text)]">
                 {invoiceItems.length} line item{invoiceItems.length !== 1 ? "s" : ""} extracted
               </div>
-              <div className="font-jetbrains text-[10px] text-[#4a5568] mt-0.5">
+              <div className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-0.5">
                 Review before importing to inventory
               </div>
             </div>
@@ -1030,20 +1030,20 @@ export function ImportClient() {
       {/* ── STEP: DONE ───────────────────────────────────────────────────────── */}
       {step === "done" && (
         <div
-          className="bg-[#e0e5ec] rounded-2xl p-10 flex flex-col items-center gap-4"
-          style={{ boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff" }}
+          className="bg-[var(--background)] rounded-2xl p-10 flex flex-col items-center gap-4"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+            style={{ boxShadow: "var(--shadow-recessed)" }}
           >
             <CheckCircle className="w-8 h-8 text-[#00b894]" />
           </div>
           <div className="text-center">
-            <div className="font-sans text-lg font-black text-[#2d3436]">
+            <div className="font-sans text-lg font-black text-[var(--text)]">
               {mode === "order" ? "Orders created!" : "Inventory updated!"}
             </div>
-            <div className="font-jetbrains text-[10px] text-[#4a5568] mt-1 flex items-center gap-2 justify-center">
+            <div className="font-jetbrains text-[10px] text-[var(--text-muted)] mt-1 flex items-center gap-2 justify-center">
               <Loader2 className="w-3 h-3 animate-spin" />
               Redirecting…
             </div>

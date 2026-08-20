@@ -22,7 +22,7 @@ export function CartSheet() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeCart}
-            className="fixed inset-0 z-50 bg-[#2d3436]/30 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
           />
 
           {/* Panel */}
@@ -31,25 +31,25 @@ export function CartSheet() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-[#e0e5ec] flex flex-col"
-            style={{ boxShadow: "-8px 0 24px #babecc" }}
+            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-[var(--background)] flex flex-col"
+            style={{ boxShadow: "var(--shadow-sidebar-left)" }}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4"
-              style={{ borderBottom: "1px solid #babecc" }}
+              style={{ borderBottom: "1px solid var(--border-shadow)" }}
             >
               <div>
-                <h2 className="font-jetbrains text-sm font-black text-[#2d3436] tracking-wider uppercase">
+                <h2 className="font-jetbrains text-sm font-black text-[var(--text)] tracking-wider uppercase">
                   Order Cart
                 </h2>
-                <p className="font-jetbrains text-[8px] text-[#4a5568] uppercase tracking-widest mt-0.5">
+                <p className="font-jetbrains text-[8px] text-[var(--text-muted)] uppercase tracking-widest mt-0.5">
                   {count} item{count !== 1 ? "s" : ""}
                 </p>
               </div>
               <button
                 onClick={closeCart}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#babecc] hover:text-[#ff4757] transition-colors"
-                style={{ boxShadow: "3px 3px 6px #babecc, -3px -3px 6px #ffffff" }}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-dim)] hover:text-[#ff4757] transition-colors"
+                style={{ boxShadow: "var(--shadow-sm)" }}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -67,12 +67,12 @@ export function CartSheet() {
                   {items.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-40 gap-3">
                       <div
-                        className="w-16 h-16 rounded-full flex items-center justify-center bg-[#e0e5ec]"
-                        style={{ boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }}
+                        className="w-16 h-16 rounded-full flex items-center justify-center bg-[var(--background)]"
+                        style={{ boxShadow: "var(--shadow-recessed)" }}
                       >
-                        <ShoppingCart className="w-7 h-7 text-[#babecc]" />
+                        <ShoppingCart className="w-7 h-7 text-[var(--text-dim)]" />
                       </div>
-                      <p className="font-jetbrains text-[9px] text-[#babecc] uppercase tracking-widest">
+                      <p className="font-jetbrains text-[9px] text-[var(--text-dim)] uppercase tracking-widest">
                         Cart is empty
                       </p>
                     </div>
@@ -80,13 +80,13 @@ export function CartSheet() {
                     items.map(item => (
                       <div
                         key={item.id}
-                        className="flex gap-3 bg-[#e0e5ec] rounded-xl p-3"
-                        style={{ boxShadow: "4px 4px 10px #babecc, -4px -4px 10px #ffffff" }}
+                        className="flex gap-3 bg-[var(--background)] rounded-xl p-3"
+                        style={{ boxShadow: "var(--shadow-sm)" }}
                       >
                         {/* Thumbnail */}
                         <div
-                          className="w-12 h-12 flex-shrink-0 bg-[#d1d9e6] overflow-hidden rounded-lg"
-                          style={{ boxShadow: "inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff" }}
+                          className="w-12 h-12 flex-shrink-0 bg-[var(--muted)] overflow-hidden rounded-lg"
+                          style={{ boxShadow: "var(--shadow-inner-sm)" }}
                         >
                           {item.image_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -100,10 +100,10 @@ export function CartSheet() {
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <p className="font-sans text-[9px] font-bold text-[#2d3436] leading-tight truncate">
+                          <p className="font-sans text-[9px] font-bold text-[var(--text)] leading-tight truncate">
                             {item.product_name}
                           </p>
-                          <p className="font-jetbrains text-[9px] text-[#4a5568] mt-0.5">{item.sku}</p>
+                          <p className="font-jetbrains text-[9px] text-[var(--text-muted)] mt-0.5">{item.sku}</p>
                           <p className="font-jetbrains text-xs text-[#ff4757] font-bold mt-1">
                             ${(Number(item.price) * item.quantity).toFixed(2)}
                           </p>
@@ -113,24 +113,24 @@ export function CartSheet() {
                         <div className="flex flex-col items-end gap-1.5">
                           <button
                             onClick={() => removeItem(item.id)}
-                            className="text-[#babecc] hover:text-[#c0392b] transition-colors"
+                            className="text-[var(--text-dim)] hover:text-[#c0392b] transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => updateQty(item.id, item.quantity - 1)}
-                              className="w-5 h-5 flex items-center justify-center text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] rounded-md transition-all"
-                              style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
+                              className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-[#ff4757] bg-[var(--background)] rounded-md transition-all"
+                              style={{ boxShadow: "var(--shadow-sm)" }}
                             >
                               <Minus className="w-2.5 h-2.5" />
                             </button>
-                            <span className="font-jetbrains text-xs text-[#2d3436] w-5 text-center font-bold">{item.quantity}</span>
+                            <span className="font-jetbrains text-xs text-[var(--text)] w-5 text-center font-bold">{item.quantity}</span>
                             <button
                               onClick={() => updateQty(item.id, item.quantity + 1)}
                               disabled={item.quantity >= item.stock}
-                              className="w-5 h-5 flex items-center justify-center text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] rounded-md transition-all disabled:opacity-30"
-                              style={{ boxShadow: "2px 2px 4px #babecc, -2px -2px 4px #ffffff" }}
+                              className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-[#ff4757] bg-[var(--background)] rounded-md transition-all disabled:opacity-30"
+                              style={{ boxShadow: "var(--shadow-sm)" }}
                             >
                               <Plus className="w-2.5 h-2.5" />
                             </button>
@@ -143,16 +143,16 @@ export function CartSheet() {
 
                 {/* Footer */}
                 {items.length > 0 && (
-                  <div className="px-5 py-4 space-y-3" style={{ borderTop: "1px solid #babecc" }}>
+                  <div className="px-5 py-4 space-y-3" style={{ borderTop: "1px solid var(--border-shadow)" }}>
                     <div className="flex items-center justify-between">
-                      <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[#4a5568]">
+                      <span className="font-jetbrains text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
                         Subtotal
                       </span>
                       <span className="font-jetbrains text-sm font-bold text-[#ff4757]">
                         ${subtotal.toFixed(2)}
                       </span>
                     </div>
-                    <p className="font-jetbrains text-[9px] text-[#babecc] leading-relaxed">
+                    <p className="font-jetbrains text-[9px] text-[var(--text-dim)] leading-relaxed">
                       No payment required. Submit your request and we will contact you.
                     </p>
                     <button
@@ -164,7 +164,7 @@ export function CartSheet() {
                     </button>
                     <button
                       onClick={clearCart}
-                      className="w-full font-jetbrains text-[9px] uppercase tracking-wider text-[#babecc] hover:text-[#c0392b] transition-colors py-1"
+                      className="w-full font-jetbrains text-[9px] uppercase tracking-wider text-[var(--text-dim)] hover:text-[#c0392b] transition-colors py-1"
                     >
                       Clear Cart
                     </button>

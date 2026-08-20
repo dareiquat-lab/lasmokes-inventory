@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useCart } from "./CartContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ThemeProvider";
 
 const links = [
   { href: "/",           label: "Home"       },
@@ -22,8 +23,8 @@ export function StorefrontNav() {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-50 h-16 bg-[#e0e5ec]/95 backdrop-blur-md"
-        style={{ boxShadow: "0 2px 12px #babecc, 0 -1px 0 #ffffff" }}
+        className="fixed top-0 left-0 right-0 z-50 h-16 bg-[var(--background)] backdrop-blur-md"
+        style={{ boxShadow: "0 2px 12px var(--nm-dark), 0 -1px 0 var(--nm-light)" }}
       >
         <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
           {/* Logo */}
@@ -35,8 +36,8 @@ export function StorefrontNav() {
               <span className="text-sm">🏪</span>
             </div>
             <div className="hidden sm:block">
-              <div className="font-jetbrains text-xs font-black text-[#2d3436] tracking-wider uppercase leading-tight">LA SMOKES</div>
-              <div className="font-jetbrains text-[8px] font-bold text-[#4a5568] tracking-widest uppercase leading-tight">WHOLESALE</div>
+              <div className="font-jetbrains text-xs font-black text-[var(--text)] tracking-wider uppercase leading-tight">LA SMOKES</div>
+              <div className="font-jetbrains text-[8px] font-bold text-[var(--text-muted)] tracking-widest uppercase leading-tight">WHOLESALE</div>
             </div>
           </Link>
 
@@ -50,12 +51,9 @@ export function StorefrontNav() {
                   "font-jetbrains text-[9px] uppercase tracking-widest px-3 py-2 rounded-lg transition-all",
                   pathname === link.href
                     ? "text-[#ff4757] font-bold"
-                    : "text-[#4a5568] hover:text-[#2d3436]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text)]"
                 )}
-                style={pathname === link.href
-                  ? { boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }
-                  : undefined
-                }
+                style={pathname === link.href ? { boxShadow: "var(--shadow-recessed)" } : undefined}
               >
                 {link.label}
               </Link>
@@ -64,11 +62,15 @@ export function StorefrontNav() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            <ThemeToggle
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-dim)] hover:text-[var(--accent)] transition-colors"
+            />
+
             {/* Cart */}
             <button
               onClick={openCart}
               className="relative flex items-center gap-1.5 font-jetbrains text-[9px] uppercase tracking-wider px-3 py-2 text-[#ff4757] rounded-lg transition-all"
-              style={{ boxShadow: "4px 4px 8px #babecc, -4px -4px 8px #ffffff" }}
+              style={{ boxShadow: "var(--shadow-sm)" }}
             >
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden sm:inline font-bold">Cart</span>
@@ -85,7 +87,7 @@ export function StorefrontNav() {
             {/* Admin link */}
             <Link
               href="/admin"
-              className="hidden sm:flex font-jetbrains text-[8px] uppercase tracking-widest px-2 py-1.5 text-[#babecc] rounded-lg hover:text-[#4a5568] transition-all"
+              className="hidden sm:flex font-jetbrains text-[8px] uppercase tracking-widest px-2 py-1.5 text-[var(--text-dim)] rounded-lg hover:text-[var(--text-muted)] transition-all"
             >
               Admin
             </Link>
@@ -93,7 +95,7 @@ export function StorefrontNav() {
             {/* Mobile menu */}
             <button
               onClick={() => setMobileOpen(o => !o)}
-              className="md:hidden text-[#4a5568] hover:text-[#ff4757] transition-colors p-1"
+              className="md:hidden text-[var(--text-muted)] hover:text-[#ff4757] transition-colors p-1"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -108,8 +110,8 @@ export function StorefrontNav() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="fixed top-16 left-0 right-0 z-40 bg-[#e0e5ec] p-4 space-y-1 md:hidden"
-            style={{ boxShadow: "0 8px 20px #babecc" }}
+            className="fixed top-16 left-0 right-0 z-40 bg-[var(--background)] p-4 space-y-1 md:hidden"
+            style={{ boxShadow: "0 8px 20px var(--nm-dark)" }}
           >
             {links.map(link => (
               <Link
@@ -120,12 +122,9 @@ export function StorefrontNav() {
                   "block font-jetbrains text-[9px] uppercase tracking-widest px-3 py-3 rounded-lg transition-all",
                   pathname === link.href
                     ? "text-[#ff4757] font-bold"
-                    : "text-[#4a5568] hover:text-[#2d3436]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text)]"
                 )}
-                style={pathname === link.href
-                  ? { boxShadow: "inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff" }
-                  : undefined
-                }
+                style={pathname === link.href ? { boxShadow: "var(--shadow-recessed)" } : undefined}
               >
                 {link.label}
               </Link>
@@ -133,7 +132,7 @@ export function StorefrontNav() {
             <Link
               href="/admin"
               onClick={() => setMobileOpen(false)}
-              className="block font-jetbrains text-[8px] uppercase tracking-widest px-3 py-3 text-[#babecc] hover:text-[#4a5568] transition-all"
+              className="block font-jetbrains text-[8px] uppercase tracking-widest px-3 py-3 text-[var(--text-dim)] hover:text-[var(--text-muted)] transition-all"
             >
               Admin Login
             </Link>
