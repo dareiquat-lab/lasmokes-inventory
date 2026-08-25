@@ -194,6 +194,10 @@ export async function ensureProductCostColumn() {
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS cost NUMERIC(10,2) NOT NULL DEFAULT 0`;
 }
 
+export async function ensureOrderItemsCostColumn() {
+  await sql`ALTER TABLE order_items ADD COLUMN IF NOT EXISTS cost NUMERIC(10,2) NOT NULL DEFAULT 0`;
+}
+
 export async function getDashboardStats() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -211,7 +215,7 @@ export async function getDashboardStats() {
     sql`SELECT COUNT(*) as count FROM orders WHERE status = 'new'`.catch(() => [{ count: 0 }]),
     sql`
       SELECT
-        COALESCE(SUM((oi.price - COALESCE(p.cost, 0)) * oi.quantity), 0) as total_profit,
+        COALESCE(SUM((oi.price - COALESCE(NULLIF(oi.cost, 0), p.cost, 0)) * oi.quantity), 0) as total_profit,
         COALESCE(SUM(oi.price * oi.quantity), 0) as total_revenue
       FROM orders o
       JOIN order_items oi ON oi.order_id = o.id
@@ -341,7 +345,7 @@ export async function createOrder(data: {
   tobacco_license_number?: string | null;
   sellers_permit_number?: string | null;
   client_id?: number | null;
-  items: { product_id: number; product_name: string; product_sku: string; quantity: number; price: number }[];
+  items: { product_id: number | null; product_name: string; product_sku: string | null; quantity: number; price: number; cost?: number }[];
 }) {
   await ensureOrderClientColumn();
   const orderNumber = generateOrderNumber();
@@ -364,11 +368,13 @@ export async function createOrder(data: {
   `;
   const order = orderResult[0] as Order;
 
+  await ensureOrderItemsCostColumn();
+
   if (data.items.length > 0) {
     for (const item of data.items) {
       await sql`
-        INSERT INTO order_items (order_id, product_id, product_name, product_sku, quantity, price)
-        VALUES (${order.id}, ${item.product_id}, ${item.product_name}, ${item.product_sku}, ${item.quantity}, ${item.price})
+        INSERT INTO order_items (order_id, product_id, product_name, product_sku, quantity, price, cost)
+        VALUES (${order.id}, ${item.product_id}, ${item.product_name}, ${item.product_sku}, ${item.quantity}, ${item.price}, ${item.cost ?? 0})
       `;
     }
   }
@@ -385,9 +391,10 @@ export async function updateOrder(id: number, data: {
   tobacco_license_number?: string | null;
   sellers_permit_number?: string | null;
   client_id?: number | null;
-  items: { product_id: number | null; product_name: string; product_sku: string | null; quantity: number; price: number }[];
+  items: { product_id: number | null; product_name: string; product_sku: string | null; quantity: number; price: number; cost?: number }[];
 }) {
   await ensureOrderClientColumn();
+  await ensureOrderItemsCostColumn();
 
   const clientId = data.client_id !== undefined
     ? data.client_id
@@ -417,8 +424,8 @@ export async function updateOrder(id: number, data: {
 
   for (const item of data.items) {
     await sql`
-      INSERT INTO order_items (order_id, product_id, product_name, product_sku, quantity, price)
-      VALUES (${id}, ${item.product_id}, ${item.product_name}, ${item.product_sku}, ${item.quantity}, ${item.price})
+      INSERT INTO order_items (order_id, product_id, product_name, product_sku, quantity, price, cost)
+      VALUES (${id}, ${item.product_id}, ${item.product_name}, ${item.product_sku}, ${item.quantity}, ${item.price}, ${item.cost ?? 0})
     `;
   }
 
@@ -581,7 +588,7 @@ export async function getProfitData(filters?: { startDate?: string; endDate?: st
     // Stats for the selected date range
     sql`
       SELECT
-        COALESCE(SUM((oi.price - COALESCE(p.cost, 0)) * oi.quantity), 0) AS total_profit,
+        COALESCE(SUM((oi.price - COALESCE(NULLIF(oi.cost, 0), p.cost, 0)) * oi.quantity), 0) AS total_profit,
         COALESCE(SUM(oi.price * oi.quantity), 0) AS total_revenue,
         COALESCE(SUM(oi.quantity), 0) AS total_units_sold,
         COUNT(DISTINCT o.id) AS total_orders
@@ -595,7 +602,7 @@ export async function getProfitData(filters?: { startDate?: string; endDate?: st
     // All-time totals (always shown regardless of filter)
     sql`
       SELECT
-        COALESCE(SUM((oi.price - COALESCE(p.cost, 0)) * oi.quantity), 0) AS total_profit,
+        COALESCE(SUM((oi.price - COALESCE(NULLIF(oi.cost, 0), p.cost, 0)) * oi.quantity), 0) AS total_profit,
         COALESCE(SUM(oi.price * oi.quantity), 0) AS total_revenue,
         COUNT(DISTINCT o.id) AS total_orders
       FROM orders o

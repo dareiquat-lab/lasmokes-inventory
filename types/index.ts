@@ -53,6 +53,7 @@ export interface OrderItem {
   product_sku: string | null;
   quantity: number;
   price: number;
+  cost: number;
 }
 
 export interface Order {

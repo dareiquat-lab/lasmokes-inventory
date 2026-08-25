@@ -287,6 +287,7 @@ interface NewItem {
   product_sku: string | null;
   quantity: number;
   price: number;
+  cost: number;
 }
 
 // ─── ItemsEditor ──────────────────────────────────────────────────────────────
@@ -309,6 +310,7 @@ function ItemsEditor({
   const [customName, setCustomName] = useState("");
   const [customSku, setCustomSku] = useState("");
   const [customPrice, setCustomPrice] = useState("");
+  const [customCost, setCustomCost] = useState("");
   const [saveToCatalog, setSaveToCatalog] = useState(false);
   const [customCategory, setCustomCategory] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
@@ -359,7 +361,7 @@ function ItemsEditor({
     setItems(prev => {
       const exists = prev.find(i => i.product_id === p.id);
       if (exists) return prev.map(i => i.product_id === p.id ? { ...i, quantity: i.quantity + 1 } : i);
-      return [...prev, { product_id: p.id, product_name: p.product_name, product_sku: p.sku, quantity: 1, price: Number(p.price) }];
+      return [...prev, { product_id: p.id, product_name: p.product_name, product_sku: p.sku, quantity: 1, price: Number(p.price), cost: Number(p.cost ?? 0) }];
     });
     setProductSearch("");
     setShowDropdown(false);
@@ -369,6 +371,7 @@ function ItemsEditor({
     setCustomName("");
     setCustomSku("");
     setCustomPrice("");
+    setCustomCost("");
     setSaveToCatalog(false);
     setCustomCategory("");
     setCustomError("");
@@ -420,6 +423,7 @@ function ItemsEditor({
         product_sku: customSku.trim() || null,
         quantity: 1,
         price,
+        cost: parseFloat(customCost) || 0,
       },
     ]);
     resetCustomForm();
@@ -433,6 +437,10 @@ function ItemsEditor({
 
   const updatePrice = (i: number, price: number) => {
     setItems(prev => prev.map((item, idx) => idx === i ? { ...item, price } : item));
+  };
+
+  const updateCost = (i: number, cost: number) => {
+    setItems(prev => prev.map((item, idx) => idx === i ? { ...item, cost } : item));
   };
 
   const removeItem = (i: number) => setItems(prev => prev.filter((_, idx) => idx !== i));
@@ -539,6 +547,21 @@ function ItemsEditor({
                   step="0.01"
                   value={customPrice}
                   onChange={e => setCustomPrice(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="label">Cost (admin)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">$</span>
+                <input
+                  className="input-field pl-6"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={customCost}
+                  onChange={e => setCustomCost(e.target.value)}
                   placeholder="0.00"
                 />
               </div>
@@ -653,16 +676,33 @@ function ItemsEditor({
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
-              <div className="relative flex-shrink-0 w-24">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">$</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className="input-field pl-6 pr-2 text-right"
-                  value={item.price}
-                  onChange={e => updatePrice(i, parseFloat(e.target.value) || 0)}
-                />
+              <div className="flex-shrink-0 flex flex-col items-end gap-0.5">
+                <span className="font-jetbrains text-[8px] uppercase tracking-widest text-[var(--text-dim)]">Cost</span>
+                <div className="relative w-20">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="input-field pl-5 pr-1 text-right text-xs"
+                    value={item.cost}
+                    onChange={e => updateCost(i, parseFloat(e.target.value) || 0)}
+                  />
+                </div>
+              </div>
+              <div className="flex-shrink-0 flex flex-col items-end gap-0.5">
+                <span className="font-jetbrains text-[8px] uppercase tracking-widest text-[#ff4757]">Price</span>
+                <div className="relative w-20">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 font-jetbrains text-xs text-[var(--text-dim)]">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="input-field pl-5 pr-1 text-right text-xs"
+                    value={item.price}
+                    onChange={e => updatePrice(i, parseFloat(e.target.value) || 0)}
+                  />
+                </div>
               </div>
               <button
                 onClick={() => removeItem(i)}
@@ -907,6 +947,7 @@ function EditOrderModal({
           product_sku: i.product_sku,
           quantity: i.quantity,
           price: Number(i.price),
+          cost: Number(i.cost ?? 0),
         }))
       );
       setError("");
